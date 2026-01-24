@@ -35,49 +35,39 @@
 	</view>
 </template>
 
-<script>
-	import uniIcons from '../uni-icons/uni-icons.vue'
-	export default {
-		name: 'UniSteps',
-		components: {
-			uniIcons
-		},
-		props: {
-			direction: {
-				// 排列方向 row column
-				type: String,
-				default: 'row'
-			},
-			activeColor: {
-				// 激活状态颜色
-				type: String,
-				default: '#FAB714'
-			},
-			deactiveColor: {
-				// 未激活状态颜色
-				type: String,
-				default: '#cccccc'
-			},
-			active: {
-				// 当前步骤
-				type: Number,
-				default: 0
-			},
-			options: {
-				type: Array,
-				default () {
-					return []
-				}
-			} ,// 数据
-			last: {
-				type: Boolean,
-				default: false
-			}
-		},
-		data() {
-			return {}
-		}
+<script setup>
+import uniIcons from '../uni-icons/uni-icons.vue'
+
+const props = defineProps({
+	direction: {
+		// 排列方向 row column
+		type: String,
+		default: 'row'
+	},
+	activeColor: {
+		// 激活状态颜色
+		type: String,
+		default: '#FAB714'
+	},
+	deactiveColor: {
+		// 未激活状态颜色
+		type: String,
+		default: '#cccccc'
+	},
+	active: {
+		// 当前步骤
+		type: Number,
+		default: 0
+	},
+	options: {
+		type: Array,
+		default: () => []
+	}, // 数据
+	last: {
+		type: Boolean,
+		default: false
 	}
+})
 </script>
 
 <style lang="scss" scoped>

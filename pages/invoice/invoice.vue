@@ -66,24 +66,16 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '../../components/list-cell/list-cell.vue'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			return {
-				form: {
-					taitou: 0,
-					username: '',
-					email: '',
-					telphone: ''
-				}
-			}
-		}
-	}
+<script setup>
+import { reactive } from 'vue'
+import listCell from '../../components/list-cell/list-cell.vue'
+
+const form = reactive({
+	taitou: 0,
+	username: '',
+	email: '',
+	telphone: ''
+})
 </script>
 
 <style lang="scss" scoped>

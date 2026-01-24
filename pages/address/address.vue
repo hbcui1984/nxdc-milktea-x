@@ -27,80 +27,75 @@
 	</view>
 </template>
 
-<script>
-	import {mapState, mapMutations} from 'vuex'
-	import uniSwipeAction from '../../components/uni-swipe-action/uni-swipe-action'
-	import uniSwipeActionItem from '../../components/uni-swipe-action-item/uni-swipe-action-item'
-	
-	export default {
-		components: {
-			uniSwipeAction,
-			uniSwipeActionItem
-		},
-		data() {
-			return {
-				scene: 'menu',
-				is_choose: false, //是否选择地址
-				swipeOption: [
-					{
-						text: '删除',
-						style: {
-							backgroundColor: '#D12E32'
-						}
-					}
-				]
-			}
-		},
-		computed: {
-			...mapState(['addresses'])
-		},
-		async onLoad({is_choose, scene}) {
-			this.is_choose = is_choose || false
-			this.scene = scene || 'menu'
-		},
-		methods: {
-			...mapMutations(['SET_ADDRESS', 'SET_ADDRESSES', 'SET_ORDER_TYPE']),
-			add() {
-				uni.navigateTo({
-					url: '/pages/address/add'
-				})
-			},
-			edit(id) {
-				uni.navigateTo({
-					url: '/pages/address/add?id=' + id
-				})
-			},
-			handleSwipeClick(id) {
-				uni.showModal({
-					title: '提示',
-					content: '确定要删除？',
-					success: res => {
-						if(res.confirm) {
-							const index = this.addresses.findIndex(item => item.id == id)
-							const addresses = JSON.parse(JSON.stringify(this.addresses))
-							addresses.splice(index, 1)
-							this.SET_ADDRESSES(addresses)
-							uni.showToast({title: '删除成功！', icon: 'success'})
-						}
-					}
-				})
-			},
-			chooseAddress(address) {
-				if(!this.is_choose) return
-				this.SET_ADDRESS(address)
-				this.SET_ORDER_TYPE('takeout')
-				if(this.scene == 'menu') {
-					uni.switchTab({
-						url: '/pages/menu/menu'
-					})
-				} else if(this.scene == 'pay') {
-					uni.navigateTo({
-						url: '/pages/pay/pay'
-					})
-				}
-			}
+<script setup>
+import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import uniSwipeAction from '../../components/uni-swipe-action/uni-swipe-action'
+import uniSwipeActionItem from '../../components/uni-swipe-action-item/uni-swipe-action-item'
+
+const store = useStore()
+
+const scene = ref('menu')
+const is_choose = ref(false)
+const swipeOption = ref([
+	{
+		text: '删除',
+		style: {
+			backgroundColor: '#D12E32'
 		}
 	}
+])
+
+const addresses = computed(() => store.state.addresses)
+
+onLoad((options) => {
+	is_choose.value = options.is_choose || false
+	scene.value = options.scene || 'menu'
+})
+
+const add = () => {
+	uni.navigateTo({
+		url: '/pages/address/add'
+	})
+}
+
+const edit = (id) => {
+	uni.navigateTo({
+		url: '/pages/address/add?id=' + id
+	})
+}
+
+const handleSwipeClick = (id) => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要删除？',
+		success: res => {
+			if(res.confirm) {
+				const index = addresses.value.findIndex(item => item.id == id)
+				const newAddresses = JSON.parse(JSON.stringify(addresses.value))
+				newAddresses.splice(index, 1)
+				store.commit('SET_ADDRESSES', newAddresses)
+				uni.showToast({title: '删除成功！', icon: 'success'})
+			}
+		}
+	})
+}
+
+const chooseAddress = (address) => {
+	if(!is_choose.value) return
+	store.commit('SET_ADDRESS', address)
+	store.commit('SET_ORDER_TYPE', 'takeout')
+	if(scene.value == 'menu') {
+		uni.switchTab({
+			url: '/pages/menu/menu'
+		})
+	} else if(scene.value == 'pay') {
+		uni.navigateTo({
+			url: '/pages/pay/pay'
+		})
+	}
+}
 </script>
 
 <style lang="scss" scoped>

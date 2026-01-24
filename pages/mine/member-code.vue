@@ -54,61 +54,61 @@
 	</view>
 </template>
 
-<script>
-import {mapState} from 'vuex'
+<script setup>
+import { computed, getCurrentInstance } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
 import uQRCode from '@/common/uqrcode'
 
-export default {
-	data() {
-		return {
+const store = useStore()
+const instance = getCurrentInstance()
+
+const member = computed(() => store.state.member)
+
+const makeMemberCode = (i) => {
+	uQRCode.make({
+		canvasId: 'memberCode',
+		componentInstance: instance,
+		text: `memberCode${i}`,
+		size: uni.upx2px(350),
+		margin: 20,
+		backgroundColor: '#ffffff',
+		foregroundColor: '#000000',
+		fileType: 'jpg',
+		correctLevel: uQRCode.defaults.correctLevel,
+		success: res => {
+			console.log(res)
 		}
-	},
-	onShow() {
-		let i = 1
-		this.makeMemberCode(i)
-		
-		setInterval(() => {
-			i++
-			this.makeMemberCode(i)
-		}, 30000)
-	},
-	computed: {
-		...mapState(['member'])
-	},
-	methods: {
-		makeMemberCode(i) {
-			uQRCode.make({
-				canvasId: 'memberCode',
-				componentInstance: this,
-				text: `memberCode${i}`,
-				size: uni.upx2px(350),
-				margin: 20,
-				backgroundColor: '#ffffff',
-				foregroundColor: '#000000',
-				fileType: 'jpg',
-				correctLevel: uQRCode.defaults.correctLevel,
-				success: res => {
-					console.log(res)
-				}
-			})
-		},
-		integrals() {
-			uni.navigateTo({
-				url: '/pages/integrals/integrals'
-			})
-		},
-		balance() {
-			uni.navigateTo({
-				url: '/pages/balance/balance'
-			})
-		},
-		coupons() {
-			uni.navigateTo({
-				url: '/pages/coupons/coupons'
-			})
-		}
-	}
-};
+	})
+}
+
+onShow(() => {
+	let i = 1
+	makeMemberCode(i)
+	
+	setInterval(() => {
+		i++
+		makeMemberCode(i)
+	}, 30000)
+})
+
+const integrals = () => {
+	uni.navigateTo({
+		url: '/pages/integrals/integrals'
+	})
+}
+
+const balance = () => {
+	uni.navigateTo({
+		url: '/pages/balance/balance'
+	})
+}
+
+const coupons = () => {
+	uni.navigateTo({
+		url: '/pages/coupons/coupons'
+	})
+}
 </script>
 
 <style lang="scss" scoped>

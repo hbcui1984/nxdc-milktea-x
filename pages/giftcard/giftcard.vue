@@ -65,33 +65,34 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				giftCards: {},
-				currentTab: 0,
-				giftCardType: 0,
-				myCards: []
-			}
-		},
-		async onShow() {
-			this.giftCards = await this.$api('giftCards')
-		},
-		methods: {
-			switchTab(index) {
-				if(this.currentTab == index) return
-				this.currentTab = index
-			},
-			switchGiftCardType(index) {
-				if(this.giftCardType == index) return
-				this.giftCardType = index
-			},
-			handleSwiperItemChange() {
-				return true
-			}
-		}
-	}
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+
+const { proxy } = getCurrentInstance()
+
+const giftCards = ref({})
+const currentTab = ref(0)
+const giftCardType = ref(0)
+const myCards = ref([])
+
+onShow(async () => {
+	giftCards.value = await proxy.$api('giftCards')
+})
+
+const switchTab = (index) => {
+	if(currentTab.value == index) return
+	currentTab.value = index
+}
+
+const switchGiftCardType = (index) => {
+	if(giftCardType.value == index) return
+	giftCardType.value = index
+}
+
+const handleSwiperItemChange = () => {
+	return true
+}
 </script>
 
 <style lang="scss" scoped>

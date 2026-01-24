@@ -13,66 +13,64 @@
 	</view>
 </template>
 
-<script>
-export default {
-	name: "ListCell",
-	props: {
-		 //是否有箭头
-		arrow: {
-			type: Boolean,
-			default: false
-		},
-		//是否有点击效果
-		hover: {
-			type: Boolean,
-			default: true
-		},
-		//left 30rpx
-		lineLeft:{
-			type: Boolean,
-			default: false
-		},
-		//right 30rpx
-		lineRight:{
-			type: Boolean,
-			default: false
-		},
-		padding:{
-			type:String,
-			default:"26rpx 30rpx"
-		},
-		last: {
-			type: Boolean,
-			default: false //最后一条数据隐藏线条
-		},
-		radius:{
-			type:Boolean,
-			default:false
-		},
-		bgcolor: {
-			type: String,
-			default: "#fff" //背景颜色
-		},
-		size: {
-			type: Number,
-			default: 28 //字体大小
-		},
-		color: {
-			type: String,
-			default: "#5A5B5C" //字体颜色
-		},
-		index: {
-			type: Number,
-			default: 0
-		}
+<script setup>
+const props = defineProps({
+	//是否有箭头
+	arrow: {
+		type: Boolean,
+		default: false
 	},
-	methods: {
-		handleClick() {
-			this.$emit('click', {
-				index: this.index
-			});
-		}
+	//是否有点击效果
+	hover: {
+		type: Boolean,
+		default: true
+	},
+	//left 30rpx
+	lineLeft:{
+		type: Boolean,
+		default: false
+	},
+	//right 30rpx
+	lineRight:{
+		type: Boolean,
+		default: false
+	},
+	padding:{
+		type:String,
+		default:"26rpx 30rpx"
+	},
+	last: {
+		type: Boolean,
+		default: false //最后一条数据隐藏线条
+	},
+	radius:{
+		type:Boolean,
+		default:false
+	},
+	bgcolor: {
+		type: String,
+		default: "#fff" //背景颜色
+	},
+	size: {
+		type: Number,
+		default: 28 //字体大小
+	},
+	color: {
+		type: String,
+		default: "#5A5B5C" //字体颜色
+	},
+	index: {
+		type: Number,
+		default: 0
 	}
+})
+
+const emit = defineEmits(['click'])
+
+const handleClick = () => {
+	emit('click', {
+		index: props.index
+	})
 }
 </script>
 

@@ -43,36 +43,35 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			return {
-				form: {
-					accept_name: '',
-					sex: 0,
-					mobile: '',
-					street: '',
-					door_number: ''
-				}
-			}
-		},
-		async onLoad({id}) {
-			//为了方便演示，这里用本地缓存
-			if(id) {
-				this.form = this.$store.state.addresses.find(item => item.id == id)
-			}
-		},
-		methods: {
-			save() {
-				uni.navigateBack()
-			}
+<script setup>
+import { reactive } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+
+const store = useStore()
+
+const form = reactive({
+	accept_name: '',
+	sex: 0,
+	mobile: '',
+	street: '',
+	door_number: ''
+})
+
+onLoad((options) => {
+	//为了方便演示，这里用本地缓存
+	if(options.id) {
+		const address = store.state.addresses.find(item => item.id == options.id)
+		if(address) {
+			Object.assign(form, address)
 		}
 	}
+})
+
+const save = () => {
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

@@ -50,46 +50,39 @@
 	</view>
 </template>
 
-<script>
-	import Member from '@/api/member'
-	import {mapMutations} from 'vuex'
-	
-	export default {
-		data() {
-			return {
-				
-			}
-		},
-		methods: {
-			...mapMutations(['SET_MEMBER']),
-			async getUserInfo(e) {
-				const {errMsg, userInfo} = e.detail
-				if(errMsg !== "getUserInfo:ok") {
-					uni.showModal({
-						title: '提示',
-						content: '您取消了授权登录，请重新授权',
-						showCancel: false
-					})
-					
-					//没有授权登录就用默认的用户信息
-					this.SET_MEMBER(Member)
-					uni.navigateBack()
-					
-					return
-				} else {
-					const {avatarUrl: avatar, city, country, gender, nickName: nickname, province} = userInfo
-					const member = Object.assign(Member, {avatar, city, country, gender, nickname, province})
-					this.SET_MEMBER(member)
-					
-					uni.navigateBack()
-				}
-			},
-			login() {
-				this.SET_MEMBER(Member)
-				uni.navigateBack()
-			}
-		}
+<script setup>
+import { useStore } from 'vuex'
+import Member from '@/api/member'
+
+const store = useStore()
+
+const getUserInfo = (e) => {
+	const { errMsg, userInfo } = e.detail
+	if (errMsg !== "getUserInfo:ok") {
+		uni.showModal({
+			title: '提示',
+			content: '您取消了授权登录，请重新授权',
+			showCancel: false
+		})
+
+		//没有授权登录就用默认的用户信息
+		store.commit('SET_MEMBER', Member)
+		uni.navigateBack()
+
+		return
+	} else {
+		const { avatarUrl: avatar, city, country, gender, nickName: nickname, province } = userInfo
+		const member = Object.assign(Member, { avatar, city, country, gender, nickname, province })
+		store.commit('SET_MEMBER', member)
+
+		uni.navigateBack()
 	}
+}
+
+const login = () => {
+	store.commit('SET_MEMBER', Member)
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

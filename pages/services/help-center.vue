@@ -31,14 +31,8 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				
-			}
-		}
-	}
+<script setup>
+// No data or methods needed for this static page
 </script>
 
 <style lang="scss" scoped>

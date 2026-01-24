@@ -29,53 +29,46 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	import rateFormItem from './rate-form-item'
-	
-	export default {
-		components: {
-			listCell,
-			rateFormItem
-		},
-		data() {
-			return {
-				form: {
-					score_service: 0,
-					score_order: 0,
-					score_speed: 0,
-					score_product: 0,
-					score_enviroment: 0,
-					opinion: ''
-				},
-				storename: '',
-				typeCate: 1,
-				date: ''
-			}
-		},
-		onLoad({storename, typeCate, date}) {
-			this.storename = storename
-			this.typeCate = typeCate
-			this.date = date
-		},
-		methods: {
-			submit() {
-				if(!this.form.score_service || !this.form.score_order || !this.form.score_speed || !this.form.score_product || !this.form.score_enviroment){
-					uni.showToast({
-						title: '请先选择评论内容',
-						icon: 'none'
-					})
-					return
-				}
-				
-				uni.showToast({
-					title: '提交成功'
-				})
-				
-				uni.navigateBack()
-			}
-		}
+<script setup>
+import { ref, reactive } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import listCell from '@/components/list-cell/list-cell'
+import rateFormItem from './rate-form-item'
+
+const form = reactive({
+	score_service: 0,
+	score_order: 0,
+	score_speed: 0,
+	score_product: 0,
+	score_enviroment: 0,
+	opinion: ''
+})
+
+const storename = ref('')
+const typeCate = ref(1)
+const date = ref('')
+
+onLoad((options) => {
+	storename.value = options.storename
+	typeCate.value = options.typeCate
+	date.value = options.date
+})
+
+const submit = () => {
+	if(!form.score_service || !form.score_order || !form.score_speed || !form.score_product || !form.score_enviroment){
+		uni.showToast({
+			title: '请先选择评论内容',
+			icon: 'none'
+		})
+		return
 	}
+	
+	uni.showToast({
+		title: '提交成功'
+	})
+	
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

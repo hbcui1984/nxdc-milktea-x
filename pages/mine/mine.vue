@@ -167,128 +167,134 @@
 	</view>
 </template>
 
-<script>
-	import {mapState, mapGetters} from 'vuex'
-	export default {
-		data() {
-			return {
-				newIcon: 'https://img-shop.qmimg.cn/s16/images/2020/05/12/ffb0613dded704b6.png'
-			}
-		},
-		computed: {
-			...mapState(['member']),
-			...mapGetters(['isLogin']),
-			growthValue() {
-				if(!this.isLogin) return 0
-				const {currentValue, needValue} = this.member
-				return currentValue / (currentValue + needValue) * 100
-			}
-		},
-		onLoad() {
-		},
-		methods: {
-			login() {
-				uni.navigateTo({
-					url: '/pages/login/login'
-				})
-			},
-			packages() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/packages/index'
-				})
-			},
-			balance() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/balance/balance'
-				})
-			},
-			addresses() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/address/address'
-				})
-			},
-			integrals() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/integrals/integrals'
-				})
-			},
-			attendance() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/attendance/attendance'
-				})
-			},
-			orders() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/orders/orders'
-				})
-			},
-			memberCode() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/mine/member-code'
-				})
-			},
-			coupons() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/coupons/coupons'
-				})
-			},
-			userinfo() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/mine/userinfo'
-				})
-			},
-			services() {
-				uni.navigateTo({
-					url: '/pages/services/services'
-				})
-			},
-			giftCards() {
-				if(!this.isLogin) {
-					this.login()
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/giftcard/giftcard'
-				})
-			}
-		}
+<script setup>
+import { ref, computed } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const newIcon = ref('https://img-shop.qmimg.cn/s16/images/2020/05/12/ffb0613dded704b6.png')
+
+const member = computed(() => store.state.member)
+const isLogin = computed(() => store.getters.isLogin)
+
+const growthValue = computed(() => {
+	if (!isLogin.value) return 0
+	const { currentValue, needValue } = member.value
+	return currentValue / (currentValue + needValue) * 100
+})
+
+const login = () => {
+	uni.navigateTo({
+		url: '/pages/login/login'
+	})
+}
+
+const packages = () => {
+	if (!isLogin.value) {
+		login()
+		return
 	}
+	uni.navigateTo({
+		url: '/pages/packages/index'
+	})
+}
+
+const balance = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/balance/balance'
+	})
+}
+
+const addresses = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/address/address'
+	})
+}
+
+const integrals = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/integrals/integrals'
+	})
+}
+
+const attendance = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/attendance/attendance'
+	})
+}
+
+const orders = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/orders/orders'
+	})
+}
+
+const memberCode = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/mine/member-code'
+	})
+}
+
+const coupons = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/coupons/coupons'
+	})
+}
+
+const userinfo = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/mine/userinfo'
+	})
+}
+
+const services = () => {
+	uni.navigateTo({
+		url: '/pages/services/services'
+	})
+}
+
+const giftCards = () => {
+	if (!isLogin.value) {
+		login()
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/giftcard/giftcard'
+	})
+}
 </script>
 
 <style lang="scss" scoped>

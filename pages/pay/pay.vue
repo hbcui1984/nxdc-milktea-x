@@ -6,7 +6,7 @@
 					<list-cell class="location">
 						<view class="flex-fill d-flex justify-content-between align-items-center">
 							<view class="store-name flex-fill">
-								{{ store.name }}
+								{{ storeInfo.name }}
 							</view>
 							<image src="/static/images/navigator-1.png" class="arrow"></image>
 						</view>
@@ -81,16 +81,16 @@
 						</view>
 					</list-cell>
 					<template v-if="orderType == 'takeout'">
-						<list-cell last v-if="store.packing_fee > 0">
+						<list-cell last v-if="storeInfo.packing_fee > 0">
 							<view class="w-100 d-flex font-size-base align-items-center justify-content-between">
 								<view>包装费</view>
-								<view>￥{{ parseFloat(store.packing_fee) }}</view>
+								<view>￥{{ parseFloat(storeInfo.packing_fee) }}</view>
 							</view>
 						</list-cell>
-						<list-cell last v-if="store.delivery_cost > 0">
+						<list-cell last v-if="storeInfo.delivery_cost > 0">
 							<view class="w-100 d-flex font-size-base align-items-center justify-content-between">
 								<view>配送费</view>
-								<view>￥{{ parseFloat(store.delivery_cost) }}</view>
+								<view>￥{{ parseFloat(storeInfo.delivery_cost) }}</view>
 							</view>
 						</list-cell>
 					</template>
@@ -183,78 +183,80 @@
 	</view>
 </template>
 
-<script>
-	import {mapState, mapMutations} from 'vuex'
-	import listCell from '@/components/list-cell/list-cell'
-	import modal from '@/components/modal/modal'
-	import orders from '@/api/orders'
-	
-	export default {
-		components: {
-			listCell,
-			modal
-		},
-		data() {
-			return {
-				cart: [],
-				form: {
-					remark: ''
-				},
-				ensureAddressModalVisible: false
-			}
-		},
-		computed: {
-			...mapState(['orderType', 'address', 'store']),
-			total() {
-				return this.cart.reduce((acc, cur) => acc + cur.number * cur.price, 0)
-			},
-			amount() {
-				return this.cart.reduce((acc, cur) => acc + cur.number * cur.price, 0)
-			}
-		},
-		onLoad(option) {
-			const {remark} = option
-			this.cart = uni.getStorageSync('cart')
-			remark && this.$set(this.form, 'remark', remark)
-		},
-		methods: {
-			...mapMutations(['SET_ORDER']),
-			goToRemark() {
-				uni.navigateTo({
-					url: '/pages/remark/remark?remark=' + this.form.remark
-				})
-			},
-			chooseAddress() {
-				uni.navigateTo({
-					url: '/pages/address/address?is_choose=true&scene=pay'
-				})
-			},
-			goToPackages() {
-				uni.navigateTo({
-					url: '/pages/packages/index'
-				})
-			},
-			submit() {
-				if(this.orderType == 'takeout') {
-					this.ensureAddressModalVisible = true
-				} else {
-					this.pay()
-				}
-			},
-			pay() {
-				uni.showLoading({title: '加载中'})
-				//测试订单
-				let order = this.orderType == 'takein' ? orders[0] : orders[1]
-				order = Object.assign(order, {status: 1})
-				this.SET_ORDER(order)
-				uni.removeStorageSync('cart')
-				uni.reLaunch({
-					url: '/pages/take-foods/take-foods'
-				})
-				uni.hideLoading()
-			}
-		}
+<script setup>
+import { ref, reactive, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+import modal from '@/components/modal/modal'
+import orders from '@/api/orders'
+
+const store = useStore()
+
+const cart = ref([])
+const form = reactive({
+	remark: ''
+})
+const ensureAddressModalVisible = ref(false)
+
+const orderType = computed(() => store.state.orderType)
+const address = computed(() => store.state.address)
+const storeInfo = computed(() => store.state.store)
+
+const total = computed(() => {
+	return cart.value.reduce((acc, cur) => acc + cur.number * cur.price, 0)
+})
+
+const amount = computed(() => {
+	return cart.value.reduce((acc, cur) => acc + cur.number * cur.price, 0)
+})
+
+const goToRemark = () => {
+	uni.navigateTo({
+		url: '/pages/remark/remark?remark=' + form.remark
+	})
+}
+
+const chooseAddress = () => {
+	uni.navigateTo({
+		url: '/pages/address/address?is_choose=true&scene=pay'
+	})
+}
+
+const goToPackages = () => {
+	uni.navigateTo({
+		url: '/pages/packages/index'
+	})
+}
+
+const submit = () => {
+	if (orderType.value == 'takeout') {
+		ensureAddressModalVisible.value = true
+	} else {
+		pay()
 	}
+}
+
+const pay = () => {
+	uni.showLoading({ title: '加载中' })
+	//测试订单
+	let order = orderType.value == 'takein' ? orders[0] : orders[1]
+	order = Object.assign(order, { status: 1 })
+	store.commit('SET_ORDER', order)
+	uni.removeStorageSync('cart')
+	uni.reLaunch({
+		url: '/pages/take-foods/take-foods'
+	})
+	uni.hideLoading()
+}
+
+onLoad((option) => {
+	const { remark } = option
+	cart.value = uni.getStorageSync('cart')
+	if (remark) {
+		form.remark = remark
+	}
+})
 </script>
 
 <style lang="scss" scoped>

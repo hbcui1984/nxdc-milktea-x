@@ -1,7 +1,7 @@
 <template>
 	<view class="container">
 		<view class="orders-list d-flex flex-column w-100" style="padding: 20rpx; padding-bottom: 0;">
-			<view class="order-item" v-for="(item, index) in orders" :key="index" style="margin-bottom: 30rpx;" @tap="detail(item.id)">
+			<view class="order-item" v-for="(item, index) in orderList" :key="index" style="margin-bottom: 30rpx;" @tap="detail(item.id)">
 				<list-cell :hover="false">
 					<view class="w-100 d-flex align-items-center">
 						<view class="flex-fill d-flex flex-column">
@@ -22,7 +22,7 @@
 						</view>
 						<view class="d-flex justify-content-between align-items-center" style="margin-bottom: 30rpx;">
 							<view class="font-size-sm text-color-assist">
-								{{ $util.formatDateTime(item.created_at) }}
+								{{ formatDateTime(item.created_at) }}
 							</view>
 							<view class="d-flex font-size-sm text-color-base align-items-center">
 								<view style="margin-right: 10rpx;">共{{ item.goods_num }}件商品，实付</view>
@@ -45,78 +45,81 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			return {
-				page: 1,
-				pageSize: 5,
-				orders: []
-			}
-		},
-		computed: {
-			orderGoodsName() {
-				return (goods) => {
-					let arr = []
-					goods.forEach(good => arr.push(good.name + '*' + good.number))
-					return arr.join('，')
-				}
-			}
-		},
-		async onLoad() {
-			if(!this.$store.getters.isLogin) {
-				uni.navigateTo({url: '/pages/login/login'})
-			}
-			await this.getOrders(false)
-		},
-		async onReachBottom() {
-			await this.getOrders(false)
-		},
-		async onPullDownRefresh() {
-			await this.getOrders(true)
-		},
-		methods: {
-			async getOrders(isRefresh = false) {
-				uni.showLoading({
-					title: '加载中'
-				})
-				
-				let orders = await this.$api('orders')
-				if(isRefresh) {
-					this.orders = []
-					this.page = 1
-				}
-				orders = orders.slice(this.pageSize * (this.page - 1), this.pageSize * this.page)
-				if(orders.length) {
-					this.orders = this.orders.concat(orders)
-					this.page += 1
-				}
-				
-				uni.hideLoading()
-			},
-			detail(id) {
-				uni.navigateTo({
-					url: '/pages/orders/detail?id=' + id
-				})
-			},
-			review(order) {
-				const date = order.completed_time.split(' ')[0]
-				uni.navigateTo({
-					url: '/pages/review/review?storename=' + order.store.name + '&typeCate=' + order.typeCate + '&date=' + date
-				})
-			},
-			goToInvoice() {
-				uni.navigateTo({
-					url: '/pages/invoice/invoice'
-				})
-			}
-		}
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onLoad, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+
+const store = useStore()
+const { proxy } = getCurrentInstance()
+
+const page = ref(1)
+const pageSize = ref(5)
+const orderList = ref([])
+
+const orderGoodsName = (goods) => {
+	let arr = []
+	goods.forEach(good => arr.push(good.name + '*' + good.number))
+	return arr.join('，')
+}
+
+const formatDateTime = (datetime) => {
+	return proxy.$util ? proxy.$util.formatDateTime(datetime) : datetime
+}
+
+const getOrders = async (isRefresh = false) => {
+	uni.showLoading({
+		title: '加载中'
+	})
+
+	let orders = await proxy.$api('orders')
+	if (isRefresh) {
+		orderList.value = []
+		page.value = 1
 	}
+	orders = orders.slice(pageSize.value * (page.value - 1), pageSize.value * page.value)
+	if (orders.length) {
+		orderList.value = orderList.value.concat(orders)
+		page.value += 1
+	}
+
+	uni.hideLoading()
+}
+
+const detail = (id) => {
+	uni.navigateTo({
+		url: '/pages/orders/detail?id=' + id
+	})
+}
+
+const review = (order) => {
+	const date = order.completed_time.split(' ')[0]
+	uni.navigateTo({
+		url: '/pages/review/review?storename=' + order.store.name + '&typeCate=' + order.typeCate + '&date=' + date
+	})
+}
+
+const goToInvoice = () => {
+	uni.navigateTo({
+		url: '/pages/invoice/invoice'
+	})
+}
+
+onLoad(async () => {
+	if (!store.getters.isLogin) {
+		uni.navigateTo({ url: '/pages/login/login' })
+	}
+	await getOrders(false)
+})
+
+onReachBottom(async () => {
+	await getOrders(false)
+})
+
+onPullDownRefresh(async () => {
+	await getOrders(true)
+})
 </script>
 
 <style lang="scss" scoped>

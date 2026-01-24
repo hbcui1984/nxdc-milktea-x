@@ -80,64 +80,63 @@
 	</view>
 </template>
 
-<script>
-	import {mapState, mapGetters} from 'vuex'
-	
-	export default {
-		data() {
-			return {
-			}
-		},
-		computed: {
-			...mapState(['member']),
-			...mapGetters(['isLogin'])
-		},
-		methods: {
-			takein() {
-				this.$store.commit('SET_ORDER_TYPE', 'takein')
-				uni.switchTab({
-					url: '/pages/menu/menu'
-				})
-			},
-			takeout() {
-				if(!this.isLogin) {
-					uni.navigateTo({url: '/pages/login/login'})
-					return
-				}
-				uni.navigateTo({
-					url: "/pages/address/address?is_choose=true"	
-				})
-			},
-			integrals() {
-				if(!this.isLogin) {
-					uni.navigateTo({url: '/pages/login/login'})
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/integrals/integrals'
-				})
-			},
-			packages() {
-				uni.navigateTo({
-					url: '/pages/packages/index'
-				})
-			},
-			memberCode() {
-				if(!this.isLogin) {
-					uni.navigateTo({url: '/pages/login/login'})
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/mine/member-code'
-				})
-			},
-			invite() {
-				uni.navigateTo({
-					url: '/pages/activities/invite'
-				})
-			}
-		}
+<script setup>
+import { computed } from 'vue'
+import { useStore } from 'vuex'
+
+const store = useStore()
+
+const member = computed(() => store.state.member)
+const isLogin = computed(() => store.getters.isLogin)
+
+const takein = () => {
+	store.commit('SET_ORDER_TYPE', 'takein')
+	uni.switchTab({
+		url: '/pages/menu/menu'
+	})
+}
+
+const takeout = () => {
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
 	}
+	uni.navigateTo({
+		url: "/pages/address/address?is_choose=true"
+	})
+}
+
+const integrals = () => {
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/integrals/integrals'
+	})
+}
+
+const packages = () => {
+	uni.navigateTo({
+		url: '/pages/packages/index'
+	})
+}
+
+const memberCode = () => {
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
+	}
+	uni.navigateTo({
+		url: '/pages/mine/member-code'
+	})
+}
+
+const invite = () => {
+	uni.navigateTo({
+		url: '/pages/activities/invite'
+	})
+}
 </script>
 
 <style lang="scss" scoped>

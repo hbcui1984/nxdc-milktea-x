@@ -5,12 +5,12 @@
 				<view class="header">
 					<view class="left" v-if="orderType == 'takein'">
 						<view class="store-name">
-							<text>{{ store.name }}</text>
+							<text>{{ storeInfo.name }}</text>
 							<view class="iconfont iconarrow-right"></view>
 						</view>
 						<view class="store-location">
 							<image src='/static/images/order/location.png' style="width: 30rpx; height: 30rpx;" class="mr-10"></image>
-							<text>距离您 {{ store.distance_text }}</text>
+							<text>距离您 {{ storeInfo.distance_text }}</text>
 						</view>
 					</view>
 					<view class="left overflow-hidden" v-else>
@@ -21,11 +21,11 @@
 							</view>
 						</view>
 						<view class="font-size-sm text-color-assist overflow-hidden text-truncate">
-							由<text class="text-color-base" style="margin: 0 10rpx">{{ store.name }}</text>配送
+							由<text class="text-color-base" style="margin: 0 10rpx">{{ storeInfo.name }}</text>配送
 						</view>
 					</view>
 					<view class="right">
-						<view class="dinein" :class="{active: orderType == 'takein'}" @tap="SET_ORDER_TYPE('takein')">
+						<view class="dinein" :class="{active: orderType == 'takein'}" @tap="setOrderType('takein')">
 							<text>自取</text>
 						</view>
 						<view class="takeout" :class="{active: orderType == 'takeout'}" @tap="takout">
@@ -175,7 +175,7 @@
 		<!-- 商品详情模态框 end -->
 		<!-- 购物车详情popup -->
 		<popup-layer direction="top" :show-pop="cartPopupVisible" class="cart-popup">
-			<template slot="content">
+			<template #content>
 				<view class="top">
 					<text @tap="handleCartClear">清空</text>
 				</view>
@@ -201,12 +201,12 @@
 								</button>
 							</view>
 						</view>
-						<view class="item" v-if="orderType == 'takeout' && store.packing_fee">
+						<view class="item" v-if="orderType == 'takeout' && storeInfo.packing_fee">
 							<view class="left">
 								<view class="name">包装费</view>
 							</view>
 							<view class="center">
-								<text>￥{{ parseFloat(store.packing_fee) }}</text>
+								<text>￥{{ parseFloat(storeInfo.packing_fee) }}</text>
 							</view>
 							<view class="right invisible">
 								<button type="default" plain size="mini" class="btn" hover-class="none">
@@ -229,252 +229,283 @@
 	</view>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, nextTick, onMounted, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
 import modal from '@/components/modal/modal'
 import popupLayer from '@/components/popup-layer/popup-layer'
-import {mapState, mapMutations, mapActions, mapGetters} from 'vuex'
 
-export default {
-	components: {
-		modal,
-		popupLayer
-	},
-	data() {
-		return {
-			goods: [], //所有商品
-			ads: [
-				{image: 'https://img-shop.qmimg.cn/s23107/2020/04/27/4ebdb582a5185358c4.jpg?imageView2/2/w/600/h/600'},
-				{image: 'https://images.qmai.cn/s23107/2020/05/08/c25de6ef72d2890630.png?imageView2/2/w/600/h/600'},
-				{image: 'https://img-shop.qmimg.cn/s23107/2020/04/10/add546c1b1561f880d.jpg?imageView2/2/w/600/h/600'},
-				{image: 'https://images.qmai.cn/s23107/2020/04/30/b3af19e0de8ed42f61.jpg?imageView2/2/w/600/h/600'},
-				{image: 'https://img-shop.qmimg.cn/s23107/2020/04/17/8aeb78516d63864420.jpg?imageView2/2/w/600/h/600'}
-			],
-			loading: true,
-			currentCateId: 6905,//默认分类
-			cateScrollTop: 0,
-			menuScrollIntoView: '',
-			cart: [], //购物车
-			goodDetailModalVisible: false, //是否饮品详情模态框
-			good: {}, //当前饮品
-			category: {}, //当前饮品所在分类
-			cartPopupVisible: false,
-			sizeCalcState: false
+const store = useStore()
+const { proxy } = getCurrentInstance()
+
+const goods = ref([])
+const ads = ref([
+	{ image: 'https://img-shop.qmimg.cn/s23107/2020/04/27/4ebdb582a5185358c4.jpg?imageView2/2/w/600/h/600' },
+	{ image: 'https://images.qmai.cn/s23107/2020/05/08/c25de6ef72d2890630.png?imageView2/2/w/600/h/600' },
+	{ image: 'https://img-shop.qmimg.cn/s23107/2020/04/10/add546c1b1561f880d.jpg?imageView2/2/w/600/h/600' },
+	{ image: 'https://images.qmai.cn/s23107/2020/04/30/b3af19e0de8ed42f61.jpg?imageView2/2/w/600/h/600' },
+	{ image: 'https://img-shop.qmimg.cn/s23107/2020/04/17/8aeb78516d63864420.jpg?imageView2/2/w/600/h/600' }
+])
+const loading = ref(true)
+const currentCateId = ref(6905)
+const cateScrollTop = ref(0)
+const menuScrollIntoView = ref('')
+const cart = ref([])
+const goodDetailModalVisible = ref(false)
+const good = ref({})
+const category = ref({})
+const cartPopupVisible = ref(false)
+const sizeCalcState = ref(false)
+
+const orderType = computed(() => store.state.orderType)
+const address = computed(() => store.state.address)
+const storeInfo = computed(() => store.state.store)
+const isLogin = computed(() => store.getters.isLogin)
+
+const goodCartNum = (id) => {
+	return cart.value.reduce((acc, cur) => {
+		if (cur.id === id) {
+			return acc += cur.number
 		}
-	},
-	async onLoad() {
-		await this.init()
-	},
-	computed: {
-		...mapState(['orderType', 'address', 'store']),
-		...mapGetters(['isLogin']),
-		goodCartNum() {	//计算单个饮品添加到购物车的数量
-			return (id) => this.cart.reduce((acc, cur) => {
-					if(cur.id === id) {
-						return acc += cur.number
-					}
-					return acc
-				}, 0)
-		},
-		menuCartNum() {
-			return (id) => this.cart.reduce((acc, cur) => {
-					if(cur.cate_id === id) {
-						return acc += cur.number
-					}
-					return acc
-			}, 0)
-		},
-		getCartGoodsNumber() { //计算购物车总数
-			return this.cart.reduce((acc, cur) => acc + cur.number, 0)
-		},
-		getCartGoodsPrice() {	//计算购物车总价
-			return this.cart.reduce((acc, cur) => acc + cur.number * cur.price, 0)
-		},
-		disabledPay() { //是否达到起送价
-			return this.orderType == 'takeout' && (this.getCartGoodsPrice < this.store.min_price) ? true : false
-		},
-		spread() { //差多少元起送
-			if(this.orderType != 'takeout') return
-			return parseFloat((this.store.min_price - this.getCartGoodsPrice).toFixed(2))
+		return acc
+	}, 0)
+}
+
+const menuCartNum = (id) => {
+	return cart.value.reduce((acc, cur) => {
+		if (cur.cate_id === id) {
+			return acc += cur.number
 		}
-	},
-	methods: {
-		...mapMutations(['SET_ORDER_TYPE']),
-		...mapActions(['getStore']),
-		async init() {	//页面初始化
-			this.loading = true
-			await this.getStore()
-			this.goods = await this.$api('goods')
-			this.loading = false
-			this.cart = uni.getStorageSync('cart') || []
-		},
-		takout() {
-			if(this.orderType == 'takeout') return
-			
-			if(!this.isLogin) {
-				uni.navigateTo({url: '/pages/login/login'})
-				return
-			}
-			
-			uni.navigateTo({
-				url: '/pages/address/address?is_choose=true'
-			})
-		},
-		handleMenuTap(id) {	//点击菜单项事件
-			if(!this.sizeCalcState) {
-				this.calcSize()
-			}
-			
-			this.currentCateId = id
-			this.$nextTick(() => this.cateScrollTop = this.goods.find(item => item.id == id).top)
-		},
-		handleGoodsScroll({detail}) {	//商品列表滚动事件
-			if(!this.sizeCalcState) {
-				this.calcSize()
-			}
-			const {scrollTop} = detail
-			let tabs = this.goods.filter(item=> item.top <= scrollTop).reverse()
-			if(tabs.length > 0){
-				this.currentCateId = tabs[0].id
-			}
-		},
-		calcSize() {
-			let h = 10
-			
-			let view = uni.createSelectorQuery().select('#ads')
-			view.fields({
-				size: true
-			}, data => {
-				h += Math.floor(data.height)
-			}).exec()
-			
-			this.goods.forEach(item => {
-				let view = uni.createSelectorQuery().select(`#cate-${item.id}`)
-				view.fields({
-					size: true
-				}, data => {
-					item.top = h
-					h += data.height
-					item.bottom = h
-				}).exec()
-			})
-			this.sizeCalcState = true
-		},
-		handleAddToCart(cate, good, num) {	//添加到购物车
-			const index = this.cart.findIndex(item => {
-				if(good.use_property) {
-					return (item.id === good.id) && (item.props_text === good.props_text)
-				} else {
-					return item.id === good.id
-				}
-			})
-			if(index > -1) {
-				this.cart[index].number += num
-			} else {
-				this.cart.push({
-					id: good.id,
-					cate_id: cate.id,
-					name: good.name,
-					price: good.price,
-					number: num,
-					image: good.images,
-					use_property: good.use_property,
-					props_text: good.props_text,
-					props: good.props
-				})
-			}
-		},
-		handleReduceFromCart(item, good) {
-			const index = this.cart.findIndex(item => item.id === good.id)
-			this.cart[index].number -= 1
-			if(this.cart[index].number <= 0) {
-				this.cart.splice(index, 1)
-			}
-		},
-		showGoodDetailModal(item, good) {
-			this.good = JSON.parse(JSON.stringify({...good, number: 1}))
-			this.category = JSON.parse(JSON.stringify(item))
-			this.goodDetailModalVisible = true
-		},
-		closeGoodDetailModal() { //关闭饮品详情模态框
-			this.goodDetailModalVisible = false
-			this.category = {}
-			this.good = {}
-		},
-		changePropertyDefault(index, key) { //改变默认属性值
-			this.good.property[index].values.forEach(value => this.$set(value, 'is_default', 0))
-			this.good.property[index].values[key].is_default = 1
-			this.good.number = 1
-		},
-		getGoodSelectedProps(good, type = 'text') {	//计算当前饮品所选属性
-			if(good.use_property) {
-				let props = []
-				good.property.forEach(({values}) => {
-					values.forEach(value => {
-						if(value.is_default) {
-							props.push(type === 'text' ? value.value : value.id)
-						}
-					})
-				})
-				return type === 'text' ? props.join('，') : props
-			}
-			return ''
-		},
-		handlePropertyAdd() {
-			this.good.number += 1
-		},
-		handlePropertyReduce() {
-			if(this.good.number === 1) return
-			this.good.number -= 1
-		},
-		handleAddToCartInModal() {
-			const product = Object.assign({}, this.good, {props_text: this.getGoodSelectedProps(this.good), props: this.getGoodSelectedProps(this.good, 'id')})
-			this.handleAddToCart(this.category, product, this.good.number)
-			this.closeGoodDetailModal()
-		},
-		openCartPopup() {	//打开/关闭购物车列表popup
-			this.cartPopupVisible = !this.cartPopupVisible
-		},
-		handleCartClear() {	//清空购物车
-			uni.showModal({
-				title: '提示',
-				content: '确定清空购物车么',
-				success: ({confirm}) =>  {
-					if(confirm) {
-						this.cartPopupVisible = false
-						this.cart = []
-					}
-				}
-			})
-		},
-		handleCartItemAdd(index) {
-			this.cart[index].number += 1
-		},
-		handleCartItemReduce(index) {
-			if(this.cart[index].number === 1) {
-				this.cart.splice(index, 1)
-			} else {
-				this.cart[index].number -= 1
-			}
-			if(!this.cart.length) {
-				this.cartPopupVisible = false
-			}
-		},
-		toPay() {
-			if(!this.isLogin) {
-				uni.navigateTo({url: '/pages/login/login'})
-				return
-			}
-			
-			uni.showLoading({title: '加载中'})
-			uni.setStorageSync('cart', JSON.parse(JSON.stringify(this.cart)))
-			
-			uni.navigateTo({
-				url: '/pages/pay/pay'
-			})
-			uni.hideLoading()
-		}
+		return acc
+	}, 0)
+}
+
+const getCartGoodsNumber = computed(() => {
+	return cart.value.reduce((acc, cur) => acc + cur.number, 0)
+})
+
+const getCartGoodsPrice = computed(() => {
+	return cart.value.reduce((acc, cur) => acc + cur.number * cur.price, 0)
+})
+
+const disabledPay = computed(() => {
+	return orderType.value == 'takeout' && (getCartGoodsPrice.value < storeInfo.value.min_price) ? true : false
+})
+
+const spread = computed(() => {
+	if (orderType.value != 'takeout') return
+	return parseFloat((storeInfo.value.min_price - getCartGoodsPrice.value).toFixed(2))
+})
+
+const setOrderType = (type) => {
+	store.commit('SET_ORDER_TYPE', type)
+}
+
+const getStore = () => {
+	return store.dispatch('getStore')
+}
+
+const init = async () => {
+	loading.value = true
+	await getStore()
+	goods.value = await proxy.$api('goods')
+	loading.value = false
+	cart.value = uni.getStorageSync('cart') || []
+}
+
+const takout = () => {
+	if (orderType.value == 'takeout') return
+
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
 	}
-};
+
+	uni.navigateTo({
+		url: '/pages/address/address?is_choose=true'
+	})
+}
+
+const handleMenuTap = (id) => {
+	if (!sizeCalcState.value) {
+		calcSize()
+	}
+
+	currentCateId.value = id
+	nextTick(() => {
+		const item = goods.value.find(item => item.id == id)
+		if (item) {
+			cateScrollTop.value = item.top
+		}
+	})
+}
+
+const handleGoodsScroll = ({ detail }) => {
+	if (!sizeCalcState.value) {
+		calcSize()
+	}
+	const { scrollTop } = detail
+	let tabs = goods.value.filter(item => item.top <= scrollTop).reverse()
+	if (tabs.length > 0) {
+		currentCateId.value = tabs[0].id
+	}
+}
+
+const calcSize = () => {
+	let h = 10
+
+	let view = uni.createSelectorQuery().select('#ads')
+	view.fields({
+		size: true
+	}, data => {
+		h += Math.floor(data.height)
+	}).exec()
+
+	goods.value.forEach(item => {
+		let view = uni.createSelectorQuery().select(`#cate-${item.id}`)
+		view.fields({
+			size: true
+		}, data => {
+			item.top = h
+			h += data.height
+			item.bottom = h
+		}).exec()
+	})
+	sizeCalcState.value = true
+}
+
+const handleAddToCart = (cate, goodItem, num) => {
+	const index = cart.value.findIndex(item => {
+		if (goodItem.use_property) {
+			return (item.id === goodItem.id) && (item.props_text === goodItem.props_text)
+		} else {
+			return item.id === goodItem.id
+		}
+	})
+	if (index > -1) {
+		cart.value[index].number += num
+	} else {
+		cart.value.push({
+			id: goodItem.id,
+			cate_id: cate.id,
+			name: goodItem.name,
+			price: goodItem.price,
+			number: num,
+			image: goodItem.images,
+			use_property: goodItem.use_property,
+			props_text: goodItem.props_text,
+			props: goodItem.props
+		})
+	}
+}
+
+const handleReduceFromCart = (item, goodItem) => {
+	const index = cart.value.findIndex(cartItem => cartItem.id === goodItem.id)
+	cart.value[index].number -= 1
+	if (cart.value[index].number <= 0) {
+		cart.value.splice(index, 1)
+	}
+}
+
+const showGoodDetailModal = (item, goodItem) => {
+	good.value = JSON.parse(JSON.stringify({ ...goodItem, number: 1 }))
+	category.value = JSON.parse(JSON.stringify(item))
+	goodDetailModalVisible.value = true
+}
+
+const closeGoodDetailModal = () => {
+	goodDetailModalVisible.value = false
+	category.value = {}
+	good.value = {}
+}
+
+const changePropertyDefault = (index, key) => {
+	good.value.property[index].values.forEach(value => value.is_default = 0)
+	good.value.property[index].values[key].is_default = 1
+	good.value.number = 1
+}
+
+const getGoodSelectedProps = (goodItem, type = 'text') => {
+	if (goodItem.use_property) {
+		let props = []
+		goodItem.property.forEach(({ values }) => {
+			values.forEach(value => {
+				if (value.is_default) {
+					props.push(type === 'text' ? value.value : value.id)
+				}
+			})
+		})
+		return type === 'text' ? props.join('，') : props
+	}
+	return ''
+}
+
+const handlePropertyAdd = () => {
+	good.value.number += 1
+}
+
+const handlePropertyReduce = () => {
+	if (good.value.number === 1) return
+	good.value.number -= 1
+}
+
+const handleAddToCartInModal = () => {
+	const product = Object.assign({}, good.value, { props_text: getGoodSelectedProps(good.value), props: getGoodSelectedProps(good.value, 'id') })
+	handleAddToCart(category.value, product, good.value.number)
+	closeGoodDetailModal()
+}
+
+const openCartPopup = () => {
+	cartPopupVisible.value = !cartPopupVisible.value
+}
+
+const handleCartClear = () => {
+	uni.showModal({
+		title: '提示',
+		content: '确定清空购物车么',
+		success: ({ confirm }) => {
+			if (confirm) {
+				cartPopupVisible.value = false
+				cart.value = []
+			}
+		}
+	})
+}
+
+const handleCartItemAdd = (index) => {
+	cart.value[index].number += 1
+}
+
+const handleCartItemReduce = (index) => {
+	if (cart.value[index].number === 1) {
+		cart.value.splice(index, 1)
+	} else {
+		cart.value[index].number -= 1
+	}
+	if (!cart.value.length) {
+		cartPopupVisible.value = false
+	}
+}
+
+const toPay = () => {
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
+	}
+
+	uni.showLoading({ title: '加载中' })
+	uni.setStorageSync('cart', JSON.parse(JSON.stringify(cart.value)))
+
+	uni.navigateTo({
+		url: '/pages/pay/pay'
+	})
+	uni.hideLoading()
+}
+
+onLoad(async () => {
+	await init()
+})
 </script>
 
 <style lang="scss" scoped>

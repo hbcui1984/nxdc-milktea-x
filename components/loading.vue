@@ -4,15 +4,8 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		name: 'Loading',
-		data() {
-			return {
-				
-			}
-		}
-	}
+<script setup>
+// Static component - no data or methods needed
 </script>
 
 <style lang="scss">

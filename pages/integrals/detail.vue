@@ -29,7 +29,7 @@
 				<view class="bg-white mb-20" style="padding: 30rpx;">
 					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">商品详情</view>
 					<view class="font-size-base text-color-assist">
-						<jyf-parser ref="desc"></jyf-parser>
+						<jyf-parser ref="descRef"></jyf-parser>
 					</view>
 				</view>
 			</view>
@@ -55,7 +55,7 @@
 				<view class="w-100 bg-white" style="padding: 30rpx;">
 					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">兑换须知</view>
 					<view class="font-size-base text-color-assist">
-						<jyf-parser ref="desc"></jyf-parser>
+						<jyf-parser ref="descRef"></jyf-parser>
 					</view>
 					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">使用须知</view>
 					<view class="font-size-base text-color-base line-height-2 d-flex align-items-center" v-for="(item, index) in useTips" :key="index">
@@ -74,37 +74,38 @@
 	</view>
 </template>
 
-<script>
-	import jyfParser from '@/components/jyf-parser/jyf-parser'
-	import pointsMall from '@/api/points-mall'
-	
-	export default {
-		components: {
-			jyfParser
-		},
-		data() {
-			return {
-				customPoints: {},
-				pointGood: {},
-				useTips: [
-					{title: '使用条件', value: '无门槛'},
-					{title: '优惠形式', value: '免最高1件'},
-					{title: '有效期', value: '领券当日开始90天内有效'},
-					{title: '使用时段', value: '00:00:00~23:59:59'},
-					{title: '使用限制', value: '不限制'},
-					{title: '兑换限制', value: '不限制'},
-					{title: '活动商品', value: '限部分商品'},
-					{title: '是否与其他优惠共享', value: '否'},
-					{title: '使用场景', value: '仅外卖、堂食可用'},
-				]
-			}
-		},
-		async onLoad({cate, id}) {
-			this.pointGood = pointsMall[cate].find(item => item.id == id)
-			this.$nextTick(() => this.$refs['desc'].setContent(this.pointGood.exchange_desc || ''))
-			this.customPoints = await this.$api('customPoints')
+<script setup>
+import { ref, nextTick, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import jyfParser from '@/components/jyf-parser/jyf-parser'
+import pointsMall from '@/api/points-mall'
+
+const { proxy } = getCurrentInstance()
+
+const descRef = ref(null)
+const customPoints = ref({})
+const pointGood = ref({})
+const useTips = ref([
+	{ title: '使用条件', value: '无门槛' },
+	{ title: '优惠形式', value: '免最高1件' },
+	{ title: '有效期', value: '领券当日开始90天内有效' },
+	{ title: '使用时段', value: '00:00:00~23:59:59' },
+	{ title: '使用限制', value: '不限制' },
+	{ title: '兑换限制', value: '不限制' },
+	{ title: '活动商品', value: '限部分商品' },
+	{ title: '是否与其他优惠共享', value: '否' },
+	{ title: '使用场景', value: '仅外卖、堂食可用' },
+])
+
+onLoad(async ({ cate, id }) => {
+	pointGood.value = pointsMall[cate].find(item => item.id == id)
+	nextTick(() => {
+		if (descRef.value) {
+			descRef.value.setContent(pointGood.value.exchange_desc || '')
 		}
-	}
+	})
+	customPoints.value = await proxy.$api('customPoints')
+})
 </script>
 
 <style lang="scss" scoped>

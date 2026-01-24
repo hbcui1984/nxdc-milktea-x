@@ -23,38 +23,32 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				remark: '',
-				quickInputs: [
-					'请放门把手上', '请放门口', '请放前台桌上', '如地址封闭管理，请电话与我联系'
-				]
-			}
-		},
-		onLoad({remark}) {
-			this.remark = remark
-		},
-		computed: {
-			remarkLength() {
-				return this.remark.length
-			},
-			isDanger() {
-				return this.remark.length > 50
-			}
-		},
-		methods: {
-			handleQuickInput(item) {
-				this.remark = this.remark.concat(" ", item)
-			},
-			submit() {
-				uni.navigateTo({
-					url: "/pages/pay/pay?remark=" + this.remark
-				})
-			}
-		}
-	}
+<script setup>
+import { ref, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+
+const remark = ref('')
+const quickInputs = ref([
+	'请放门把手上', '请放门口', '请放前台桌上', '如地址封闭管理，请电话与我联系'
+])
+
+onLoad((options) => {
+	remark.value = options.remark || ''
+})
+
+const remarkLength = computed(() => remark.value.length)
+
+const isDanger = computed(() => remark.value.length > 50)
+
+const handleQuickInput = (item) => {
+	remark.value = remark.value.concat(" ", item)
+}
+
+const submit = () => {
+	uni.navigateTo({
+		url: "/pages/pay/pay?remark=" + remark.value
+	})
+}
 </script>
 
 <style lang="scss" scoped>

@@ -59,7 +59,7 @@
 						<view class="w-100 d-flex flex-column">
 							<view class="pay-cell">
 								<view>下单时间</view>
-								<view class="font-weight-bold">{{ $util.formatDateTime(order.created_at) }}</view>
+								<view class="font-weight-bold">{{ formatDateTime(order.created_at) }}</view>
 							</view>
 							<view class="pay-cell">
 								<view>下单门店</view>
@@ -120,36 +120,36 @@
 	</view>
 </template>
 
-<script>
-import Orders from '@/api/orders';
-import listCell from '@/components/list-cell/list-cell';
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import Orders from '@/api/orders'
+import listCell from '@/components/list-cell/list-cell'
 
-export default {
-	components: {
-		listCell
-	},
-	data() {
-		return {
-			order: {}
-		};
-	},
-	onLoad({ id }) {
-		this.order = Orders.find(item => item.id == id);
-	},
-	methods: {
-		review() {
-			const date = this.order.completed_time.split(' ')[0]
-			uni.navigateTo({
-				url: '/pages/review/review?storename=' + this.order.store.name + '&typeCate=' + this.order.typeCate + '&date=' + date
-			})
-		},
-		goToInvoice() {
-			uni.navigateTo({
-				url: '/pages/invoice/invoice'
-			})
-		}
-	}
-};
+const { proxy } = getCurrentInstance()
+
+const order = ref({})
+
+const formatDateTime = (datetime) => {
+	return proxy.$util ? proxy.$util.formatDateTime(datetime) : datetime
+}
+
+const review = () => {
+	const date = order.value.completed_time.split(' ')[0]
+	uni.navigateTo({
+		url: '/pages/review/review?storename=' + order.value.store.name + '&typeCate=' + order.value.typeCate + '&date=' + date
+	})
+}
+
+const goToInvoice = () => {
+	uni.navigateTo({
+		url: '/pages/invoice/invoice'
+	})
+}
+
+onLoad(({ id }) => {
+	order.value = Orders.find(item => item.id == id)
+})
 </script>
 
 <style lang="scss" scoped>

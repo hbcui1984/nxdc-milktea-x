@@ -121,7 +121,7 @@
 							<view class="w-100 d-flex flex-column">
 								<view class="pay-cell">
 									<view>下单时间</view>
-									<view class="font-weight-bold">{{ $util.formatDateTime(order.created_at) }}</view>
+									<view class="font-weight-bold">{{ formatDateTime(order.created_at) }}</view>
 								</view>
 								<view class="pay-cell">
 									<view>下单门店</view>
@@ -171,39 +171,35 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	import {mapState} from 'vuex'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			return {
-				
-			}
-		},
-		computed: {
-			...mapState(['order'])
-		},
-		methods: {
-			orders() {
-				if(!this.$store.getters.isLogin) {
-					uni.navigateTo({url: '/pages/login/login'})
-					return
-				}
-				uni.navigateTo({
-					url: '/pages/orders/orders'
-				})
-			},
-			menu() {
-				uni.switchTab({
-					url: '/pages/menu/menu'
-				})
-			}
-		}
+<script setup>
+import { computed, getCurrentInstance } from 'vue'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+
+const store = useStore()
+const { proxy } = getCurrentInstance()
+
+const order = computed(() => store.state.order)
+
+const formatDateTime = (datetime) => {
+	return proxy.$util ? proxy.$util.formatDateTime(datetime) : datetime
+}
+
+const orders = () => {
+	if (!store.getters.isLogin) {
+		uni.navigateTo({ url: '/pages/login/login' })
+		return
 	}
+	uni.navigateTo({
+		url: '/pages/orders/orders'
+	})
+}
+
+const menu = () => {
+	uni.switchTab({
+		url: '/pages/menu/menu'
+	})
+}
 </script>
 
 <style lang="scss" scoped>

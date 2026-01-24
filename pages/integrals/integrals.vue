@@ -64,73 +64,71 @@
 	</view>
 </template>
 
-<script>
-	import navbarBackButton from '@/components/navbar-back-button'
-	import uniSteps from '@/components/uni-steps/uni-steps'
-	
-	export default {
-		components: {
-			navbarBackButton,
-			uniSteps
-		},
-		data() {
-			return {
-				customPoints: {},
-				stepsOption: [],
-				activeDay: 0,
-				pointsMall: []
-			}
-		},
-		async onLoad() {
-			await this.getStepsOptions()
-			this.customPoints = await this.$api('customPoints')
-			await this.getPointsMall()
-		},
-		methods: {
-			async getStepsOptions() {
-				let stepsOptions = []
-				
-				const attendance = await this.$api('attendance')
-				
-				attendance.forEach((item, index) => {
-					if(item.is_day) {
-						this.activeDay = index
-					}
-					
-					let arr = {
-						title: item.day_name + '天',
-						desc: '+' + item.points
-					}
-					if(index == attendance.length - 1) {
-						arr.circle = '/static/images/integrals/goal.png'
-						arr.circleStyle = 'width: 47rpx; height: 39rpx;'
-					}
-					
-					stepsOptions.push(arr)
-				})
-				
-				this.stepsOption = stepsOptions
-			},
-			async getPointsMall() {
-				this.pointsMall = await this.$api('pointsMall')
-			},
-			attendance() {
-				uni.navigateTo({
-					url: '/pages/attendance/attendance'
-				})
-			},
-			flow() {
-				uni.navigateTo({
-					url: '/pages/integrals/flow'
-				})
-			},
-			detail(cate, id) {
-				uni.navigateTo({
-					url: '/pages/integrals/detail?cate=' + cate + '&id=' + id
-				})
-			}
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import navbarBackButton from '@/components/navbar-back-button'
+import uniSteps from '@/components/uni-steps/uni-steps'
+
+const { proxy } = getCurrentInstance()
+
+const customPoints = ref({})
+const stepsOption = ref([])
+const activeDay = ref(0)
+const pointsMall = ref([])
+
+const getStepsOptions = async () => {
+	let stepsOptions = []
+
+	const attendance = await proxy.$api('attendance')
+
+	attendance.forEach((item, index) => {
+		if (item.is_day) {
+			activeDay.value = index
 		}
-	}
+
+		let arr = {
+			title: item.day_name + '天',
+			desc: '+' + item.points
+		}
+		if (index == attendance.length - 1) {
+			arr.circle = '/static/images/integrals/goal.png'
+			arr.circleStyle = 'width: 47rpx; height: 39rpx;'
+		}
+
+		stepsOptions.push(arr)
+	})
+
+	stepsOption.value = stepsOptions
+}
+
+const getPointsMall = async () => {
+	pointsMall.value = await proxy.$api('pointsMall')
+}
+
+const attendance = () => {
+	uni.navigateTo({
+		url: '/pages/attendance/attendance'
+	})
+}
+
+const flow = () => {
+	uni.navigateTo({
+		url: '/pages/integrals/flow'
+	})
+}
+
+const detail = (cate, id) => {
+	uni.navigateTo({
+		url: '/pages/integrals/detail?cate=' + cate + '&id=' + id
+	})
+}
+
+onLoad(async () => {
+	await getStepsOptions()
+	customPoints.value = await proxy.$api('customPoints')
+	await getPointsMall()
+})
 </script>
 
 <style lang="scss" lang="scss">

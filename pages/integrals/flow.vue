@@ -5,7 +5,7 @@
 			<view class="font-size-sm text-color-primary">查看积分规则</view>
 		</view>
 		<view>
-			<list-cell v-for="(item, index) in pointsFlow" :key="index" :hover="false" bgcolor="#F5F9FB">
+			<list-cell v-for="(item, index) in pointsFlowList" :key="index" :hover="false" bgcolor="#F5F9FB">
 				<view class="w-100 d-flex align-items-center">
 					<view class="flex-fill d-flex flex-column">
 						<view class="font-size-lg text-color-base mb-10">{{ item.reason }}</view>
@@ -23,26 +23,23 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	import pointsFlow from '@/api/points-flow'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			return {
-				pointNum: 0,
-				pointsFlow: []
-			}
-		},
-		onLoad() {
-			const member = this.$store.state.member
-			this.pointNum = member.pointNum
-			this.pointsFlow = pointsFlow
-		}
-	}
+<script setup>
+import { ref } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+import pointsFlow from '@/api/points-flow'
+
+const store = useStore()
+
+const pointNum = ref(0)
+const pointsFlowList = ref([])
+
+onLoad(() => {
+	const member = store.state.member
+	pointNum.value = member.pointNum
+	pointsFlowList.value = pointsFlow
+})
 </script>
 
 <style lang="scss" scoped>
@@ -66,7 +63,7 @@
 		}
 	}
 	
-	/deep/.tui-list-cell:after{
+	:deep(.tui-list-cell:after){
 		transform: scaleY(0.8);
 	}
 </style>

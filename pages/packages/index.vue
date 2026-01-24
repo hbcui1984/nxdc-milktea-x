@@ -22,38 +22,38 @@
 	<loading v-else></loading>
 </template>
 
-<script>
-	import loading from '@/components/loading'
-	
-	export default {
-		components: {
-			loading
-		},
-		data() {
-			return {
-				loading: true,
-				packages: []
-			}
-		},
-		async onLoad() {
-			await this.getPackages()
-		},
-		async onPullDownRefresh() {
-			await this.getPackages()
-		},
-		methods: {
-			async getPackages() {
-				this.loading = true
-				this.packages = await this.$api('packages')
-				this.loading = false
-			},
-			pay(id) {
-				uni.navigateTo({
-					url: '/pages/packages/detail?id=' + id
-				})
-			}
-		}
-	}
+<script setup>
+import { ref, getCurrentInstance } from 'vue'
+import { onLoad, onPullDownRefresh } from '@dcloudio/uni-app'
+import loading from '@/components/loading'
+
+const { proxy } = getCurrentInstance()
+
+const loadingState = ref(true)
+const packages = ref([])
+
+// 重命名为 loadingState 避免与组件名冲突
+const loading = loadingState
+
+const getPackages = async () => {
+	loadingState.value = true
+	packages.value = await proxy.$api('packages')
+	loadingState.value = false
+}
+
+const pay = (id) => {
+	uni.navigateTo({
+		url: '/pages/packages/detail?id=' + id
+	})
+}
+
+onLoad(async () => {
+	await getPackages()
+})
+
+onPullDownRefresh(async () => {
+	await getPackages()
+})
 </script>
 
 <style lang="scss" scoped>

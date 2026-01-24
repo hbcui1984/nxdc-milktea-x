@@ -28,101 +28,93 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		name: "Modal",
-		props: {
-			//是否显示
-			show: {
-				type: Boolean,
-				default: false
-			},
-			//自定义modal体
-			custom: {
-				type: Boolean,
-				default: false
-			},
-			width: {
-				type: String,
-				default: "84%"
-			},
-			padding: {
-				type: String,
-				default: "40rpx"
-			},
-			radius: {
-				type: String,
-				default: "24rpx"
-			},
-			//标题
-			title: {
-				type: String,
-				default: ""
-			},
-			//内容
-			content: {
-				type: String,
-				default: ""
-			},
-			//内容字体颜色
-			color: {
-				type: String,
-				default: "#999"
-			},
-			//内容字体大小 rpx
-			size: {
-				type: Number,
-				default: 28
-			},
-			//形状 circle, square
-			shape: {
-				type: String,
-				default: 'square'
-			},
-			button: {
-				type: Array,
-				default: function() {
-					return [{
-						text: "取消",
-						type: "red",
-						plain: true //是否空心
-					}, {
-						text: "确定",
-						type: "red",
-						plain: false
-					}]
-				}
-			},
-			//点击遮罩 是否可关闭
-			maskClosable: {
-				type: Boolean,
-				default: true
-			},
-			//淡入效果，自定义弹框插入input输入框时传true
-			fadein: {
-				type: Boolean,
-				default: false
-			}
-		},
-		data() {
-			return {
-
-			};
-		},
-		methods: {
-			handleClick(e) {
-				if (!this.show) return;
-				const dataset = e.currentTarget.dataset;
-				this.$emit('click', {
-					index: Number(dataset.index)
-				});
-			},
-			handleClickCancel() {
-				if (!this.maskClosable) return;
-				this.$emit('cancel');
-			}
-		}
+<script setup>
+const props = defineProps({
+	//是否显示
+	show: {
+		type: Boolean,
+		default: false
+	},
+	//自定义modal体
+	custom: {
+		type: Boolean,
+		default: false
+	},
+	width: {
+		type: String,
+		default: "84%"
+	},
+	padding: {
+		type: String,
+		default: "40rpx"
+	},
+	radius: {
+		type: String,
+		default: "24rpx"
+	},
+	//标题
+	title: {
+		type: String,
+		default: ""
+	},
+	//内容
+	content: {
+		type: String,
+		default: ""
+	},
+	//内容字体颜色
+	color: {
+		type: String,
+		default: "#999"
+	},
+	//内容字体大小 rpx
+	size: {
+		type: Number,
+		default: 28
+	},
+	//形状 circle, square
+	shape: {
+		type: String,
+		default: 'square'
+	},
+	button: {
+		type: Array,
+		default: () => [{
+			text: "取消",
+			type: "red",
+			plain: true //是否空心
+		}, {
+			text: "确定",
+			type: "red",
+			plain: false
+		}]
+	},
+	//点击遮罩 是否可关闭
+	maskClosable: {
+		type: Boolean,
+		default: true
+	},
+	//淡入效果，自定义弹框插入input输入框时传true
+	fadein: {
+		type: Boolean,
+		default: false
 	}
+})
+
+const emit = defineEmits(['click', 'cancel'])
+
+const handleClick = (e) => {
+	if (!props.show) return
+	const dataset = e.currentTarget.dataset
+	emit('click', {
+		index: Number(dataset.index)
+	})
+}
+
+const handleClickCancel = () => {
+	if (!props.maskClosable) return
+	emit('cancel')
+}
 </script>
 
 <style lang="scss">

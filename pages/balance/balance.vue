@@ -47,29 +47,27 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				agree: false,
-				amounts: []
-			}
-		},
-		async onLoad() {
-			this.amounts = await this.$api('rechargeCards')
-		},
-		computed: {
-			rechargeCard() {
-				return this.amounts.find(item => item.selected) || ''
-			}
-		},
-		methods: {
-			handleSelected(index) {
-				this.amounts.forEach(item => this.$set(item, 'selected', false))
-				this.$set(this.amounts[index], 'selected', true)
-			}
-		}
-	}
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+
+const { proxy } = getCurrentInstance()
+
+const agree = ref(false)
+const amounts = ref([])
+
+onLoad(async () => {
+	amounts.value = await proxy.$api('rechargeCards')
+})
+
+const rechargeCard = computed(() => {
+	return amounts.value.find(item => item.selected) || ''
+})
+
+const handleSelected = (index) => {
+	amounts.value.forEach(item => item.selected = false)
+	amounts.value[index].selected = true
+}
 </script>
 
 <style lang="scss" scoped>

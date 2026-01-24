@@ -45,14 +45,8 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				
-			}
-		}
-	}
+<script setup>
+// Static page - no data or methods needed
 </script>
 
 <style lang="scss">

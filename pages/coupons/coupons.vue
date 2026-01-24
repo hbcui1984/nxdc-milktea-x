@@ -43,7 +43,7 @@
 					有效期：{{ coupon.beginAt }}至{{ coupon.endAt }}
 				</view>
 				<pre class="pre-line font-size-sm text-color-assist mb-30">
-					<jyf-parser ref="couponExplain"></jyf-parser>
+					<jyf-parser ref="couponExplainRef"></jyf-parser>
 				</pre>
 				<view class="d-flex align-items-center just-content-center">
 					<button type="primary" @tap="useCoupon" class="use-coupon-btn">立即使用</button>
@@ -53,77 +53,79 @@
 	</view>
 </template>
 
-<script>
+<script setup>
+import { ref, watch, getCurrentInstance } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import modal from '@/components/modal/modal'
 import jyfParser from "@/components/jyf-parser/jyf-parser"
 
-export default {
-	components: {
-		modal,
-		jyfParser
-	},
-	data() {
-		return {
-			tabs: [
-				{title: '全部', value: 'all'},
-				{title: '茶饮券', value: '1'},
-				{title: '酒屋券', value: '2'}
-			],
-			activeTabIndex: '',
-			coupons: [],
-			detailModalVisible: false,
-			coupon: {}
-		}
-	},
-	onShow() {
-		this.activeTabIndex = 0
-	},
-	watch: {
-		activeTabIndex: async function(val) {
-			const type = this.tabs[val].value
-			await this.getCoupons(type)
-		}
-	},
-	methods: {
-		handleTab(index) {
-			this.activeTabIndex = index
-		},
-		async getCoupons(type) {
-			const coupons = await this.$api('customerCoupons')
-			if(type == 'all') {
-				this.coupons = coupons
-			} else {
-				this.coupons = coupons.filter(item => item.couponType == type)
-			}
-		},
-		openDetailModal(coupon) {
-			this.coupon = coupon
-			this.$refs['couponExplain'].setContent(this.coupon.couponExplain || '')
-			this.detailModalVisible = true
-		},
-		closeDetailModal() {
-			this.detailModalVisible = false
-			this.coupon = {}
-		},
-		useCoupon() {
-			uni.switchTab({
-				url: '/pages/menu/menu'
-			})
-		},
-		showTip1() {
-			uni.showToast({
-				title: '您暂时还没有赠送中卡券哦~',
-				icon: 'none'
-			})
-		},
-		showTip2() {
-			uni.showToast({
-				title: '您暂时还没有券码哦~',
-				icon: 'none'
-			})
-		}
+const { proxy } = getCurrentInstance()
+
+const couponExplainRef = ref(null)
+const tabs = ref([
+	{ title: '全部', value: 'all' },
+	{ title: '茶饮券', value: '1' },
+	{ title: '酒屋券', value: '2' }
+])
+const activeTabIndex = ref('')
+const coupons = ref([])
+const detailModalVisible = ref(false)
+const coupon = ref({})
+
+const handleTab = (index) => {
+	activeTabIndex.value = index
+}
+
+const getCoupons = async (type) => {
+	const couponList = await proxy.$api('customerCoupons')
+	if (type == 'all') {
+		coupons.value = couponList
+	} else {
+		coupons.value = couponList.filter(item => item.couponType == type)
 	}
 }
+
+const openDetailModal = (couponItem) => {
+	coupon.value = couponItem
+	if (couponExplainRef.value) {
+		couponExplainRef.value.setContent(coupon.value.couponExplain || '')
+	}
+	detailModalVisible.value = true
+}
+
+const closeDetailModal = () => {
+	detailModalVisible.value = false
+	coupon.value = {}
+}
+
+const useCoupon = () => {
+	uni.switchTab({
+		url: '/pages/menu/menu'
+	})
+}
+
+const showTip1 = () => {
+	uni.showToast({
+		title: '您暂时还没有赠送中卡券哦~',
+		icon: 'none'
+	})
+}
+
+const showTip2 = () => {
+	uni.showToast({
+		title: '您暂时还没有券码哦~',
+		icon: 'none'
+	})
+}
+
+watch(activeTabIndex, async (val) => {
+	const type = tabs.value[val].value
+	await getCoupons(type)
+})
+
+onShow(() => {
+	activeTabIndex.value = 0
+})
 </script>
 
 <style lang="scss" scoped>

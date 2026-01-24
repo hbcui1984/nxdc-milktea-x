@@ -55,57 +55,49 @@
 	</view>
 </template>
 
-<script>
-	import listCell from '@/components/list-cell/list-cell'
-	
-	export default {
-		components: {
-			listCell
-		},
-		data() {
-			const currentDate = this.getDate({format: true})
-			return {
-				member: {},
-				date: currentDate
-			}
-		},
-		computed: {
-		   startDate() {
-				return this.getDate('start');
-			},
-			endDate() {
-				return this.getDate('end');
-			}
-		},
-		onLoad() {
-			this.member = this.$store.state.member
-		},
-		methods: {
-			getDate(type) {
-				const date = new Date();
-				let year = date.getFullYear();
-				let month = date.getMonth() + 1;
-				let day = date.getDate();
-	
-				if (type === 'start') {
-					year = year - 60;
-				} else if (type === 'end') {
-					year = year + 2;
-				}
-				month = month > 9 ? month : '0' + month;;
-				day = day > 9 ? day : '0' + day;
-				return `${year}-${month}-${day}`;
-			},
-			handleDateChange(e) {
-				this.member.birthday = e.target.value
-			},
-			save() {
-				const member = Object.assign(this.$store.state.member, this.member)
-				this.$store.commit('SET_MEMBER', member)
-				uni.navigateBack()
-			}
-		}
+<script setup>
+import { ref, reactive, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import listCell from '@/components/list-cell/list-cell'
+
+const store = useStore()
+
+const getDate = (type) => {
+	const date = new Date()
+	let year = date.getFullYear()
+	let month = date.getMonth() + 1
+	let day = date.getDate()
+
+	if (type === 'start') {
+		year = year - 60
+	} else if (type === 'end') {
+		year = year + 2
 	}
+	month = month > 9 ? month : '0' + month
+	day = day > 9 ? day : '0' + day
+	return `${year}-${month}-${day}`
+}
+
+const member = reactive({})
+const date = ref(getDate('format'))
+
+const startDate = computed(() => getDate('start'))
+const endDate = computed(() => getDate('end'))
+
+onLoad(() => {
+	Object.assign(member, store.state.member)
+})
+
+const handleDateChange = (e) => {
+	member.birthday = e.target.value
+}
+
+const save = () => {
+	const updatedMember = Object.assign(store.state.member, member)
+	store.commit('SET_MEMBER', updatedMember)
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

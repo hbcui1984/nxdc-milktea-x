@@ -44,46 +44,39 @@
 	</view>
 </template>
 
-<script>
-	import {mapState} from 'vuex'
-	import navbarBackButton from '@/components/navbar-back-button'
-	import uniCalendar from '@/pages/attendance/uni-calendar/uni-calendar'
-	import modal from '@/components/modal/modal'
-	
-	export default {
-		components: {
-			navbarBackButton,
-			uniCalendar,
-			modal
-		},
-		data() {
-			return {
-				customPoints: {},
-				attendanceModalVisible: false,
-				attendanceList: [],
-				todayAttendance: {},
-				startDate: '',
-				endDate: ''
-			}
-		},
-		async onLoad() {
-			this.customPoints = await this.$api('customPoints'),
-			this.attendanceList = await this.$api('attendanceList')
-			this.todayAttendance = await this.$api('todayAttendance')
-			const date = new Date()
-			let year = date.getFullYear()
-			let month = date.getMonth()
-			this.startDate = `${year}-${month}-01`
-		},
-		computed: {
-			...mapState(['member'])
-		},
-		methods: {
-			attendance() {
-				this.attendanceModalVisible = true
-			}
-		}
-	}
+<script setup>
+import { ref, computed, getCurrentInstance } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useStore } from 'vuex'
+import navbarBackButton from '@/components/navbar-back-button'
+import uniCalendar from '@/pages/attendance/uni-calendar/uni-calendar'
+import modal from '@/components/modal/modal'
+
+const store = useStore()
+const { proxy } = getCurrentInstance()
+
+const customPoints = ref({})
+const attendanceModalVisible = ref(false)
+const attendanceList = ref([])
+const todayAttendance = ref({})
+const startDate = ref('')
+const endDate = ref('')
+
+const member = computed(() => store.state.member)
+
+const attendance = () => {
+	attendanceModalVisible.value = true
+}
+
+onLoad(async () => {
+	customPoints.value = await proxy.$api('customPoints')
+	attendanceList.value = await proxy.$api('attendanceList')
+	todayAttendance.value = await proxy.$api('todayAttendance')
+	const date = new Date()
+	let year = date.getFullYear()
+	let month = date.getMonth()
+	startDate.value = `${year}-${month}-01`
+})
 </script>
 
 <style lang="scss" scoped>
@@ -170,7 +163,7 @@
 		}
 	}
 	
-	/deep/.uni-calendar {
+	:deep(.uni-calendar) {
 		margin-bottom: 30rpx;
 		border-radius: 8rpx;
 		box-shadow: 0 0 20rpx rgba($color: #000000, $alpha: 0.1);

@@ -24,21 +24,12 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		data() {
-			return {
-				
-			}
-		},
-		methods: {
-			helpCenter() {
-				uni.navigateTo({
-					url: '/pages/services/help-center'
-				})
-			}
-		}
-	}
+<script setup>
+const helpCenter = () => {
+	uni.navigateTo({
+		url: '/pages/services/help-center'
+	})
+}
 </script>
 
 <style lang="scss">

@@ -4,37 +4,31 @@
 	</view>
 </template>
 
-<script>
-	export default {
-		name: "navbarBackButton",
-		data() {
-			return {
-				height: 0,
-				left: 0,
-				top: 0
-			}
-		},
-		created() {
-			//#ifdef MP-WEIXIN
-			const {height, right, top} = uni.getMenuButtonBoundingClientRect()
-			const {windowWidth} = uni.getSystemInfoSync()
-			this.top = top
-			this.left = windowWidth - right
-			this.height = height
-			//#endif
-			//#ifndef MP-WEIXIN
-			this.height = 32
-			this.top = 26
-			this.left = 10
-			//#endif
+<script setup>
+import { ref, onMounted } from 'vue'
 
-		},
-		methods: {
-			click() {
-				uni.navigateBack()
-			}
-		}
-	}
+const height = ref(0)
+const left = ref(0)
+const top = ref(0)
+
+onMounted(() => {
+	//#ifdef MP-WEIXIN
+	const menuButton = uni.getMenuButtonBoundingClientRect()
+	const systemInfo = uni.getSystemInfoSync()
+	top.value = menuButton.top
+	left.value = systemInfo.windowWidth - menuButton.right
+	height.value = menuButton.height
+	//#endif
+	//#ifndef MP-WEIXIN
+	height.value = 32
+	top.value = 26
+	left.value = 10
+	//#endif
+})
+
+const click = () => {
+	uni.navigateBack()
+}
 </script>
 
 <style lang="scss" scoped>

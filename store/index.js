@@ -1,19 +1,18 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import api from '@/api'
 import addresses from '@/api/addresses'
 
-Vue.use(Vuex)
-
-const store = new Vuex.Store({
-	state: {
-		store: {},
-		cart: [],
-		orderType: 'takein',
-		address: {},
-		addresses: addresses,
-		member: {},
-		order: {}
+const store = createStore({
+	state() {
+		return {
+			store: {},
+			cart: [],
+			orderType: 'takein',
+			address: {},
+			addresses: addresses,
+			member: {},
+			order: {}
+		}
 	},
 	getters: {
 		isLogin: state => Object.keys(state.member).length > 0	//是否登录
@@ -45,7 +44,7 @@ const store = new Vuex.Store({
 		}
 	},
 	actions: {
-		async getStore({commit}) {
+		async getStore({ commit }) {
 			const store = await api('store')
 			commit('SET_STORE', store)
 		}
