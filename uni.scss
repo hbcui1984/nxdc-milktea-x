@@ -19,6 +19,18 @@ $color-success: #4cd964;
 $color-warning: #FAB714;
 $color-error: #D12E32;
 
+/* uni-app 官方变量兼容 */
+$uni-color-primary: $color-primary;
+$uni-color-error: $color-error;
+$uni-bg-color-mask: rgba(0, 0, 0, 0.4);
+$uni-border-color: #e5e5e5;
+$uni-text-color: #333333;
+$uni-text-color-grey: #999999;
+$uni-text-color-disable: #c0c0c0;
+$uni-font-size-base: 28rpx;
+$uni-font-size-sm: 24rpx;
+$uni-opacity-disabled: 0.3;
+
 /* 文字基本颜色 */
 $text-color-base: #5A5B5C; //基本色
 $text-color-assist: #919293; //辅助色
