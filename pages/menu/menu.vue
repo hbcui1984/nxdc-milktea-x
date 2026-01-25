@@ -73,7 +73,7 @@
 											<view class="price_and_action">
 												<text class="price">￥{{ good.price }}</text>
 												<view class="btn-group" v-if="good.use_property">
-													<button type="primary" class="btn property_btn" hover-class="none"
+													<button type="default" class="btn btn-primary property_btn" hover-class="none"
 													 size="mini" @tap="showGoodDetailModal(item, good)">
 														选规格
 													</button>
@@ -85,7 +85,7 @@
 														<view class="iconfont iconsami-select"></view>
 													</button>
 													<view class="number" v-show="goodCartNum(good.id)">{{ goodCartNum(good.id) }}</view>
-													<button type="primary" class="btn add_btn" size="min" hover-class="none" 
+													<button type="default" class="btn btn-primary add_btn" size="mini" hover-class="none" 
 														@tap="handleAddToCart(item, good, 1)">
 														<view class="iconfont iconadd-select"></view>
 													</button>
@@ -110,7 +110,7 @@
 					<view class="tag">{{ getCartGoodsNumber }}</view>
 				</view>
 				<view class="price">￥{{ getCartGoodsPrice }}</view>
-				<button type="primary" class="pay-btn" @tap="toPay" :disabled="disabledPay">
+				<button type="default" class="pay-btn" @tap="toPay" :disabled="disabledPay">
 					{{ disabledPay ? `差${spread}元起送` : '去结算' }}
 				</button>
 			</view>
@@ -162,7 +162,7 @@
 						<view class="iconfont iconsami-select"></view>
 					</button>
 					<view class="number">{{ good.number }}</view>
-					<button type="primary" class="btn" size="min" hover-class="none" 
+					<button type="default" class="btn btn-primary" size="mini" hover-class="none" 
 						@tap="handlePropertyAdd">
 						<view class="iconfont iconadd-select"></view>
 					</button>

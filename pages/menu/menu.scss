@@ -377,6 +377,12 @@ page {
 										height: 44rpx;
 										line-height: 44rpx;
 
+										&.btn-primary {
+											background-color: $color-primary;
+											color: #ffffff;
+											border: none;
+										}
+
 										&.property_btn {
 											border-radius: 24rpx;
 										}
@@ -595,6 +601,12 @@ page {
 				height: 44rpx;
 				line-height: 44rpx;
 				border-radius: 100%;
+				
+				&.btn-primary {
+					background-color: $color-primary;
+					color: #ffffff;
+					border: none;
+				}
 			}
 		}
 	}
@@ -640,6 +652,8 @@ page {
 		display: flex;
 		align-items: center;
 		font-size: $font-size-base;
+		background-color: $color-primary;
+		border: none;
 	}
 	
 	.mark {
