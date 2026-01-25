@@ -30,11 +30,11 @@
 <script>
 	// #ifndef H5 || APP-PLUS-NVUE
 	import trees from './libs/trees';
-	var cache = {},
+	import Parser from './libs/MpHtmlParser.js';
+	var cache = {};
 		// #ifdef MP-WEIXIN || MP-TOUTIAO
-		fs = uni.getFileSystemManager ? uni.getFileSystemManager() : null,
+	var	fs = uni.getFileSystemManager ? uni.getFileSystemManager() : null;
 		// #endif
-		Parser = require('./libs/MpHtmlParser.js');
 	var document; // document 补丁包 https://jin-yufeng.github.io/Parser/#/instructions?id=document
 	// 计算 cache 的 key
 	function hash(str) {
@@ -44,8 +44,8 @@
 	}
 	// #endif
 	// #ifdef H5 || APP-PLUS-NVUE
-	var rpx = uni.getSystemInfoSync().screenWidth / 750,
-		cfg = require('./libs/config.js');
+	import cfg from './libs/config.js';
+	var rpx = uni.getSystemInfoSync().screenWidth / 750;
 	// #endif
 	// #ifdef APP-PLUS-NVUE
 	var dom = weex.requireModule('dom');

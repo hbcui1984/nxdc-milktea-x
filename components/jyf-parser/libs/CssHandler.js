@@ -5,7 +5,7 @@
   author：JinYufeng
   update：2020/03/15
 */
-var cfg = require('./config.js');
+import cfg from './config.js';
 class CssHandler {
 	constructor(tagStyle) {
 		var styles = Object.assign({}, cfg.userAgentStyles);
@@ -27,7 +27,7 @@ class CssHandler {
 		return matched;
 	}
 }
-module.exports = CssHandler;
+export default CssHandler;
 class CssParser {
 	constructor(data, init) {
 		this.data = data;

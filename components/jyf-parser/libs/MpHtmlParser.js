@@ -5,10 +5,10 @@
   author：JinYufeng
   update：2020/05/08
 */
-var cfg = require('./config.js'),
-	blankChar = cfg.blankChar,
-	CssHandler = require('./CssHandler.js'),
-	screenWidth = wx.getSystemInfoSync().screenWidth;
+import cfg from './config.js';
+import CssHandler from './CssHandler.js';
+var blankChar = cfg.blankChar,
+	screenWidth = uni.getSystemInfoSync().screenWidth;
 var emoji; // emoji 补丁包 https://jin-yufeng.github.io/Parser/#/instructions?id=emoji
 class MpHtmlParser {
 	constructor(data, options = {}) {
@@ -514,4 +514,4 @@ class MpHtmlParser {
 		}
 	}
 }
-module.exports = MpHtmlParser;
+export default MpHtmlParser;
