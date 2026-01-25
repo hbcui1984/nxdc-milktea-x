@@ -90,7 +90,7 @@ var dateUtils = {
 	}
 };
 
-module.exports = {
+export default {
 	formatTime,
 	formatDateTime,
 	formatLocation,
