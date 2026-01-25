@@ -161,7 +161,7 @@
 			</view>
 		</view>
 		<!-- 付款栏 end -->
-		<modal :show="ensureAddressModalVisible" custom :mask-closable="false" :radius="0" width="90%">
+		<modal :show="ensureAddressModalVisible" custom :mask-closable="false" radius="0" width="90%">
 			<view class="modal-content">
 				<view class="d-flex justify-content-end">
 					<image src="/static/images/pay/close.png" style="width: 40rpx; height: 40rpx;" @tap="ensureAddressModalVisible=false"></image>
