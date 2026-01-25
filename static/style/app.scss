@@ -21,30 +21,32 @@ page {
 	height: 100%;
 }
 
-button {
+button,
+uni-button {
 	margin: 0;
 
 	&[type='primary'] {
-		background-color: $color-primary;
-		color: #ffffff;
+		background-color: $color-primary !important;
+		color: #ffffff !important;
 		font-size: $font-size-base;
 		
 		&[disabled] {
-			background-color: #D1D78C;
+			background-color: #D1D78C !important;
 		}
 		
 		&[plain] {
-			color: $color-primary;
-			border: 1rpx solid $color-primary;
+			background-color: transparent !important;
+			color: $color-primary !important;
+			border: 1rpx solid $color-primary !important;
 			
 			&.button-hover {
-				color: rgba($color: $color-primary, $alpha: 0.5);
-				border: 1rpx solid rgba($color: $color-primary, $alpha: 0.5);
+				color: rgba($color: $color-primary, $alpha: 0.5) !important;
+				border: 1rpx solid rgba($color: $color-primary, $alpha: 0.5) !important;
 			}
 		}
 		
 		&.button-hover {
-			background-color: #d5da91;
+			background-color: #d5da91 !important;
 		}
 		
 		&::after {
@@ -63,6 +65,40 @@ button {
 			}
 		}
 	}
+}
+
+/* H5 环境下 uni-button 样式覆盖 - 需要足够的选择器优先级 */
+uni-button[type='primary'],
+uni-button[type='primary'][size='mini'],
+uni-button[type='primary'][size='default'] {
+	background-color: $color-primary !important;
+	color: #ffffff !important;
+}
+
+uni-button[type='primary'][plain],
+uni-button[type='primary'][plain][size='mini'],
+uni-button[type='primary'][plain][size='default'] {
+	background-color: transparent !important;
+	color: $color-primary !important;
+	border: 1px solid $color-primary !important;
+}
+
+uni-button[disabled][type='primary'] {
+	background-color: #D1D78C !important;
+}
+
+/* hover 状态 */
+uni-button.button-hover[type='primary'],
+.button-hover[type='primary'] {
+	background-color: #d5da91 !important;
+	color: #ffffff !important;
+}
+
+uni-button.button-hover[type='primary'][plain],
+.button-hover[type='primary'][plain] {
+	background-color: transparent !important;
+	color: rgba(173, 184, 56, 0.6) !important;
+	border-color: rgba(173, 184, 56, 0.6) !important;
 }
 
 uni-toast {
