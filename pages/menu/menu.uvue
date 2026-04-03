@@ -105,12 +105,12 @@
 			<!-- content end -->
 			<!-- 购物车栏 begin -->
 			<view class="cart-box" v-if="cart.length > 0">
-				<view class="mark">
+				<view class="cart-mark">
 					<image src="/static/images/menu/cart.png" class="cart-img" @click="openCartPopup"></image>
-					<view class="tag">{{ getCartGoodsNumber }}</view>
+					<view class="cart-tag">{{ getCartGoodsNumber }}</view>
 				</view>
-				<view class="price">￥{{ getCartGoodsPrice }}</view>
-				<button type="default" class="pay-btn" @click="toPay" :disabled="disabledPay">
+				<view class="cart-total-price">￥{{ getCartGoodsPrice }}</view>
+				<button type="default" class="cart-pay-btn" @click="toPay" :disabled="disabledPay">
 					{{ disabledPay ? `差${spread}元起送` : '去结算' }}
 				</button>
 			</view>

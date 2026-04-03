@@ -17,6 +17,7 @@ page {
 	width: 100%;
 	height: 100%;
 	display: flex;
+	flex-direction: row;
 	align-items: center;
 	justify-content: center;
 
@@ -37,13 +38,14 @@ page {
 	flex-direction: column;
 	justify-content: flex-start;
 	margin-bottom: -40rpx;
-	.store {
-		width: 100%;
-		background-color: $bg-color-grey;
-		padding: 20rpx;
-		display: flex;
-		align-items: center;
-		margin-bottom: 20rpx;
+		.store {
+			width: 100%;
+			background-color: $bg-color-grey;
+			padding: 20rpx;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			margin-bottom: 20rpx;
 		border-radius: 6rpx;
 
 		.iconfont {
@@ -69,6 +71,7 @@ page {
 			.name_and_distance {
 				width: 100%;
 				display: flex;
+				flex-direction: row;
 				justify-content: space-between;
 				margin-bottom: 10rpx;
 				overflow: hidden;
@@ -483,6 +486,7 @@ page {
 		height: 320rpx;
 		padding: 30rpx 0;
 		display: flex;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 		position: relative;
@@ -497,6 +501,7 @@ page {
 			right: 10rpx;
 			top: 30rpx;
 			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: space-around;
 
@@ -596,6 +601,7 @@ page {
 	
 	.action {
 		display: flex;
+		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
 		background-color: $bg-color-grey;
@@ -626,6 +632,7 @@ page {
 		}
 		.btn-group {
 			display: flex;
+			flex-direction: row;
 			align-items: center;
 			justify-content: space-around;
 
@@ -656,6 +663,7 @@ page {
 
 	.add-to-cart-btn {
 		display: flex;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
 		background-color: $color-primary;
@@ -676,56 +684,64 @@ page {
 	box-shadow: 0 0 20rpx rgba(0, 0, 0, 0.2);
 	background-color: #FFFFFF;
 	display: flex;
+	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
 	z-index: 9999;
-	
-	.cart-img {
-		width: 96rpx;
-		height: 96rpx;
-		position: relative;
-		margin-top: -48rpx;
-	}
-	
-	.pay-btn {
-		height: 100%;
-		padding: 0 30rpx;
-		color: #FFFFFF;
-		border-radius: 0 50rpx 50rpx 0;
-		display: flex;
-		align-items: center;
-		font-size: $font-size-base;
-		background-color: $color-primary;
-		border: none;
-	}
-	
-	.mark {
-		padding-left: 46rpx;
-		margin-right: 30rpx;
-		position: relative;
-		
-		.tag {
-			background-color: $color-warning;
-			color: $text-color-white;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			font-size: $font-size-sm;
-			position: absolute;
-			right: -10rpx;
-			top: -50rpx;
-			border-radius: 100%;
-			padding: 4rpx;
-			width: 40rpx;
-			height: 40rpx;
-			opacity: .9;
-		}
-	}
-	
-	.price {
-		flex: 1;
-		color: $text-color-base;
-	}
+	overflow: visible;
+}
+
+.cart-img {
+	width: 96rpx;
+	height: 96rpx;
+	position: relative;
+	margin-top: -48rpx;
+}
+
+.cart-pay-btn {
+	height: 100%;
+	padding: 0 30rpx;
+	color: #FFFFFF;
+	border-radius: 0 50rpx 50rpx 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-size: $font-size-base;
+	background-color: $color-primary;
+	border: none;
+}
+
+.cart-mark {
+	padding-left: 46rpx;
+	margin-right: 30rpx;
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	overflow: visible;
+}
+
+.cart-tag {
+	background-color: $color-warning;
+	color: $text-color-white;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	font-size: $font-size-sm;
+	position: absolute;
+	right: -10rpx;
+	top: -50rpx;
+	border-radius: 100%;
+	padding: 4rpx;
+	width: 40rpx;
+	height: 40rpx;
+	opacity: .9;
+}
+
+.cart-total-price {
+	flex: 1;
+	color: $text-color-base;
 }
 
 .cart-popup {
@@ -752,6 +768,7 @@ page {
 			
 			.item {
 				display: flex;
+				flex-direction: row;
 				justify-content: space-between;
 				align-items: center;
 				padding: 30rpx 0;
@@ -795,6 +812,7 @@ page {
 				
 				.right {
 					display: flex;
+					flex-direction: row;
 					align-items: center;
 					justify-content: space-between;
 					
