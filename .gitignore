@@ -1,4 +1,5 @@
 /unpackage
 manifest.json
 .DS_Store
+.hbuilderx/
 upgradeLog_files/
