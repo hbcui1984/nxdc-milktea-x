@@ -1,51 +1,39 @@
-# 奈雪の茶小程序模板 (Vue 3 版)
+# nxdc-milktea-x
 
-> 本项目基于 [tinypuppet/nxdc-milktea](https://github.com/tinypuppet/nxdc-milktea) 升级改造，感谢原作者的开源贡献！
+本项目是使用 [uni-agent](https://uniapp.dcloud.net.cn/ai/uni-agent.html) 从 [https://github.com/hbcui1984/nxdc-milktea](https://github.com/hbcui1984/nxdc-milktea) 升级而来的 `uni-app x` 版本。
 
-## 升级说明
+## 项目关系
 
-| 项目 | 原版 | 本项目 |
-|------|------|--------|
-| Vue 版本 | Vue 2 (Options API) | Vue 3 (Composition API) |
-| 框架支持 | uni-app | uni-app + uni-app x |
-| 语法风格 | Options API | `<script setup>` |
+| 项目 | 仓库地址 | 技术版本 |
+|------|----------|----------|
+| 原项目 | [https://github.com/hbcui1984/nxdc-milktea](https://github.com/hbcui1984/nxdc-milktea) | `uni-app` Vue 3 版本 |
+| 当前项目 | [https://github.com/hbcui1984/nxdc-milktea-x](https://github.com/hbcui1984/nxdc-milktea-x) | `uni-app x` 版本 |
 
-**特别声明：本项目中的展示图片归奈雪の茶所有。**
+## 升级目标
 
-## 简介
+- 保持原项目的页面结构与主要业务场景
+- 完成从 `uni-app` 到 `uni-app x` 的迁移与适配
+- 以 `uvue` / `uts` 形式重建页面与本地数据层
 
-一套仿奈雪の茶小程序的项目模板。
-
-## 功能列表
+## 功能范围
 
 - 首页
-- 点餐（自取和外卖两种方式，有基本的点餐逻辑处理）
+- 点餐
 - 取餐
 - 我的
-- 积分商城
-- 积分商城详情页
-- 积分签到
 - 会员码
-- 我的卡券
-- 收货地址
-- 我的资料
-- 我的订单
-- 订单详情
-- 余额
-- 会员券包
-- 券包详情
-- 订单评价
-- 买茶送包
-- 更多服务
-- 开发票
-- 礼品卡
+- 卡券
+- 地址
+- 订单
+- 积分相关页面
+- 礼品卡、发票、服务等页面
 
 ## 数据说明
 
-所有数据都是静态的，保存在 `api` 文件夹下。
+- 当前项目主要使用本地静态模拟数据
+- 数据文件位于 `api/*.uts`
 
-## 展示效果
+## 备注
 
-|首页|点餐|饮品详情|我的|取餐|
-|---|---|---|---|---|
-|![](https://img.cdn.aliyun.dcloud.net.cn/stream/plugin_screens/fafaa180-94f3-11ea-9423-8760f636375f_0.jpg?v=1590130842)|![](https://img.cdn.aliyun.dcloud.net.cn/stream/plugin_screens/fafaa180-94f3-11ea-9423-8760f636375f_1.jpg?v=1590130842)|![](https://img.cdn.aliyun.dcloud.net.cn/stream/plugin_screens/fafaa180-94f3-11ea-9423-8760f636375f_2.jpg?v=1590130842)|![](https://img.cdn.aliyun.dcloud.net.cn/stream/plugin_screens/fafaa180-94f3-11ea-9423-8760f636375f_3.jpg?v=1590130842)|![](https://img.cdn.aliyun.dcloud.net.cn/stream/plugin_screens/fafaa180-94f3-11ea-9423-8760f636375f_4.jpg?v=1590130842)|
+- 提交到 GitHub 的 `manifest.json` 中 `appid` 为空，避免提交本地应用标识
+- 如需本地运行 App，可在本地自行补充 `appid`
