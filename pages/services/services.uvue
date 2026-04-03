@@ -1,0 +1,88 @@
+<template>
+	<view class="container">
+		<view class="cell" @click="helpCenter">
+			<view class="content">
+				<image src="/static/images/services/bzzx.png" class="icon"></image>
+				<view class="cell-text">帮助中心</view>
+			</view>
+			<image src="/static/images/navigator-1.png" class="navigator"></image>
+		</view>
+		<view class="cell-line"></view>
+		<view class="cell">
+			<view class="content">
+				<image src="/static/images/services/gynx.png" class="icon"></image>
+				<view class="cell-text">关于奈雪</view>
+			</view>
+			<image src="/static/images/navigator-1.png" class="navigator"></image>
+		</view>
+		<view class="cell-line"></view>
+		<view class="cell">
+			<view class="content">
+				<image src="/static/images/services/wdzl.png" class="icon"></image>
+				<view class="cell-text">奈雪礼物</view>
+			</view>
+			<image src="/static/images/navigator-1.png" class="navigator"></image>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+const helpCenter = () => {
+	uni.navigateTo({
+		url: '/pages/services/help-center'
+	})
+}
+</script>
+
+<style lang="scss">
+page {
+	background-color: #FFFFFF;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+}
+
+.cell {
+	padding: 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	position: relative;
+	background-color: #FFFFFF;
+}
+
+.content {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.cell-text {
+	font-size: 28rpx;
+	color: #333333;
+}
+
+.icon {
+	width: 70rpx;
+	height: 70rpx;
+	margin-right: 10rpx;
+}
+
+.navigator {
+	width: 50rpx;
+	height: 50rpx;
+	position: relative;
+	margin-right: -10rpx;
+	flex-shrink: 0;
+}
+
+.cell-line {
+	height: 2rpx;
+	background-color: #d9d9d9;
+	margin-left: 30rpx;
+	margin-right: 30rpx;
+}
+</style>

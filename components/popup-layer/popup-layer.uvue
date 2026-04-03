@@ -1,0 +1,136 @@
+<template>
+	<view class="popup-wrapper">
+		<view v-if="ifshow" @tap="ableClose" @touchmove.stop.prevent class="popup-layer">
+		</view>
+		<view v-if="ifshow" class="popup-content" @tap.stop="stopEvent" :style="computedLocation">
+			<slot name="content"></slot>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+	const props = defineProps({
+		showPop: {
+			type: Boolean,
+			default: false
+		},
+		direction: {
+			type: String,
+			default: 'top'
+		},
+		autoClose: {
+			type: Boolean,
+			default: true
+		}
+	})
+
+	const emit = defineEmits<{
+		(e: 'closeCallBack', data: any | null): void
+		(e: 'update:showPop', value: boolean): void
+	}>()
+
+	const ifshow = ref<boolean>(false)
+	const translateValue = ref<number>(-100)
+	const iftoggle = ref<boolean>(false)
+	let timer: number | null = null
+
+	const computedLocation = computed((): string => {
+		let positionStyle = ''
+		if (props.direction == 'top') {
+			positionStyle = 'bottom: 0px; width: 100%;'
+		} else if (props.direction == 'bottom') {
+			positionStyle = 'top: 0px; width: 100%;'
+		} else if (props.direction == 'left') {
+			positionStyle = 'right: 0px; height: 100%;'
+		} else if (props.direction == 'right') {
+			positionStyle = 'left: 0px; height: 100%;'
+		}
+		return positionStyle
+	})
+
+	const stopEvent = (_event: UniPointerEvent) => {}
+
+	const show = () => {
+		ifshow.value = true
+		setTimeout(() => {
+			translateValue.value = 0
+		}, 100)
+		setTimeout(() => {
+			iftoggle.value = true
+		}, 300)
+	}
+
+	const close = () => {
+		if (timer != null || !iftoggle.value) {
+			return
+		}
+		translateValue.value = -100
+		timer = setTimeout(() => {
+			ifshow.value = false
+			timer = null
+			iftoggle.value = false
+			emit('closeCallBack', null)
+			emit('update:showPop', false)
+		}, 300)
+	}
+
+	const ableClose = () => {
+		if (props.autoClose) {
+			close()
+		}
+	}
+
+	onMounted(() => {
+		if (props.showPop) {
+			show()
+		}
+	})
+
+	watch((): boolean => props.showPop, (value: boolean) => {
+		console.log(value)
+		if (value) {
+			show()
+		} else {
+			close()
+		}
+	})
+
+	defineExpose({
+		show,
+		close
+	})
+</script>
+
+<style lang="scss">
+	.popup-wrapper {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 0;
+		height: 0;
+		overflow: visible;
+		z-index: 9989;
+		pointer-events: none;
+	}
+
+	.popup-layer {
+		position: fixed;
+		z-index: 9990;
+		background-color: rgba(0, 0, 0, 0.3);
+		height: 100%;
+		width: 100%;
+		top: 0px;
+		left: 0px;
+		overflow: hidden;
+		pointer-events: auto;
+	}
+
+	.popup-content {
+		position: fixed;
+		z-index: 9991;
+		background-color: #FFFFFF;
+		overflow: hidden;
+		box-sizing: border-box;
+		pointer-events: auto;
+	}
+</style>

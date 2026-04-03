@@ -1,0 +1,254 @@
+<template>
+	<view class="container">
+		<navbar-back-button></navbar-back-button>
+		<view class="header">
+			<image src="/static/images/integrals/bg.png" mode="scaleToFill"></image>
+			<view class="sign-in-info">
+				<view class="left">
+					<view class="d-flex align-items-baseline" @click="flow">
+						<image class="integral-icon" src="/static/images/integrals/integral.png"></image>
+						<view class="number">{{ customPoints.totalPoints }}</view>
+						<view class="font-size-base">积分</view>
+						<view class="iconfont iconarrow-right line-height-100"></view>
+					</view>
+				</view>
+				<view class="right">
+					兑换记录
+				</view>
+			</view>
+		</view>
+		<view style="padding: 0 30rpx;">
+			<view class="sign-in-box">
+				<view class="text-color-base font-weight-bold font-size-lg" style="margin: 20rpx 0;">连续签到赚积分</view>
+				<!-- 签到步骤简化显示 -->
+				<view class="d-flex justify-content-between align-items-center" style="padding: 20rpx 0;">
+					<text v-for="(step, idx) in stepsOption" :key="idx" 
+						class="font-size-sm" 
+						:class="idx < activeDay ? 'text-color-primary' : 'text-color-assist'">
+						{{ step.title }}
+					</text>
+				</view>
+				<view class="d-flex flex-column align-items-center just-content-center" style="margin: 20rpx 0;">
+					<button type="primary" class="sign-in-btn" @click="attendance">签到</button>
+					<view class="font-size-base text-color-primary" style="margin-top: 20rpx;">查看签到日历</view>
+				</view>
+			</view>
+			
+			<view class="banner">
+				<image src="https://images.qmai.cn/s23107/2020/04/30/aed6cdb1db4712f87e.png" mode="widthFix"></image>
+			</view>
+			<!-- 积分商品列表 begin -->
+			<view class="d-flex flex-column" v-for="(entry, entryIndex) in pointsMallEntries" :key="entryIndex">
+				<view class="d-flex justify-content-between align-items-center mb-30">
+					<view class="font-size-lg text-color-base">{{ entry.key }}</view>
+					<image src="/static/images/navigator.png" style="width: 40rpx; height: 40rpx;"></image>
+				</view>
+				<view class="d-flex flex-wrap justify-content-between">
+					<view v-for="(item, itemIndex) in entry.value" :key="itemIndex" 
+						class="d-flex bg-white flex-column align-items-stretch point-box" 
+						@click="detail(entry.key, item.id)">
+						<image :src="getItemImage(item)" class="w-100" mode="widthFix"></image>
+						<view class="d-flex flex-column overflow-hidden">
+							<view class="font-size-lg text-color-base text-truncate font-weight-bold" style="margin-bottom: 10rpx;">{{ item.goods_name }}</view>
+							<view class="d-flex align-items-center">
+								<view class="d-flex align-items-baseline">
+									<view class="font-size-base text-color-primary mr-10">{{ item.points_price }}</view>
+									<view class="font-size-sm text-color-assist">积分</view>
+								</view>
+								<view v-if="parseFloat(item.amount) > 0" class="d-flex align-items-center font-size-sm text-color-assist" style="margin: 0 10rpx;">+</view>
+								<view v-if="parseFloat(item.amount) > 0" class="d-flex align-items-baseline">
+									<view class="font-size-base text-color-primary mr-10">{{ parseFloat(item.amount) }}</view>
+									<view class="font-size-sm text-color-assist">元</view>
+								</view>
+							</view>
+							<view class="font-size-sm text-color-assist">剩余{{ item.goods_stock }}件</view>
+						</view>
+					</view>						
+				</view>
+			</view>
+			<!-- 积分商品列表 end -->
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import navbarBackButton from '@/components/navbar-back-button.uvue'
+// uni-steps 组件已移除，使用简化显示
+
+// 积分商品类型
+type PointGoodItem = {
+	id: number
+	goods_name: string
+	points_price: number
+	amount: string
+	goods_stock: number
+	img: string[]
+	goods_type: number
+	exchange_desc: string | null
+}
+
+// 签到步骤类型
+type StepOption = {
+	title: string
+	desc: string
+	circle?: string
+	circleStyle?: string
+}
+
+// 用户积分类型
+type CustomPointsType = {
+	totalPoints: number
+}
+
+// 积分商品条目类型
+type PointsMallEntry = {
+	key: string
+	value: PointGoodItem[]
+}
+
+const customPoints = ref<CustomPointsType>({ totalPoints: 0 })
+const stepsOption = ref<StepOption[]>([])
+const activeDay = ref<number>(0)
+const pointsMallEntries = ref<PointsMallEntry[]>([])
+
+const getItemImage = (item: PointGoodItem): string => {
+	if (item.img.length > 0) {
+		return item.img[0]
+	}
+	return '/static/images/integrals/ticket.png'
+}
+
+const getStepsOptions = async () => {
+	// TODO: 实现签到步骤数据获取
+	const stepsOptions: StepOption[] = []
+	// 模拟数据
+	const days = [1, 2, 3, 4, 5, 6, 7]
+	days.forEach((day: number, index: number) => {
+		const option: StepOption = {
+			title: day.toString() + '天',
+			desc: '+' + (day * 10).toString()
+		}
+		if (index == days.length - 1) {
+			option.circle = '/static/images/integrals/goal.png'
+			option.circleStyle = 'width: 47rpx; height: 39rpx;'
+		}
+		stepsOptions.push(option)
+	})
+	stepsOption.value = stepsOptions
+}
+
+const getPointsMall = async () => {
+	// TODO: 实现积分商城数据获取
+	// 模拟数据结构
+	const entries: PointsMallEntry[] = []
+	pointsMallEntries.value = entries
+}
+
+const attendance = () => {
+	uni.navigateTo({
+		url: '/pages/attendance/attendance'
+	})
+}
+
+const flow = () => {
+	uni.navigateTo({
+		url: '/pages/integrals/flow'
+	})
+}
+
+const detail = (cate: string, id: number) => {
+	uni.navigateTo({
+		url: '/pages/integrals/detail?cate=' + cate + '&id=' + id.toString()
+	})
+}
+
+onLoad(() => {
+	getStepsOptions()
+	getPointsMall()
+	// 模拟用户积分
+	customPoints.value = { totalPoints: 1200 }
+})
+</script>
+
+<style lang="scss">
+.header {
+	position: relative;
+	width: 100%;
+	height: 430rpx;
+	
+	image {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.sign-in-info {
+	position: absolute;
+	width: 100%;
+	height: 430rpx;
+	display: flex;
+	align-items: center;
+	top: 0;
+	left: 0;
+	
+	.left {
+		color: #FFFFFF;
+		margin-left: 40rpx;
+		flex: 1;
+		display: flex;
+		
+		.integral-icon {
+			width: 64rpx;
+			height: 64rpx;
+			margin-right: 20rpx;
+		}
+		
+		.number {
+			font-size: 80rpx;
+			margin-right: 10rpx;
+		}
+	}
+	
+	.right {
+		background-color: #FFFFFF;
+		color: $color-primary;
+		font-size: $font-size-base;
+		border-radius: 50rpx 0 0 50rpx;
+		padding: 10rpx 30rpx;
+	}
+}
+
+.sign-in-box {
+	position: relative;
+	background-color: #FFFFFF;
+	margin-top: -90rpx;
+	margin-bottom: 30rpx;
+	width: 100%;
+	border-radius: 8rpx;
+	padding: 20rpx;
+	display: flex;
+	flex-direction: column;
+	
+	.sign-in-btn {
+		width: 50%;
+		border-radius: 50rpx;
+	}
+}
+
+.banner {
+	width: 100%;
+	margin: 30rpx 0;
+	border-radius: 8rpx;
+	
+	image {
+		width: 100%;
+	}
+}
+
+.point-box {
+	width: 49%;
+	margin-bottom: 30rpx;
+	border-radius: 8rpx;
+	padding: 20rpx;
+}
+</style>

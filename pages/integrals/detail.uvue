@@ -1,0 +1,253 @@
+<template>
+	<view class="container position-relative">
+		<view style="padding-bottom: 150rpx;">
+			<view class="d-flex flex-column" v-if="pointGood.goods_type == 2">
+				<view class="bg-white mb-30">
+					<image :src="getFirstImage()" class="w-100" mode="widthFix"></image>
+					<view class="d-flex flex-column" style="padding: 30rpx;">
+						<view class="d-flex align-items-center mb-10">
+							<view class="d-flex align-items-baseline">
+								<view class="font-size-extra-lg text-color-primary mr-10 font-weight-bold">{{ pointGood.points_price }}</view>
+								<view class="font-size-base text-color-base">积分</view>
+							</view>
+							<view v-if="parseFloat(pointGood.amount) > 0" class="font-size-sm text-color-base" style="margin: 0 10rpx;">+</view>
+							<view class="d-flex align-items-baseline" v-if="parseFloat(pointGood.amount) > 0">
+								<view class="font-size-extra-lg text-color-primary mr-10 font-weight-bold">{{ pointGood.amount }}</view>
+								<view class="font-size-base text-color-base">元</view>
+							</view>
+						</view>
+						<view class="d-flex justify-content-between align-items-center">
+							<view class="font-size-extra-lg text-color-base font-weight-bold">
+								{{ pointGood.goods_name }}
+							</view>
+							<view class="font-size-sm text-color-base">
+								剩余<text class="text-color-primary">{{ pointGood.goods_stock }}</text>件
+							</view>
+						</view>
+					</view>
+				</view>
+				<view class="bg-white mb-20" style="padding: 30rpx;">
+					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">商品详情</view>
+					<view class="font-size-base text-color-assist">
+						<rich-text :nodes="pointGood.exchange_desc"></rich-text>
+					</view>
+				</view>
+			</view>
+			<view v-else class="d-flex flex-column">
+				<view class="coupon-box">
+					<view class="coupon">
+						<image src="/static/images/integrals/ticket.png" mode="aspectFit" class="coupon-image"></image>
+						<view class="intro">
+							<view class="goods-name">{{ pointGood.goods_name }}</view>
+							<view class="expire">有效期：领券当日开始90天内有效</view>
+						</view>
+						<view class="arch-left"></view>
+						<view class="arch-right"></view>
+					</view>
+				</view>
+				<view class="points-and-stocks">
+					<view class="points">
+						<view class="font-size-lg text-color-primary font-weight-bold mr-10">{{ pointGood.points_price }}</view>
+						<view class="font-size-sm text-color-base">积分</view>
+					</view>
+					<view class="stocks font-size-sm text-color-base">
+						剩余<text class="text-color-primary">{{ pointGood.goods_stock }}</text>件
+					</view>
+				</view>
+				<view class="w-100 bg-white" style="padding: 30rpx;">
+					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">兑换须知</view>
+					<view class="font-size-base text-color-assist">
+						<rich-text :nodes="pointGood.exchange_desc"></rich-text>
+					</view>
+					<view class="d-flex align-items-center font-size-lg font-weight-bold line-height-2">使用须知</view>
+					<view v-for="(item, index) in useTips" :key="index" 
+						class="font-size-base text-color-base line-height-2 d-flex align-items-center">
+						<view>{{ item.title }}：</view>
+						<view class="font-weight-bold">{{ item.value }}</view>
+					</view>
+				</view>
+			</view>
+			
+			<view class="btn-box">
+				<button type="primary" :disabled="isPointsInsufficient" class="exchange-btn">
+					{{ isPointsInsufficient ? '积分不足' : '立即兑换' }}
+				</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+// 积分商品类型
+type PointGoodType = {
+	id: number
+	goods_name: string
+	points_price: number
+	amount: string
+	goods_stock: number
+	img: string[]
+	goods_type: number
+	exchange_desc: string
+}
+
+// 用户积分类型
+type CustomPointsType = {
+	totalPoints: number
+}
+
+// 使用须知类型
+type UseTipType = {
+	title: string
+	value: string
+}
+
+const customPoints = ref<CustomPointsType>({ totalPoints: 0 })
+const pointGood = ref<PointGoodType>({
+	id: 0,
+	goods_name: '',
+	points_price: 0,
+	amount: '0.00',
+	goods_stock: 0,
+	img: [],
+	goods_type: 1,
+	exchange_desc: ''
+})
+
+const useTips = ref<UseTipType[]>([
+	{ title: '使用条件', value: '无门槛' },
+	{ title: '优惠形式', value: '免最高1件' },
+	{ title: '有效期', value: '领券当日开始90天内有效' },
+	{ title: '使用时段', value: '00:00:00~23:59:59' },
+	{ title: '使用限制', value: '不限制' },
+	{ title: '兑换限制', value: '不限制' },
+	{ title: '活动商品', value: '限部分商品' },
+	{ title: '是否与其他优惠共享', value: '否' },
+	{ title: '使用场景', value: '仅外卖、堂食可用' }
+])
+
+const isPointsInsufficient = computed<boolean>((): boolean => {
+	return customPoints.value.totalPoints < pointGood.value.points_price
+})
+
+const getFirstImage = (): string => {
+	if (pointGood.value.img.length > 0) {
+		return pointGood.value.img[0]
+	}
+	return '/static/images/integrals/ticket.png'
+}
+
+onLoad((option: OnLoadOptions) => {
+	const cate = option['cate'] ?? ''
+	const id = option['id'] ?? ''
+	// TODO: 根据 cate 和 id 获取商品详情
+	console.log('加载商品详情', cate, id)
+	
+	// 模拟数据
+	pointGood.value = {
+		id: parseInt(id),
+		goods_name: '软欧包免费券',
+		points_price: 800,
+		amount: '0.00',
+		goods_stock: 99665,
+		img: [],
+		goods_type: 1,
+		exchange_desc: '<p>兑换规则：会员可凭800积分兑换</p>'
+	}
+	customPoints.value = { totalPoints: 1200 }
+})
+</script>
+
+<style lang="scss">
+.btn-box {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 150rpx;
+	padding: 30rpx;
+	z-index: 10;
+	background-color: #FFFFFF;
+	
+	.exchange-btn {
+		border-radius: 50rpx;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+}
+
+.coupon-box {
+	width: 100%;
+	padding: 30rpx 50rpx;
+	
+	.coupon {
+		background-color: #FFFFFF;
+		padding: 40rpx;
+		border-radius: 10rpx;
+		display: flex;
+		align-items: center;
+		position: relative;
+		
+		.coupon-image {
+			width: 180rpx;
+			height: 120rpx;
+			margin-right: 30rpx;
+		}
+		
+		.intro {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			
+			.goods-name {
+				font-size: $font-size-lg;
+				color: $text-color-base;
+				margin-bottom: 10rpx;
+			}
+			
+			.expire {
+				font-size: 22rpx;
+				color: $text-color-assist;
+			}
+		}
+		
+		.arch-left {
+			position: absolute;
+			background-color: $bg-color;
+			width: 40rpx;
+			height: 40rpx;
+			z-index: 10;
+			border-radius: 20rpx;
+			left: -20rpx;
+			top: 50%;
+			margin-top: -20rpx;
+		}
+		
+		.arch-right {
+			position: absolute;
+			background-color: $bg-color;
+			width: 40rpx;
+			height: 40rpx;
+			z-index: 10;
+			border-radius: 20rpx;
+			right: -20rpx;
+			top: 50%;
+			margin-top: -20rpx;
+		}
+	}
+}
+
+.points-and-stocks {
+	padding: 0 50rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30rpx;
+	
+	.points {
+		display: flex;
+		align-items: baseline;
+	}
+}
+</style>

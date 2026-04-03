@@ -1,0 +1,221 @@
+<template>
+	<view class="container">
+		<view class="main">
+			<view v-if="addresses.length == 0" class="no-address-tips">
+				<view class="mb-30">暂无地址信息</view>
+				<view>请点击底部按钮添加地址信息</view>
+			</view>
+			<view v-else class="address-list">
+				<view class="address-wrapper" v-for="(address, index) in addresses" :key="index">
+					<view class="address" @click="chooseAddress(address)">
+						<view class="left">
+							<view class="street-text">{{ address.street }}</view>
+							<view class="contact-text">
+								{{ address.accept_name }} {{ address.sex == 0 ? '先生' : '女士' }} {{ address.mobile }}
+							</view>
+						</view>
+						<image src="/static/images/edit.png" class="edit-icon" @click.stop="edit(address.id)"></image>
+					</view>
+					<view class="delete-btn" @click="handleDelete(address.id)">
+						<text class="delete-text">删除</text>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="btn-box">
+			<button type="primary" size="default" class="add-btn" @click="add">新增地址</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { state, setAddress, setAddresses, setOrderType, AddressType } from '@/store/index.uts'
+
+// 页面参数
+const scene = ref<string>('menu')
+const is_choose = ref<boolean>(false)
+
+// 计算属性 - 地址列表
+const addresses = computed((): AddressType[] => {
+	return state.addresses
+})
+
+onLoad((options: OnLoadOptions) => {
+	if (options['is_choose'] != null) {
+		is_choose.value = options['is_choose'] == 'true'
+	}
+	if (options['scene'] != null) {
+		scene.value = options['scene'] as string
+	}
+})
+
+// 新增地址
+const add = () => {
+	uni.navigateTo({
+		url: '/pages/address/add'
+	})
+}
+
+// 编辑地址
+const edit = (id: number) => {
+	uni.navigateTo({
+		url: '/pages/address/add?id=' + id
+	})
+}
+
+// 删除地址
+const handleDelete = (id: number) => {
+	uni.showModal({
+		title: '提示',
+		content: '确定要删除？',
+		success: (res: ShowModalResult) => {
+			if (res.confirm) {
+				const index = addresses.value.findIndex((item: AddressType): boolean => item.id == id)
+				if (index >= 0) {
+					const newAddresses: AddressType[] = [] as AddressType[]
+					for (let i = 0; i < addresses.value.length; i++) {
+						if (i != index) {
+							newAddresses.push(addresses.value[i])
+						}
+					}
+					setAddresses(newAddresses)
+					uni.showToast({ title: '删除成功！', icon: 'success' })
+				}
+			}
+		}
+	})
+}
+
+// 选择地址
+const chooseAddress = (address: AddressType) => {
+	if (!is_choose.value) return
+	setAddress(address)
+	setOrderType('takeout')
+	if (scene.value == 'menu') {
+		uni.switchTab({
+			url: '/pages/menu/menu'
+		})
+	} else if (scene.value == 'pay') {
+		uni.navigateTo({
+			url: '/pages/pay/pay'
+		})
+	}
+}
+</script>
+
+<style lang="scss">
+.container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.main {
+	width: 100%;
+	padding: 30rpx;
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	padding-bottom: 120rpx;
+}
+
+.no-address-tips {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 60rpx 0;
+}
+
+.mb-30 {
+	margin-bottom: 30rpx;
+}
+
+.address-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.address-wrapper {
+	margin-bottom: 30rpx;
+	display: flex;
+	flex-direction: row;
+}
+
+.address {
+	flex: 1;
+	padding: 40rpx 30rpx;
+	background-color: #FFFFFF;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.left {
+	flex: 1;
+	overflow: hidden;
+	margin-right: 20rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.street-text {
+	font-size: 32rpx;
+	font-weight: bold;
+	margin-bottom: 10rpx;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	lines: 1;
+}
+
+.contact-text {
+	font-size: 26rpx;
+	color: #999999;
+}
+
+.edit-icon {
+	width: 50rpx;
+	height: 50rpx;
+	flex-shrink: 0;
+}
+
+.delete-btn {
+	width: 120rpx;
+	background-color: #D12E32;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.delete-text {
+	color: #FFFFFF;
+	font-size: 28rpx;
+}
+
+.btn-box {
+	height: 100rpx;
+	background-color: #FFFFFF;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 10rpx 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.add-btn {
+	height: 80rpx;
+	flex: 1;
+	border-radius: 40rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+</style>

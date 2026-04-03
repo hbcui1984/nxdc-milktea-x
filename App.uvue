@@ -1,0 +1,51 @@
+<script lang="uts">
+  // #ifdef APP-ANDROID || APP-HARMONY
+  let firstBackTime : number = 0
+  // #endif
+
+  export default {
+    onLaunch(_options : OnLaunchOptions) {
+      console.log('App Launch')
+    },
+
+    onShow(_options : OnShowOptions) {
+      console.log('App Show')
+    },
+
+    onHide() {
+      console.log('App Hide')
+    },
+
+    // #ifdef APP-ANDROID || APP-HARMONY
+    onLastPageBackPress() {
+      console.log('App LastPageBackPress')
+      if (firstBackTime == 0) {
+        uni.showToast({
+          title: '再按一次退出应用',
+          position: 'bottom',
+        })
+        firstBackTime = Date.now()
+        setTimeout(() => {
+          firstBackTime = 0
+        }, 2000)
+      } else if (Date.now() - firstBackTime < 2000) {
+        firstBackTime = Date.now()
+        uni.exit()
+      }
+    },
+    
+    onExit() {
+      console.log('App Exit')
+    },
+    // #endif
+
+    onError(err : string) {
+      console.log('App Error', err)
+    }
+  }
+</script>
+
+<style lang="scss">
+  /* 每个页面公共css */
+  @import '@/static/style/app.scss';
+</style>

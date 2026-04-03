@@ -1,0 +1,221 @@
+<template>
+	<view class="container bg-white w-100 h-100">
+		
+		<view class="content-wrapper">
+			
+			<view class="balance-info d-flex justify-content-between">
+				<view class="flex-fill d-flex flex-column align-items-between justify-content-between info-left">
+					<view class="font-size-sm text-color-base">账户余额（元）</view>
+					<view class="font-size-extra-lg text-color-base font-weight-bold">0</view>
+					<view class="font-size-sm text-color-primary">交易记录</view>
+				</view>
+				<image src="/static/images/balance.png" mode="widthFix" class="balance-img"></image>
+			</view>
+			
+			<view class="font-size-lg text-color-base font-weight-bold section-title">储值金额</view>
+			
+			<view class="d-flex flex-wrap justify-content-between amounts">
+				<view class="d-flex align-items-center just-content-center amount" 
+					 :class="{'selected': isSelected(index), 'unselected': !isSelected(index)}"
+					  v-for="(item, index) in amounts" :key="index" @click="handleSelected(index)">
+					<view class="font-size-extra-lg font-weight-bold">{{ getAmountValue(item) }}</view>
+					<view class="font-size-sm font-weight-light">元</view>
+				</view>
+			</view>
+			
+			<template v-if="hasSelectedCard">
+				<view class="font-size-lg text-color-base font-weight-bold section-title">使用说明</view>
+				<view class="pre-line font-size-sm text-color-assist">
+					{{ selectedCardDesc }}
+				</view>
+			</template>
+			
+			<!-- bottom box begin -->
+			<view class="bottom-box position-fixed fixed-bottom w-100 d-flex flex-column bg-white">
+				<view class="protocol font-size-sm d-flex justify-content-start align-items-center">
+					<view class="iconfont line-height-100" @click="toggleAgree"
+						:class="{'iconradio-button-on text-color-primary': agree, 'iconradio-button-off text-color-base': !agree}"></view>
+					<view class="text-color-base">我已阅读并同意</view>
+					<view class="text-color-primary">《储值协议》</view>
+				</view>
+				<button type="primary" class="buy-btn" @click="buy">购买</button>
+			</view>
+			<!-- bottom box end -->
+			
+		</view>
+		
+	</view>
+</template>
+
+<script setup lang="uts">
+// 充值卡类型定义
+type RechargeCardType = {
+	id: string
+	value: number
+	desc: string
+	selected: boolean
+}
+
+const agree = ref<boolean>(false)
+const amounts = ref<RechargeCardType[]>([])
+
+const hasSelectedCard = computed((): boolean => {
+	for (let i = 0; i < amounts.value.length; i++) {
+		if (amounts.value[i].selected) {
+			return true
+		}
+	}
+	return false
+})
+
+const selectedCardDesc = computed((): string => {
+	for (let i = 0; i < amounts.value.length; i++) {
+		if (amounts.value[i].selected) {
+			return amounts.value[i].desc
+		}
+	}
+	return ''
+})
+
+const isSelected = (index: number): boolean => {
+	return amounts.value[index].selected
+}
+
+const getAmountValue = (item: RechargeCardType): string => {
+	return item.value.toInt().toString()
+}
+
+const toggleAgree = () => {
+	agree.value = !agree.value
+}
+
+const handleSelected = (index: number) => {
+	for (let i = 0; i < amounts.value.length; i++) {
+		amounts.value[i].selected = false
+	}
+	amounts.value[index].selected = true
+}
+
+const buy = () => {
+	if (!agree.value) {
+		uni.showToast({
+			title: '请先阅读并同意储值协议',
+			icon: 'none'
+		})
+		return
+	}
+	
+	if (!hasSelectedCard.value) {
+		uni.showToast({
+			title: '请选择储值金额',
+			icon: 'none'
+		})
+		return
+	}
+	
+	uni.showToast({
+		title: '购买成功',
+		icon: 'success'
+	})
+}
+
+onLoad(() => {
+	// 模拟数据
+	amounts.value = [
+		{ id: '1', value: 50, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额', selected: false },
+		{ id: '2', value: 100, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额', selected: false },
+		{ id: '3', value: 200, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满200元送20元', selected: false },
+		{ id: '4', value: 300, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满300元送35元', selected: false },
+		{ id: '5', value: 500, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满500元送60元', selected: false },
+		{ id: '6', value: 1000, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满1000元送150元', selected: false }
+	] as RechargeCardType[]
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	padding: 0 40rpx;
+}
+
+.content-wrapper {
+	padding-bottom: 220rpx;
+}
+
+.balance-info {
+	padding: 50rpx 10rpx;
+}
+
+.balance-info .info-left {
+	height: 180rpx;
+	padding: 10rpx 0;
+}
+
+.balance-info .balance-img {
+	width: 340rpx;
+}
+
+.section-title {
+	margin-bottom: 20rpx;
+}
+
+.amounts {
+	margin-bottom: 40rpx;
+}
+
+.amounts .amount {
+	width: 31%;
+	padding: 50rpx 0;
+	margin-bottom: 20rpx;
+	border-radius: 8rpx;
+}
+
+.amounts .amount.selected {
+	background-color: #ADB838;
+	color: #ffffff;
+}
+
+.amounts .amount.unselected {
+	background-color: #F5F5F5;
+	color: #5A5B5C;
+}
+
+.bottom-box {
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 0 40rpx;
+	box-shadow: 0 0 20rpx rgba(6, 6, 6, 0.1);
+}
+
+.bottom-box .protocol {
+	padding: 36rpx 0;
+	height: 100rpx;
+}
+
+.bottom-box .protocol view {
+	margin-right: 10rpx;
+}
+
+.bottom-box .buy-btn {
+	height: 70rpx;
+	line-height: 70rpx;
+	border-radius: 100px;
+	margin-bottom: 30rpx;
+}
+
+.pre-line {
+	white-space: pre-line;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.h-100 {
+	height: 100%;
+}
+
+.flex-fill {
+	flex: 1;
+}
+</style>

@@ -1,0 +1,106 @@
+<template>
+	<view class="container w-100 h-100" v-if="!isLoading">
+		<view class="d-flex flex-column w-100" style="padding: 30rpx; margin-bottom: 150rpx;">
+			<view v-for="(item, index) in packages" :key="index"
+				class="d-flex align-items-center bg-white package-item" 
+				@click="pay(item.id)">
+				<image :src="item.image" class="package-image"></image>
+				<view class="d-flex flex-fill flex-column justify-content-between" style="height: 160rpx;">
+					<view class="font-size-lg text-color-base">{{ item.title }}</view>
+					<view class="d-flex justify-content-between align-items-center">
+						<view class="font-size-sm">{{ item.amount }}元</view>
+						<button type="primary" size="mini" plain class="pay-btn">去购买</button>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="d-flex position-fixed bg-base fixed-bottom text-color-primary font-size-base align-items-center just-content-center w-100 bottom-bar">
+			<text>购买记录</text>
+		</view>
+	</view>
+	<LoadingComponent v-else></LoadingComponent>
+</template>
+
+<script setup lang="uts">
+import LoadingComponent from '@/components/loading.uvue'
+
+// 套餐类型
+type PackageItem = {
+	id: number
+	title: string
+	amount: number
+	image: string
+}
+
+const isLoading = ref<boolean>(true)
+const packages = ref<PackageItem[]>([])
+
+const getPackages = () => {
+	isLoading.value = true
+	// TODO: 实现套餐数据获取
+	// 模拟数据
+	packages.value = [
+		{
+			id: 1,
+			title: '奈雪超值套餐',
+			amount: 88,
+			image: '/static/images/packages/package1.png'
+		},
+		{
+			id: 2,
+			title: '霸气水果茶套餐',
+			amount: 128,
+			image: '/static/images/packages/package2.png'
+		}
+	]
+	isLoading.value = false
+}
+
+const pay = (id: number) => {
+	uni.navigateTo({
+		url: '/pages/packages/detail?id=' + id.toString()
+	})
+}
+
+onLoad(() => {
+	getPackages()
+})
+
+onPullDownRefresh(() => {
+	getPackages()
+	uni.stopPullDownRefresh()
+})
+</script>
+
+<style lang="scss">
+.container {
+	padding-bottom: 150rpx;
+}
+
+.package-item {
+	padding: 30rpx;
+	height: 220rpx;
+	margin-bottom: 34rpx;
+	border-radius: 8rpx;
+}
+
+.package-image {
+	width: 200rpx;
+	height: 160rpx;
+	margin-right: 20rpx;
+}
+
+.bottom-bar {
+	height: 150rpx;
+}
+
+.pay-btn {
+	height: 50rpx;
+	width: 120rpx;
+	font-size: $font-size-sm;
+	border-radius: 50rpx;
+	padding: 0;
+	line-height: 50rpx;
+	text-align: center;
+}
+</style>

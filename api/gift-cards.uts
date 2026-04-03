@@ -1,0 +1,91 @@
+// 礼品卡模拟数据
+export type ThemeItem = {
+	activityId: number
+	activityName: string
+	activityCode: string
+	cardShelvesCategoryId: number
+	imageUrls: string
+}
+
+export type CategoryItem = {
+	id: number
+	themesList: ThemeItem[]
+	name: string
+	activityIds: string
+}
+
+export type GiftCardsData = {
+	banner_activity_id: number
+	content: string
+	category_list: CategoryItem[]
+}
+
+export const mockGiftCards: GiftCardsData = {
+	banner_activity_id: 38,
+	content: "1.发售渠道：奈雪の茶心意卡券在"奈雪点单"小程序内独立发售...",
+	category_list: [
+		{
+			id: 41,
+			themesList: [
+				{
+					activityId: 41,
+					activityName: "梦回童年六一玩趣",
+					activityCode: "474613760767721473",
+					cardShelvesCategoryId: 41,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/06/02/feb01bdc9e018d7a22.jpg"
+				},
+				{
+					activityId: 42,
+					activityName: ""大宝宝"通行证",
+					activityCode: "474613956256256001",
+					cardShelvesCategoryId: 41,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/06/02/c58ae1b6c7af70ace3.jpg"
+				}
+			],
+			name: "送TA六一限定卡，陪TA一口回到童年",
+			activityIds: "41,42"
+		},
+		{
+			id: 42,
+			themesList: [
+				{
+					activityId: 40,
+					activityName: "拥抱我的小宇宙",
+					activityCode: "474613468311351298",
+					cardShelvesCategoryId: 42,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/05/29/610a53aa1d08c04e0c.jpg"
+				},
+				{
+					activityId: 35,
+					activityName: "给生活一个拥抱",
+					activityCode: "474611855417462785",
+					cardShelvesCategoryId: 42,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/05/29/a359015f2be252f3b7.jpg"
+				}
+			],
+			name: "送TA抱抱治愈卡，用心意卡说出爱",
+			activityIds: "40,35,37,38,39,36"
+		},
+		{
+			id: 43,
+			themesList: [
+				{
+					activityId: 33,
+					activityName: "霸气入夏",
+					activityCode: "474611160824172545",
+					cardShelvesCategoryId: 43,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/06/02/93d2e5e3e768c04581.jpg"
+				},
+				{
+					activityId: 34,
+					activityName: "梅你不行",
+					activityCode: "474611484393525248",
+					cardShelvesCategoryId: 43,
+					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/06/02/79ba8839a547c49835.jpg"
+				}
+			],
+			name: "送TA梅你不行卡，美好如期而至",
+			activityIds: "33,34"
+		}
+	]
+}

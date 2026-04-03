@@ -1,0 +1,269 @@
+<template>
+	<view class="w-100 h-100">
+		<image :src="packageData.image" class="w-100 header-image"></image>
+		<view style="padding: 30rpx 40rpx; padding-bottom: 100rpx;">
+			<view class="d-flex justify-content-between align-items-center" style="margin-bottom: 20rpx;">
+				<view class="font-size-lg">{{ packageData.title }}</view>
+				<view class="text-color-primary font-size-sm">购买记录</view>
+			</view>
+			<view class="text-color-assist font-size-sm" style="margin-bottom: 20rpx;">
+				共{{ couponNum }}张优惠券
+			</view>
+			<!-- 优惠券列表 begin -->
+			<view class="d-flex flex-column w-100">
+				<view v-for="(couponItem, index) in packageData.coupons" :key="index" 
+					class="coupon d-flex flex-column bg-white" 
+					@click="openCouponDetailModal(couponItem)">
+					<view class="d-flex flex-fill overflow-hidden" style="margin-bottom: 20rpx;">
+						<image :src="couponItem.detail.image" class="coupon-image"></image>
+						<view class="flex-fill flex-column justify-content-start overflow-hidden">
+							<view class="text-right text-color-assist">x{{ couponItem.coupon_num }}</view>
+							<view class="text-truncate font-size-extra-lg text-color-base w-80">
+								{{ couponItem.detail.coupon_title }}
+							</view>
+							<view class="font-size-sm text-color-assist">{{ couponItem.detail.expire }}</view>
+						</view>
+					</view>
+					<view class="bottom d-flex font-size-sm justify-content-between align-items-center">
+						<view class="text-color-assist">
+							使用时段：{{ getCouponUseTime(couponItem) }}
+						</view>
+						<view class="text-color-primary">
+							查看详情
+						</view>
+					</view>
+					<view class="arch-left"></view>
+					<view class="arch-right"></view>
+					<view class="bottom-line"></view>
+				</view>
+			</view>
+			<!-- 优惠券列表 end -->
+			<view class="font-size-extra-lg" style="margin-bottom: 40rpx;">购买须知</view>
+			<view class="font-size-base text-color-base">
+				售卖时间：{{ getStartDate() }}~{{ getEndDate() }}
+			</view>
+			<view class="font-size-base text-color-base" style="margin-bottom: 30rpx;">
+				购买限制：无限制
+			</view>
+			<view class="font-size-sm text-color-assist pre-line">
+				{{ packageData.content }}
+			</view>
+		</view>
+		<view class="pay-box d-flex just-content-center align-items-center position-fixed fixed-bottom bg-white">
+			<button type="primary" class="pay-btn font-size-base text-color-white rounded-pill">
+				{{ packageData.amount }}元购买
+			</button>
+		</view>
+		<modal :custom="true" :show="couponDetailModalShow" @cancel="closeCouponDetailModal">
+			<view class="d-flex flex-column">
+				<view class="text-center font-size-extra-lg text-color-base" style="margin-bottom: 30rpx;">
+					{{ coupon.detail.coupon_title }}
+				</view>
+				<view class="text-center font-size-sm text-color-assist" style="margin-bottom: 40rpx;">
+					{{ coupon.detail.expire }}
+				</view>
+				<view class="text-color-assist font-size-sm pre-line">
+					{{ coupon.detail.desc }}
+				</view>
+			</view>
+		</modal>
+	</view>
+</template>
+
+<script setup lang="uts">
+import modal from '@/components/modal/modal.uvue'
+
+// 优惠券使用时间类型
+type CouponUseTime = {
+	use_time_start: string
+	use_time_end: string
+}
+
+// 优惠券详情类型
+type CouponDetail = {
+	image: string
+	coupon_title: string
+	expire: string
+	desc: string
+	coupon_use_time: CouponUseTime[]
+}
+
+// 优惠券类型
+type CouponItem = {
+	coupon_num: number
+	detail: CouponDetail
+}
+
+// 套餐类型
+type PackageDataType = {
+	id: number
+	title: string
+	amount: number
+	image: string
+	start_at: string
+	end_at: string
+	content: string
+	coupons: CouponItem[]
+}
+
+const packageData = ref<PackageDataType>({
+	id: 0,
+	title: '',
+	amount: 0,
+	image: '',
+	start_at: '',
+	end_at: '',
+	content: '',
+	coupons: []
+})
+
+const coupon = ref<CouponItem>({
+	coupon_num: 0,
+	detail: {
+		image: '',
+		coupon_title: '',
+		expire: '',
+		desc: '',
+		coupon_use_time: []
+	}
+})
+
+const couponDetailModalShow = ref<boolean>(false)
+
+const couponNum = computed<number>((): number => {
+	let total = 0
+	packageData.value.coupons.forEach((c: CouponItem) => {
+		total += c.coupon_num
+	})
+	return total
+})
+
+const getCouponUseTime = (couponItem: CouponItem): string => {
+	if (couponItem.detail.coupon_use_time.length > 0) {
+		const useTime = couponItem.detail.coupon_use_time[0]
+		return useTime.use_time_start + '-' + useTime.use_time_end
+	}
+	return ''
+}
+
+const getStartDate = (): string => {
+	const startAt = packageData.value.start_at
+	if (startAt.length > 0) {
+		return startAt.split(' ')[0]
+	}
+	return ''
+}
+
+const getEndDate = (): string => {
+	const endAt = packageData.value.end_at
+	if (endAt.length > 0) {
+		return endAt.split(' ')[0]
+	}
+	return ''
+}
+
+const openCouponDetailModal = (couponItem: CouponItem) => {
+	coupon.value = couponItem
+	couponDetailModalShow.value = true
+}
+
+const closeCouponDetailModal = () => {
+	couponDetailModalShow.value = false
+}
+
+onLoad((option: OnLoadOptions) => {
+	const id = option['id'] ?? ''
+	// TODO: 根据 id 获取套餐详情
+	console.log('加载套餐详情', id)
+	
+	// 模拟数据
+	packageData.value = {
+		id: parseInt(id),
+		title: '奈雪超值套餐',
+		amount: 88,
+		image: '/static/images/packages/package1.png',
+		start_at: '2020-01-01 00:00:00',
+		end_at: '2020-12-31 23:59:59',
+		content: '本套餐包含多张优惠券，购买后自动发放到您的账户中。',
+		coupons: [
+			{
+				coupon_num: 2,
+				detail: {
+					image: '/static/images/coupons/coupon1.png',
+					coupon_title: '茶饮5元代金券',
+					expire: '2020-12-31到期',
+					desc: '满20元可用',
+					coupon_use_time: [
+						{ use_time_start: '00:00', use_time_end: '23:59' }
+					]
+				}
+			}
+		]
+	}
+})
+</script>
+
+<style lang="scss">
+.header-image {
+	height: 500rpx;
+}
+
+.pay-box {
+	padding: 10rpx 0;
+	height: 100rpx;
+}
+
+.pay-btn {
+	width: 90%;
+	height: 80rpx;
+	line-height: 80rpx;
+	border-radius: 40rpx;
+}
+
+.coupon {
+	border-radius: 6rpx;
+	padding: 20rpx 40rpx; 
+	margin-bottom: 40rpx;
+	position: relative;
+	
+	.coupon-image {
+		margin-right: 40rpx;
+		width: 150rpx;
+		height: 150rpx;
+	}
+	
+	.arch-left {
+		position: absolute;
+		background-color: $bg-color;
+		width: 30rpx;
+		height: 30rpx;
+		bottom: 70rpx;
+		left: -15rpx;
+		border-radius: 15rpx;
+	}
+	
+	.arch-right {
+		position: absolute;
+		background-color: $bg-color;
+		width: 30rpx;
+		height: 30rpx;
+		bottom: 70rpx;
+		right: -15rpx;
+		border-radius: 15rpx;
+	}
+	
+	.bottom {
+		height: 70rpx;
+		position: relative;
+	}
+	
+	.bottom-line {
+		position: absolute;
+		left: 0;
+		top: auto;
+		bottom: 70rpx;
+		right: 0;
+		border-top: 2rpx dashed #E2E2E2;
+	}
+}
+</style>

@@ -1,0 +1,293 @@
+<template>
+	<view class="container">
+		<view class="orders-list">
+			<view class="order-item" v-for="(item, index) in orderList" :key="index" @click="detail(item.id)">
+				<list-cell :hover="false">
+					<view class="order-header">
+						<view class="order-info">
+							<view class="store-name">
+								{{ item.store.name }}
+							</view>
+							<view class="order-no">订单编号：{{ item.order_no }}</view>
+						</view>
+						<view class="order-status">
+							{{ item.status_text }}
+						</view>
+					</view>
+				</list-cell>
+				<list-cell :hover="false" last>
+					<view class="order-content">
+						<view class="goods-name">
+							{{ orderGoodsName(item.goods) }}
+						</view>
+						<view class="order-summary">
+							<view class="order-time">
+								{{ formatDateTime(item.created_at) }}
+							</view>
+							<view class="order-amount">
+								<view class="amount-text">共{{ item.goods_num }}件商品，实付</view>
+								<view class="amount-price">￥{{ item.amount }}</view>
+							</view>
+						</view>
+						<view class="order-actions">
+							<view class="action-btn" v-if="item.invoice_status > 0">
+								<button type="primary" plain size="mini">查看发票</button>
+							</view>
+							<view class="action-btn" v-else @click.stop="goToInvoice">
+								<button type="primary" plain size="mini">开发票</button>
+							</view>
+							<view class="action-btn" @click.stop="review(item)">
+								<button type="primary" plain size="mini">去评价</button>
+							</view>
+						</view>
+					</view>
+				</list-cell>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { isLogin } from '@/store/index.uts'
+
+// 商品类型
+type GoodItem = {
+	name: string
+	number: number
+	price: string
+	property?: string
+}
+
+// 门店类型
+type StoreInfo = {
+	name: string
+	address: string
+}
+
+// 订单类型
+type OrderItem = {
+	id: number
+	order_no: string
+	status_text: string
+	goods_num: number
+	amount: string | number
+	created_at: number
+	invoice_status: number
+	completed_time: string
+	typeCate: number
+	store: StoreInfo
+	goods: GoodItem[]
+}
+
+// 模拟订单数据
+const ordersData: OrderItem[] = [
+	{
+		id: 1,
+		order_no: "ABCDEFGHIJKLMN0001",
+		status_text: "已完成",
+		goods_num: 2,
+		amount: "50.00",
+		created_at: 1588936782,
+		invoice_status: 1,
+		completed_time: "2020-05-08 19:25:39",
+		typeCate: 1,
+		store: { name: "福永同泰时代城店", address: "广东省深圳市宝安区" },
+		goods: [{ name: "霸气葡萄", number: 1, price: "28.00" }, { name: "霸气葡萄", number: 1, price: "22.00" }]
+	},
+	{
+		id: 2,
+		order_no: "ABCDEFGHIJKLMN0002",
+		status_text: "已完成",
+		goods_num: 3,
+		amount: "73.00",
+		created_at: 1588682001,
+		invoice_status: 0,
+		completed_time: "2020-05-05 20:42:46",
+		typeCate: 2,
+		store: { name: "福永同泰时代城店", address: "广东省深圳市宝安区" },
+		goods: [{ name: "杨枝甘露宝藏茶", number: 1, price: "27.00" }]
+	}
+]
+
+const page = ref<number>(1)
+const pageSize = ref<number>(5)
+const orderList = ref<OrderItem[]>([])
+
+const orderGoodsName = (goods: GoodItem[]): string => {
+	const arr: string[] = []
+	goods.forEach((good: GoodItem) => {
+		arr.push(good.name + '*' + good.number.toString())
+	})
+	return arr.join('，')
+}
+
+const formatDateTime = (timestamp: number): string => {
+	const date = new Date(timestamp * 1000)
+	const year = date.getFullYear()
+	const month = (date.getMonth() + 1).toString().padStart(2, '0')
+	const day = date.getDate().toString().padStart(2, '0')
+	const hours = date.getHours().toString().padStart(2, '0')
+	const minutes = date.getMinutes().toString().padStart(2, '0')
+	return `${year}-${month}-${day} ${hours}:${minutes}`
+}
+
+const getOrders = (isRefresh: boolean): void => {
+	uni.showLoading({ title: '加载中' })
+	
+	if (isRefresh) {
+		orderList.value = []
+		page.value = 1
+	}
+	
+	const start = pageSize.value * (page.value - 1)
+	const end = pageSize.value * page.value
+	const orders = ordersData.slice(start, end)
+	
+	if (orders.length > 0) {
+		orderList.value = orderList.value.concat(orders)
+		page.value += 1
+	}
+	
+	uni.hideLoading()
+	uni.stopPullDownRefresh()
+}
+
+const detail = (id: number): void => {
+	uni.navigateTo({
+		url: '/pages/orders/detail?id=' + id.toString()
+	})
+}
+
+const review = (order: OrderItem): void => {
+	const date = order.completed_time.split(' ')[0]
+	uni.navigateTo({
+		url: '/pages/review/review?storename=' + order.store.name + '&typeCate=' + order.typeCate.toString() + '&date=' + date
+	})
+}
+
+const goToInvoice = (): void => {
+	uni.navigateTo({
+		url: '/pages/invoice/invoice'
+	})
+}
+
+onLoad(() => {
+	if (!isLogin.value) {
+		uni.navigateTo({ url: '/pages/login/login' })
+	}
+	getOrders(false)
+})
+
+onReachBottom(() => {
+	getOrders(false)
+})
+
+onPullDownRefresh(() => {
+	getOrders(true)
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.orders-list {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding: 10px;
+	padding-bottom: 0;
+}
+
+.order-item {
+	margin-bottom: 15px;
+}
+
+.order-header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.order-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.store-name {
+	font-size: 16px;
+	color: #333333;
+	margin-bottom: 10px;
+}
+
+.order-no {
+	font-size: 12px;
+	color: #999999;
+}
+
+.order-status {
+	font-size: 16px;
+	color: #b9985e;
+}
+
+.order-content {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.goods-name {
+	width: 100%;
+	font-size: 16px;
+	color: #333333;
+	margin-bottom: 10px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.order-summary {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 15px;
+}
+
+.order-time {
+	font-size: 12px;
+	color: #999999;
+}
+
+.order-amount {
+	display: flex;
+	flex-direction: row;
+	font-size: 12px;
+	color: #333333;
+	align-items: center;
+}
+
+.amount-text {
+	margin-right: 5px;
+}
+
+.amount-price {
+	font-size: 16px;
+}
+
+.order-actions {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.action-btn {
+	margin-left: 5px;
+}
+</style>

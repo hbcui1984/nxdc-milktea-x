@@ -1,0 +1,227 @@
+<template>
+	<view class="container d-flex flex-column">
+		<view class="flex-fill form">
+			<list-cell :hover="false">
+				<view class="form-input w-100 d-flex align-items-center">
+					<view class="label">昵称</view>
+					<view class="input flex-fill">
+						<input type="text" placeholder="请填写昵称" placeholder-class="text-color-assist font-size-base" 
+						v-model="nickname" />
+					</view>
+				</view>
+			</list-cell>
+			<list-cell :hover="false">
+				<view class="form-input w-100 d-flex align-items-center">
+					<view class="label">手机号码</view>
+					<view class="input flex-fill">
+						<input type="text" :value="mobilePhone" disabled />
+					</view>
+				</view>
+			</list-cell>
+			<list-cell :hover="false">
+				<view class="form-input w-100 d-flex align-items-center">
+					<view class="label">性别</view>
+					<view class="input flex-fill">
+						<view class="radio-group">
+							<view class="radio" :class="{'checked': gender == 1}" style="margin-right: 10rpx;" @click="setGender(1)">先生</view>
+							<view class="radio" :class="{'checked': gender == 2}" @click="setGender(2)">女士</view>
+						</view>
+					</view>
+				</view>
+			</list-cell>
+			<list-cell :hover="false" :arrow="birthdayEmpty">
+				<view class="form-input w-100 d-flex align-items-center">
+					<view class="label">生日</view>
+					<view class="input flex-fill">
+						<picker mode="date" :value="date" :start="startDate" :end="endDate" v-if="birthdayEmpty" @change="handleDateChange">
+							<view>生日当天有惊喜</view>
+						</picker>
+						<input type="text" v-else :value="birthday" disabled />
+					</view>
+				</view>
+			</list-cell>
+			<list-cell :hover="false" :last="true">
+				<view class="form-input w-100 d-flex align-items-center">
+					<view class="label">入会时间</view>
+					<view class="input flex-fill">
+						<input type="text" :value="openingCardDate" disabled />
+					</view>
+				</view>
+			</list-cell>
+		</view>
+		<view class="btn-box d-flex align-items-center just-content-center">
+			<button type="primary" class="save-btn" @click="save">保存</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { state, setMember, MemberType } from '@/store/index.uts'
+
+const nickname = ref<string>('')
+const mobilePhone = ref<string>('')
+const gender = ref<number>(0)
+const birthday = ref<string>('')
+const openingCardDate = ref<string>('')
+const date = ref<string>('')
+
+const birthdayEmpty = computed((): boolean => {
+	return birthday.value == ''
+})
+
+const getDate = (type: string): string => {
+	const dateObj = new Date()
+	let year = dateObj.getFullYear()
+	const month = dateObj.getMonth() + 1
+	const day = dateObj.getDate()
+
+	if (type == 'start') {
+		year = year - 60
+	} else if (type == 'end') {
+		year = year + 2
+	}
+	const monthStr = month > 9 ? month.toString() : '0' + month.toString()
+	const dayStr = day > 9 ? day.toString() : '0' + day.toString()
+	return `${year}-${monthStr}-${dayStr}`
+}
+
+const startDate = computed((): string => getDate('start'))
+const endDate = computed((): string => getDate('end'))
+
+onLoad(() => {
+	if (state.member != null) {
+		const member = state.member as MemberType
+		nickname.value = member.nickname
+		mobilePhone.value = member.mobilePhone
+		gender.value = member.gender
+		birthday.value = member.birthday
+		openingCardDate.value = member.openingCardDate
+	}
+	date.value = getDate('format')
+})
+
+const setGender = (value: number) => {
+	gender.value = value
+}
+
+type PickerEventDetail = {
+	value: string
+}
+
+type PickerEvent = {
+	detail: PickerEventDetail
+}
+
+const handleDateChange = (e: PickerEvent) => {
+	birthday.value = e.detail.value
+}
+
+const save = () => {
+	if (state.member != null) {
+		const member = state.member as MemberType
+		const updatedMember: MemberType = {
+			storeId: member.storeId,
+			mobilePhone: mobilePhone.value,
+			nickname: nickname.value,
+			avatar: member.avatar,
+			country: member.country,
+			cardName: member.cardName,
+			memberLevel: member.memberLevel,
+			city: member.city,
+			cardNo: member.cardNo,
+			openingCardDate: openingCardDate.value,
+			customerId: member.customerId,
+			district: member.district,
+			unionId: member.unionId,
+			address: member.address,
+			storeName: member.storeName,
+			gender: gender.value,
+			province: member.province,
+			memberOrigin: member.memberOrigin,
+			username: member.username,
+			memberLevelName: member.memberLevelName,
+			birthday: birthday.value,
+			pointNum: member.pointNum,
+			couponNum: member.couponNum,
+			rechargeBalance: member.rechargeBalance,
+			balance: member.balance,
+			giftBalance: member.giftBalance,
+			expenseAmount: member.expenseAmount,
+			conditionType: member.conditionType,
+			ruleList: member.ruleList,
+			expiredTime: member.expiredTime,
+			currentValue: member.currentValue,
+			level: member.level,
+			cardUrl: member.cardUrl,
+			needValue: member.needValue,
+			max: member.max
+		}
+		setMember(updatedMember)
+	}
+	uni.navigateBack()
+}
+</script>
+
+<style lang="scss" scoped>
+.container {
+	padding: 20rpx 30rpx;
+	height: 100%;
+}
+
+.form {
+	border-radius: 8rpx;
+}
+
+.form-input {
+	width: 100%;
+}
+
+.form-input .label {
+	width: 160rpx;
+	font-size: 28rpx;
+	color: #5A5B5C;
+}
+
+.form-input .input {
+	flex: 1;
+}
+
+.form-input .radio-group {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.form-input .radio-group .radio {
+	padding: 10rpx 30rpx;
+	border-radius: 6rpx;
+	border-width: 2rpx;
+	border-style: solid;
+	border-color: #919293;
+	color: #919293;
+	font-size: 28rpx;
+}
+
+.form-input .radio-group .radio.checked {
+	background-color: #ADB838;
+	color: #ffffff;
+	border-color: #ADB838;
+}
+
+.btn-box {
+	height: 400rpx;
+}
+
+.save-btn {
+	width: 90%;
+	border-radius: 100px;
+	font-size: 32rpx;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.flex-fill {
+	flex: 1;
+}
+</style>

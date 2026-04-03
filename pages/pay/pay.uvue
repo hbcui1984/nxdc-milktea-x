@@ -1,0 +1,809 @@
+<template>
+	<view class="container">
+		<view class="main-content">
+			<view class="section-1">
+				<template v-if="orderType == 'takein'">
+					<list-cell class="location">
+						<view class="location-row">
+							<view class="store-name">
+								{{ storeInfo.name }}
+							</view>
+							<image src="/static/images/navigator-1.png" class="arrow"></image>
+						</view>
+					</list-cell>
+				</template>
+				<template v-else>
+					<list-cell @click="chooseAddress">
+						<view class="address-section">
+							<view class="address-header">
+								<view class="address-street">{{ address.street }}</view>
+								<image src="/static/images/navigator-1.png" class="arrow"></image>
+							</view>
+							<view class="address-info">
+								<view class="address-name">{{ address.accept_name }}</view>
+								<view class="address-sex">{{ address.sex == 0 ? '先生' : '女士' }}</view>
+								<view class="address-mobile">{{ address.mobile }}</view>
+							</view>
+						</view>
+					</list-cell>
+				</template>
+				<template v-if="orderType == 'takein'">
+					<list-cell arrow class="meal-time">
+						<view class="meal-time-row">
+							<view class="meal-time-title">取餐时间</view>
+							<view class="meal-time-value">立即用餐</view>
+						</view>
+					</list-cell>
+					<list-cell class="contact" last :hover="false">
+						<view class="contact-row">
+							<view class="contact-title">联系电话</view>
+							<view class="contact-input-wrapper">
+								<input class="contact-input" placeholder="请输入手机号码" value="18666600000"/>
+							</view>
+							<view class="contact-tip">自动填写</view>
+						</view>
+					</list-cell>
+				</template>
+				<template v-else>
+					<list-cell>
+						<view class="delivery-section">
+							<view class="delivery-row">
+								<view class="delivery-label">预计送达时间</view>
+								<view class="delivery-time">15:18</view>
+								<image src="/static/images/navigator-1.png" class="arrow"></image>
+							</view>
+							<view class="delivery-tip">
+								特殊时期减少接触，请修改下方订单备注
+							</view>
+						</view>
+					</list-cell>
+				</template>
+			</view>
+			<!-- 购物车列表 begin -->
+			<view class="section-2">
+				<view class="cart">
+					<list-cell last v-for="(item, index) in cart" :key="index">
+						<view class="cart-item">
+							<view class="cart-item-header">
+								<view class="cart-item-name-wrapper">
+									<view class="cart-item-name">
+										{{ item.name }}
+									</view>
+								</view>
+								<view class="cart-item-price-wrapper">
+									<view class="cart-item-number">x{{ item.number }}</view>
+									<view class="cart-item-price">￥{{ item.price }}</view>
+								</view>
+							</view>
+							<view class="cart-item-props">
+								{{ item.props_text }}
+							</view>
+						</view>
+					</list-cell>
+					<template v-if="orderType == 'takeout'">
+						<list-cell last v-if="storeInfo.packing_fee > 0">
+							<view class="fee-row">
+								<view>包装费</view>
+								<view>￥{{ storeInfo.packing_fee }}</view>
+							</view>
+						</list-cell>
+						<list-cell last v-if="storeInfo.delivery_cost > 0">
+							<view class="fee-row">
+								<view>配送费</view>
+								<view>￥{{ storeInfo.delivery_cost }}</view>
+							</view>
+						</list-cell>
+					</template>
+				</view>
+				<list-cell arrow @click="goToPackages">
+					<view class="coupon-row">
+						<view class="coupon-label">奈雪券</view>
+						<view class="coupon-value">超值购买优惠券大礼包</view>
+					</view>
+				</list-cell>
+				<list-cell arrow>
+					<view class="coupon-row">
+						<view class="coupon-label">礼品卡</view>
+						<view class="coupon-value">请选择</view>
+					</view>
+				</list-cell>
+				<list-cell last>
+					<view class="total-row">
+						<view class="total-label">总计￥{{ total }},实付</view>
+						<view class="total-amount">￥{{ amount }}</view>
+					</view>
+				</list-cell>
+			</view>
+			<!-- 购物车列表 end -->
+			<view class="tip-row">
+				<view class="tip-icon">!</view>
+				<view class="tip-text">优惠券不与满赠、满减活动共享</view>
+			</view>
+			<!-- 支付方式 begin -->
+			<view class="payment">
+				<list-cell last :hover="false">
+					<text>支付方式</text>
+				</list-cell>
+				<list-cell>
+					<view class="payment-row disabled">
+						<view class="payment-icon balance-icon">余</view>
+						<view class="payment-name">余额支付（余额￥0）</view>
+						<view class="payment-tip">余额不足</view>
+						<view class="payment-checkbox">○</view>
+					</view>
+				</list-cell>
+				<list-cell last>
+					<view class="payment-row">
+						<view class="payment-icon wechat-icon">微</view>
+						<view class="payment-name">微信支付</view>
+						<view class="payment-checkbox checked">●</view>
+					</view>
+				</list-cell>
+			</view>
+			<!-- 支付方式 end -->
+			<!-- 备注 begin -->
+			<list-cell arrow last @click="goToRemark">
+				<view class="remark-row">
+					<view class="remark-label">备注</view>
+					<view class="remark-value">{{ form.remark.length > 0 ? form.remark : '点击填写备注' }}</view>
+				</view>
+			</list-cell>
+			<!-- 备注 end -->
+		</view>
+		<!-- 付款栏 begin -->
+		<view class="pay-box">
+			<view class="pay-box-label">合计：</view>
+			<view class="pay-box-amount">￥{{ amount }}</view>
+			<view class="pay-box-btn" @click="submit">
+				付款
+			</view>
+		</view>
+		<!-- 付款栏 end -->
+		<!-- 确认地址弹窗 -->
+		<view class="modal-mask" v-if="ensureAddressModalVisible" @click="closeModal">
+			<view class="modal-content" @click.stop="">
+				<view class="modal-close-wrapper">
+					<image src="/static/images/pay/close.png" class="modal-close" @click="closeModal"></image>
+				</view>
+				<view class="modal-title-wrapper">
+					<view class="modal-title">请再次确认下单地址</view>
+				</view>
+				<view class="modal-address-row">
+					<view class="modal-address-name">{{ address.accept_name }} {{ address.sex > 0 ? '女士' : '先生' }}</view>
+					<view class="modal-address-mobile">{{ address.mobile }}</view>
+				</view>
+				<view class="modal-address-detail-row">
+					<view class="modal-address-detail">{{ address.street }}{{ address.door_number }}</view>
+					<button type="primary" size="mini" plain class="change-address-btn">修改地址</button>
+				</view>
+				<button type="primary" class="pay-btn" @click="pay">确认并付款</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { state, setOrder, OrderType } from '@/store/index.uts'
+
+// 购物车商品类型
+type CartItem = {
+	id: number
+	name: string
+	price: number
+	number: number
+	props_text: string
+}
+
+// 地址类型
+type AddressInfo = {
+	id: number
+	accept_name: string
+	mobile: string
+	sex: number
+	street: string
+	door_number: string
+}
+
+// 门店类型
+type StoreInfoType = {
+	id: number
+	name: string
+	address: string
+	packing_fee: number
+	delivery_cost: number
+}
+
+// 表单类型
+type FormData = {
+	remark: string
+}
+
+const cart = ref<CartItem[]>([])
+const form = reactive<FormData>({
+	remark: ''
+})
+const ensureAddressModalVisible = ref<boolean>(false)
+
+const orderType = computed((): string => {
+	return state.orderType
+})
+
+const address = computed((): AddressInfo => {
+	if (state.address != null) {
+		return {
+			id: state.address!.id,
+			accept_name: state.address!.accept_name,
+			mobile: state.address!.mobile,
+			sex: state.address!.sex,
+			street: state.address!.street,
+			door_number: state.address!.door_number
+		}
+	}
+	return {
+		id: 0,
+		accept_name: '',
+		mobile: '',
+		sex: 0,
+		street: '',
+		door_number: ''
+	}
+})
+
+const storeInfo = computed((): StoreInfoType => {
+	if (state.store != null) {
+		return {
+			id: state.store!.id,
+			name: state.store!.name,
+			address: state.store!.address,
+			packing_fee: 0,
+			delivery_cost: 0
+		}
+	}
+	return {
+		id: 0,
+		name: '请选择门店',
+		address: '',
+		packing_fee: 0,
+		delivery_cost: 0
+	}
+})
+
+const total = computed((): number => {
+	let sum: number = 0
+	cart.value.forEach((item: CartItem) => {
+		sum += item.number * item.price
+	})
+	return sum
+})
+
+const amount = computed((): number => {
+	let sum: number = 0
+	cart.value.forEach((item: CartItem) => {
+		sum += item.number * item.price
+	})
+	return sum
+})
+
+const goToRemark = (): void => {
+	uni.navigateTo({
+		url: '/pages/remark/remark?remark=' + form.remark
+	})
+}
+
+const chooseAddress = (): void => {
+	uni.navigateTo({
+		url: '/pages/address/address?is_choose=true&scene=pay'
+	})
+}
+
+const goToPackages = (): void => {
+	uni.navigateTo({
+		url: '/pages/packages/index'
+	})
+}
+
+const closeModal = (): void => {
+	ensureAddressModalVisible.value = false
+}
+
+const pay = (): void => {
+	uni.showLoading({ title: '加载中' })
+	
+	// 创建测试订单
+	const testOrder: OrderType = {
+		id: '1',
+		orderNo: 'ABCDEFGHIJKLMN0001',
+		status: 1,
+		totalPrice: amount.value,
+		items: [],
+		createTime: new Date().toISOString()
+	}
+	
+	setOrder(testOrder)
+	uni.removeStorageSync('cart')
+	uni.reLaunch({
+		url: '/pages/take-foods/take-foods'
+	})
+	uni.hideLoading()
+}
+
+const submit = (): void => {
+	if (orderType.value == 'takeout') {
+		ensureAddressModalVisible.value = true
+	} else {
+		pay()
+	}
+}
+
+onLoad((option: OnLoadOptions) => {
+	const remark = option['remark'] ?? ''
+	const cartData = uni.getStorageSync('cart')
+	if (cartData != null && cartData != '') {
+		// 这里简化处理，实际需要解析存储的数据
+		cart.value = []
+	}
+	if (remark.length > 0) {
+		form.remark = remark
+	}
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.main-content {
+	margin-bottom: 65px;
+}
+
+.arrow {
+	width: 25px; 
+	height: 25px;
+	position: relative;
+	margin-right: -5px;
+}
+
+.location-row {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.store-name {
+	font-size: 16px;
+	flex: 1;
+}
+
+.section-1 {
+	margin-bottom: 15px;
+}
+
+.address-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.address-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 5px;
+}
+
+.address-street {
+	font-size: 18px;
+	color: #333333;
+}
+
+.address-info {
+	display: flex;
+	flex-direction: row;
+	color: #999999;
+	font-size: 12px;
+	align-items: center;
+}
+
+.address-name {
+	margin-right: 5px;
+}
+
+.address-sex {
+	margin-right: 5px;
+}
+
+.meal-time-row {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.meal-time-title {
+	font-size: 14px;
+}
+
+.meal-time-value {
+	font-size: 14px;
+}
+
+.contact-row {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.contact-title {
+	flex: 1;
+	font-size: 14px;
+}
+
+.contact-input-wrapper {
+	flex: 2;
+}
+
+.contact-input {
+	text-align: right;
+}
+
+.contact-tip {
+	margin-left: 5px;
+	border: 1px solid #b9985e;
+	padding: 3px 5px;
+	color: #b9985e;
+	font-size: 12px;
+}
+
+.delivery-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.delivery-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-size: 14px;
+	color: #333333;
+}
+
+.delivery-label {
+	flex: 1;
+}
+
+.delivery-time {
+	margin-right: 5px;
+}
+
+.delivery-tip {
+	font-size: 14px;
+	color: #b9985e;
+}
+
+.section-2 {
+	display: flex;
+	flex-direction: column;
+}
+
+.cart {
+	display: flex;
+	flex-direction: column;
+}
+
+.cart-item {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.cart-item-header {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 5px;
+}
+
+.cart-item-name-wrapper {
+	width: 65%;
+	overflow: hidden;
+}
+
+.cart-item-name {
+	color: #333333;
+	font-size: 16px;
+}
+
+.cart-item-price-wrapper {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	justify-content: space-between;
+	align-items: center;
+	color: #333333;
+	font-size: 16px;
+}
+
+.cart-item-number {
+	font-size: 16px;
+}
+
+.cart-item-price {
+	font-size: 16px;
+}
+
+.cart-item-props {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 14px;
+	color: #999999;
+}
+
+.fee-row {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	font-size: 14px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.coupon-row {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.coupon-label {
+	color: #333333;
+}
+
+.coupon-value {
+	color: #b9985e;
+}
+
+.total-row {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.total-label {
+	font-size: 14px;
+}
+
+.total-amount {
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.tip-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	font-size: 12px;
+	color: #ff9900;
+	padding: 10px 0;
+}
+
+.tip-icon {
+	width: 16px;
+	height: 16px;
+	border-radius: 8px;
+	background-color: #ff9900;
+	color: #ffffff;
+	text-align: center;
+	line-height: 16px;
+	margin-right: 5px;
+	font-size: 12px;
+}
+
+.tip-text {
+	font-size: 12px;
+}
+
+.payment {
+	margin-bottom: 15px;
+}
+
+.payment-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+
+.payment-row.disabled {
+	color: #cccccc;
+}
+
+.payment-icon {
+	font-size: 22px; 
+	margin-right: 5px;
+	width: 24px;
+	height: 24px;
+	border-radius: 4px;
+	text-align: center;
+	line-height: 24px;
+	color: #ffffff;
+}
+
+.balance-icon {
+	background-color: #cccccc;
+}
+
+.wechat-icon {
+	background-color: #7EB73A;
+}
+
+.payment-name {
+	flex: 1;
+}
+
+.payment-tip {
+	font-size: 12px;
+}
+
+.payment-checkbox {
+	font-size: 18px;
+	margin-left: 5px;
+}
+
+.payment-checkbox.checked {
+	color: #b9985e;
+}
+
+.remark-row {
+	display: flex;
+	flex-direction: row;
+	flex: 1;
+	align-items: center;
+	justify-content: space-between;
+	overflow: hidden;
+}
+
+.remark-label {
+	flex-shrink: 0;
+	margin-right: 10px;
+}
+
+.remark-value {
+	color: #b9985e;
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	text-align: right;
+}
+
+.pay-box {
+	width: 100%;
+	height: 50px;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	background-color: #ffffff;
+}
+
+.pay-box-label {
+	font-size: 12px;
+	margin-left: 10px;
+}
+
+.pay-box-amount {
+	font-size: 16px;
+	flex: 1;
+}
+
+.pay-box-btn {
+	background-color: #b9985e;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	font-size: 14px;
+	padding: 0 30px;
+}
+
+.modal-mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	z-index: 100;
+}
+
+.modal-content {
+	width: 90%;
+	background-color: #ffffff;
+	padding: 20px;
+	display: flex;
+	flex-direction: column;
+}
+
+.modal-close-wrapper {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+}
+
+.modal-close {
+	width: 20px;
+	height: 20px;
+}
+
+.modal-title-wrapper {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.modal-title {
+	font-size: 18px;
+	color: #333333;
+}
+
+.modal-address-row {
+	display: flex;
+	flex-direction: row;
+	font-size: 14px;
+	color: #333333;
+	font-weight: bold;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.modal-address-detail-row {
+	display: flex;
+	flex-direction: row;
+	font-size: 12px;
+	color: #999999;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20px;
+}
+
+.change-address-btn {
+	line-height: 2;
+	padding: 0 10px;
+}
+
+.pay-btn {
+	width: 100%;
+	border-radius: 50px;
+	line-height: 3;
+}
+</style>

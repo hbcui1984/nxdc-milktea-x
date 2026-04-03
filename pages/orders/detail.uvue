@@ -1,0 +1,480 @@
+<template>
+	<view class="container">
+		<view class="content-wrapper">
+			<view class="bg-white">
+				<view class="section">
+					<!-- store info begin -->
+					<list-cell :hover="false">
+						<view class="store-header">
+							<view class="store-info">
+								<view class="store-name">{{ order.store.name }}</view>
+								<view class="store-address-row">
+									<image src="/static/images/order/location.png" class="location-icon"></image>
+									<view class="store-address">{{ order.store.address }}</view>
+								</view>
+							</view>
+							<view class="store-actions">
+								<image src="/static/images/order/mobile.png" class="action-icon"></image>
+								<image src="/static/images/order/navigation.png" class="action-icon"></image>
+							</view>
+						</view>
+					</list-cell>
+					<!-- store info end -->
+					<!-- goods begin -->
+					<list-cell :hover="false" padding="25px 15px">
+						<view class="goods-list">
+							<view class="goods-item" v-for="(good, index) in order.goods" :key="index">
+								<view class="goods-info">
+									<view class="goods-name">{{ good.name }}</view>
+									<view class="goods-property">{{ good.property }}</view>
+								</view>
+								<view class="goods-price-info">
+									<view class="goods-number">x{{ good.number }}</view>
+									<view class="goods-price">￥{{ good.price }}</view>
+								</view>
+							</view>
+						</view>
+					</list-cell>
+					<!-- goods end -->
+				</view>
+				<view class="section">
+					<!-- payment and amount begin -->
+					<list-cell :hover="false" padding="25px 15px">
+						<view class="pay-section">
+							<view class="pay-cell">
+								<view>支付方式</view>
+								<view class="pay-value">{{ order.pay_mode }}</view>
+							</view>
+							<view class="pay-cell">
+								<view>金额总计</view>
+								<view class="pay-value">￥{{ order.amount }}</view>
+							</view>
+						</view>
+					</list-cell>
+					<!-- payment and amount end -->
+				</view>
+				<view class="section">
+					<!-- order info begin -->
+					<list-cell :hover="false" padding="25px 15px">
+						<view class="pay-section">
+							<view class="pay-cell">
+								<view>下单时间</view>
+								<view class="pay-value">{{ formatDateTime(order.created_at) }}</view>
+							</view>
+							<view class="pay-cell">
+								<view>下单门店</view>
+								<view class="pay-value">{{ order.store.name }}</view>
+							</view>
+							<view class="pay-cell">
+								<view>支付方式</view>
+								<view class="pay-value">{{ order.pay_mode }}</view>
+							</view>
+							<view class="pay-cell">
+								<view>订单号</view>
+								<view class="pay-value">{{ order.order_no }}</view>
+							</view>
+						</view>
+					</list-cell>
+					<!-- order info end -->
+				</view>
+				<!-- order other info begin -->
+				<list-cell :hover="false" padding="25px 15px 10px" last>
+					<view class="pay-section">
+						<view class="pay-cell">
+							<view>取单号</view>
+							<view class="pay-value">{{ order.sort_num }}</view>
+						</view>
+						<view class="pay-cell">
+							<view>享用方式</view>
+							<view class="pay-value">自取</view>
+						</view>
+						<view class="pay-cell">
+							<view>取餐时间</view>
+							<view class="pay-value">立即取餐</view>
+						</view>
+						<view class="pay-cell">
+							<view>完成制作时间</view>
+							<view class="pay-value">{{ order.productioned_time }}</view>
+						</view>
+						<view class="pay-cell">
+							<view>备注</view>
+							<view class="pay-value">{{ order.postscript }}</view>
+						</view>
+					</view>
+				</list-cell>
+				<!-- order other info end -->
+			</view>
+			<view class="bottom-image-wrapper">
+				<image src="/static/images/order/bottom.png" mode="widthFix" class="bottom-image"></image>
+				<view class="invoice-box" v-if="order.invoice_status == 0" @click="goToInvoice">
+					<view class="invoice-text">去开发票</view>
+					<image src="/static/images/order/right.png" class="invoice-arrow"></image>
+				</view>
+			</view>
+		</view>
+		<view class="btn-box">
+			<view class="btn-item" v-if="order.invoice_status > 0"><button type="primary">查看发票</button></view>
+			<view class="btn-item" @click="review"><button type="primary" plain>去评价</button></view>
+			<view class="btn-item"><button type="primary">再来一单</button></view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+// 商品类型
+type GoodItem = {
+	name: string
+	number: number
+	price: string
+	property?: string
+}
+
+// 门店类型
+type StoreInfo = {
+	name: string
+	address: string
+}
+
+// 订单详情类型
+type OrderDetail = {
+	id: number
+	order_no: string
+	status_text: string
+	goods_num: number
+	amount: string | number
+	created_at: number
+	invoice_status: number
+	completed_time: string
+	typeCate: number
+	pay_mode: string
+	sort_num: string
+	productioned_time: string
+	postscript: string
+	store: StoreInfo
+	goods: GoodItem[]
+}
+
+// 模拟订单数据
+const ordersData: OrderDetail[] = [
+	{
+		id: 1,
+		order_no: "ABCDEFGHIJKLMN0001",
+		status_text: "已完成",
+		goods_num: 2,
+		amount: "50.00",
+		created_at: 1588936782,
+		invoice_status: 1,
+		completed_time: "2020-05-08 19:25:39",
+		typeCate: 1,
+		pay_mode: "微信支付",
+		sort_num: "8093",
+		productioned_time: "2020-05-08 19:24:37",
+		postscript: "打包",
+		store: { 
+			name: "福永同泰时代城店", 
+			address: "广东省深圳市宝安区深圳市宝安区福海街道宝安大道6259号 L1 层55/56号商铺" 
+		},
+		goods: [
+			{ name: "霸气葡萄", number: 1, price: "28.00", property: "去冰,标准糖" }, 
+			{ name: "霸气葡萄", number: 1, price: "22.00", property: "标准冰,标准糖" }
+		]
+	},
+	{
+		id: 2,
+		order_no: "ABCDEFGHIJKLMN0002",
+		status_text: "已完成",
+		goods_num: 3,
+		amount: "73.00",
+		created_at: 1588682001,
+		invoice_status: 0,
+		completed_time: "2020-05-05 20:42:46",
+		typeCate: 2,
+		pay_mode: "微信支付",
+		sort_num: "8145",
+		productioned_time: "2020-05-05 20:38:49",
+		postscript: "打包",
+		store: { 
+			name: "福永同泰时代城店", 
+			address: "广东省深圳市宝安区深圳市宝安区福海街道宝安大道6259号 L1 层55/56号商铺" 
+		},
+		goods: [
+			{ name: "杨枝甘露宝藏茶", number: 1, price: "27.00", property: "标准,标准（冰沙）,标准糖" }
+		]
+	}
+]
+
+const defaultOrder: OrderDetail = {
+	id: 0,
+	order_no: "",
+	status_text: "",
+	goods_num: 0,
+	amount: "0",
+	created_at: 0,
+	invoice_status: 0,
+	completed_time: "",
+	typeCate: 0,
+	pay_mode: "",
+	sort_num: "",
+	productioned_time: "",
+	postscript: "",
+	store: { name: "", address: "" },
+	goods: []
+}
+
+const order = ref<OrderDetail>(defaultOrder)
+
+const formatDateTime = (timestamp: number): string => {
+	const date = new Date(timestamp * 1000)
+	const year = date.getFullYear()
+	const month = (date.getMonth() + 1).toString().padStart(2, '0')
+	const day = date.getDate().toString().padStart(2, '0')
+	const hours = date.getHours().toString().padStart(2, '0')
+	const minutes = date.getMinutes().toString().padStart(2, '0')
+	const seconds = date.getSeconds().toString().padStart(2, '0')
+	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+const review = (): void => {
+	const date = order.value.completed_time.split(' ')[0]
+	uni.navigateTo({
+		url: '/pages/review/review?storename=' + order.value.store.name + '&typeCate=' + order.value.typeCate.toString() + '&date=' + date
+	})
+}
+
+const goToInvoice = (): void => {
+	uni.navigateTo({
+		url: '/pages/invoice/invoice'
+	})
+}
+
+onLoad((option: OnLoadOptions) => {
+	const id = option['id'] ?? ''
+	const orderId = parseInt(id)
+	const foundOrder = ordersData.find((item: OrderDetail): boolean => item.id == orderId)
+	if (foundOrder != null) {
+		order.value = foundOrder
+	}
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.content-wrapper {
+	padding-bottom: 60px;
+}
+
+.bg-white {
+	background-color: #ffffff;
+}
+
+.section {
+	position: relative;
+}
+
+.store-header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.store-info {
+	display: flex;
+	flex-direction: column;
+	width: 60%;
+}
+
+.store-name {
+	width: 100%;
+	font-size: 16px;
+	color: #333333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	margin-bottom: 5px;
+}
+
+.store-address-row {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	overflow: hidden;
+}
+
+.location-icon {
+	width: 15px;
+	height: 15px;
+	flex-shrink: 0;
+}
+
+.store-address {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 12px;
+	color: #999999;
+}
+
+.store-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	width: 40%;
+}
+
+.action-icon {
+	width: 30px;
+	height: 30px;
+	margin-left: 15px;
+}
+
+.goods-list {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.goods-item {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-bottom: 20px;
+}
+
+.goods-info {
+	display: flex;
+	flex-direction: column;
+	width: 60%;
+	overflow: hidden;
+}
+
+.goods-name {
+	font-size: 16px;
+	color: #333333;
+	margin-bottom: 5px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.goods-property {
+	font-size: 12px;
+	color: #999999;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.goods-price-info {
+	display: flex;
+	flex-direction: row;
+	width: 40%;
+	align-items: center;
+	justify-content: space-between;
+	padding-left: 15px;
+}
+
+.goods-number {
+	font-size: 14px;
+	color: #333333;
+}
+
+.goods-price {
+	font-size: 14px;
+	color: #333333;
+	font-weight: bold;
+}
+
+.pay-section {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.pay-cell {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 14px;
+	color: #333333;
+	margin-bottom: 20px;
+}
+
+.pay-value {
+	font-weight: bold;
+}
+
+.bottom-image-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+.bottom-image {
+	width: 100%;
+}
+
+.invoice-box {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	top: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.invoice-text {
+	font-size: 14px;
+	color: #b9985e;
+}
+
+.invoice-arrow {
+	width: 15px;
+	height: 15px;
+}
+
+.btn-box {
+	background-color: #ffffff;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 60px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-evenly;
+	z-index: 11;
+}
+
+.btn-item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 5px;
+	flex: 1;
+}
+
+.btn-item button {
+	width: 100%;
+	border-radius: 50px;
+	height: 40px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+</style>

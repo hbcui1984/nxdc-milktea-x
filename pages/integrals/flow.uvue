@@ -1,0 +1,110 @@
+<template>
+	<view class="container">
+		<view class="masthead d-flex flex-column just-content-center align-items-center">
+			<view class="point-num">{{ pointNum }}</view>
+			<view class="font-size-sm text-color-primary">查看积分规则</view>
+			<view class="masthead-line"></view>
+		</view>
+		<view>
+			<list-cell v-for="(item, index) in pointsFlowList" :key="index" :hover="false" bgcolor="#F5F9FB">
+				<view class="w-100 d-flex align-items-center">
+					<view class="flex-fill d-flex flex-column">
+						<view class="font-size-lg text-color-base mb-10">{{ item.reason }}</view>
+						<view class="font-size-base text-color-assist">{{ item.createdAt }}</view>
+					</view>
+					<view class="d-flex flex-column align-items-center">
+						<view class="font-size-lg text-color-base font-weight-bold">
+							{{ getChangeSymbol(item.changeType) }}{{ item.changeNum }}
+						</view>
+						<view class="font-size-sm text-color-assist">{{ item.sellerName }}</view>
+					</view>
+				</view>
+			</list-cell>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { state } from '@/store/index.uts'
+import listCell from '@/components/list-cell/list-cell.uvue'
+
+// 积分流水类型
+type PointsFlowItem = {
+	id: number
+	happenedDate: string
+	sourceType: number
+	sellerName: string
+	changeNum: number
+	changeType: number
+	reason: string
+	createdAt: string
+}
+
+const pointNum = ref<number>(0)
+const pointsFlowList = ref<PointsFlowItem[]>([])
+
+const getChangeSymbol = (changeType: number): string => {
+	return changeType == 1 ? '+' : '-'
+}
+
+onLoad(() => {
+	const member = state.member
+	if (member != null) {
+		pointNum.value = member.pointNum
+	}
+	
+	// 模拟积分流水数据
+	pointsFlowList.value = [
+		{
+			id: 1,
+			happenedDate: '2020-05-11',
+			sourceType: 5,
+			sellerName: '奈雪の茶',
+			changeNum: 1,
+			changeType: 1,
+			reason: '积分签到奖励',
+			createdAt: '2020-05-11 00:17:47'
+		},
+		{
+			id: 2,
+			happenedDate: '2020-05-10',
+			sourceType: 5,
+			sellerName: '奈雪の茶',
+			changeNum: 1,
+			changeType: 1,
+			reason: '积分签到奖励',
+			createdAt: '2020-05-10 22:23:36'
+		},
+		{
+			id: 3,
+			happenedDate: '2020-05-08',
+			sourceType: 1,
+			sellerName: '奈雪の茶',
+			changeNum: 50,
+			changeType: 1,
+			reason: '消费增加',
+			createdAt: '2020-05-08 19:25:40'
+		}
+	]
+})
+</script>
+
+<style lang="scss">
+.masthead {
+	height: 300rpx;
+	position: relative;
+	
+	.point-num {
+		font-size: 72rpx;
+		color: $text-color-base;
+	}
+	
+	.masthead-line {
+		position: absolute;
+		border-bottom: 2rpx solid #e2e2e2;
+		bottom: 0;
+		right: 0;
+		left: 0;
+	}
+}
+</style>

@@ -1,0 +1,178 @@
+/**
+ * 全局状态管理 - uni-app x 版本
+ * 使用 reactive 替代 Vuex
+ */
+
+// 会员信息类型
+export type MemberType = {
+	storeId: string | null
+	mobilePhone: string
+	nickname: string
+	avatar: string
+	country: string
+	cardName: string
+	memberLevel: number
+	city: string
+	cardNo: string
+	openingCardDate: string
+	customerId: string
+	district: string | null
+	unionId: string
+	address: string | null
+	storeName: string | null
+	gender: number
+	province: string
+	memberOrigin: string
+	username: string
+	memberLevelName: string
+	birthday: string
+	pointNum: number
+	couponNum: number
+	rechargeBalance: number | null
+	balance: number
+	giftBalance: number
+	expenseAmount: number | null
+	conditionType: number
+	ruleList: string | null
+	expiredTime: string | null
+	currentValue: number
+	level: number
+	cardUrl: string
+	needValue: number
+	max: boolean
+}
+
+// 地区信息类型
+export type DistrictType = {
+	districts: string
+	area: string
+	city: string
+	province: string
+}
+
+// 地址类型
+export type AddressType = {
+	id: number
+	accept_name: string
+	mobile: string
+	province_name: string
+	area: number
+	city: number
+	sex: number
+	district: DistrictType
+	street: string
+	inner: boolean
+	lat: string
+	door_number: string
+	is_default: number
+	province: number
+	area_name: string
+	city_name: string
+	poiname: string
+}
+
+// 门店类型
+export type StoreType = {
+	id: number
+	name: string
+	address: string
+	distance: string
+	openTime: string
+	closeTime: string
+	min_price: number
+	packing_fee: number
+}
+
+// 购物车商品类型
+export type CartItemType = {
+	id: number
+	name: string
+	price: number
+	quantity: number
+	specs: string
+	image: string
+}
+
+// 订单类型
+export type OrderType = {
+	id: string
+	orderNo: string
+	status: number
+	totalPrice: number
+	items: CartItemType[]
+	createTime: string
+}
+
+// 全局状态类型
+export type State = {
+	store: StoreType | null
+	cart: CartItemType[]
+	orderType: string
+	address: AddressType | null
+	addresses: AddressType[]
+	member: MemberType | null
+	order: OrderType | null
+}
+
+// 创建响应式状态
+export const state = reactive({
+	store: null,
+	cart: [],
+	orderType: 'takein',
+	address: null,
+	addresses: [],
+	member: null,
+	order: null
+} as State)
+
+// Getters
+export const isLogin = computed((): boolean => {
+	return state.member != null
+})
+
+// Mutations
+export const setOrderType = (type: string) => {
+	state.orderType = type
+}
+
+export const setMember = (member: MemberType | null) => {
+	state.member = member
+}
+
+export const setAddress = (address: AddressType | null) => {
+	state.address = address
+}
+
+export const setAddresses = (addresses: AddressType[]) => {
+	state.addresses = addresses
+}
+
+export const setStore = (store: StoreType | null) => {
+	state.store = store
+}
+
+export const setCart = (cart: CartItemType[]) => {
+	state.cart = cart
+}
+
+export const removeCart = () => {
+	state.cart = []
+}
+
+export const setOrder = (order: OrderType | null) => {
+	state.order = order
+}
+
+// 默认导出
+export default {
+	state,
+	isLogin,
+	setOrderType,
+	setMember,
+	setAddress,
+	setAddresses,
+	setStore,
+	setCart,
+	removeCart,
+	setOrder
+}

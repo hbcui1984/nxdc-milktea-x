@@ -1,0 +1,277 @@
+<template>
+	<view class="uni-calendar-item__weeks-box" :class="weeksBoxClass" @click="choiceDate(weeks)">
+		<view class="uni-calendar-item__weeks-box-item">
+			<view v-if="hasSelectedExtra" class="uni-calendar-item__weeks-box-selected">
+				<view class="iconfont iconseleted"></view>
+			</view>
+			<template v-else>
+				<text class="uni-calendar-item__weeks-box-text" :class="textClass">{{ weeks.date }}</text>
+				<text v-if="lunar && !hasExtraInfo" class="uni-calendar-item__weeks-lunar-text" :class="lunarTextClass">{{ lunarText }}</text>
+				<text v-if="hasExtraInfoText" class="uni-calendar-item__weeks-lunar-text" :class="extraTextClass">{{ extraInfoText }}</text>
+			</template>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+type LunarInfo = {
+	IDayCn: string
+	IMonthCn: string
+}
+
+type ExtraInfo = {
+	info: string
+}
+
+type WeekItemType = {
+	date: string
+	fullDate: string
+	disable: boolean
+	isDay: boolean
+	multiple: boolean
+	lunar: LunarInfo | null
+	extraInfo: ExtraInfo | null
+}
+
+type CalendarType = {
+	fullDate: string
+}
+
+type SelectedItemType = {
+	date: string
+}
+
+const props = defineProps({
+	weeks: {
+		type: Object as PropType<WeekItemType>,
+		default: (): WeekItemType => ({
+			date: '',
+			fullDate: '',
+			disable: false,
+			isDay: false,
+			multiple: false,
+			lunar: null,
+			extraInfo: null
+		})
+	},
+	calendar: {
+		type: Object as PropType<CalendarType>,
+		default: (): CalendarType => ({
+			fullDate: ''
+		})
+	},
+	selected: {
+		type: Array as PropType<SelectedItemType[]>,
+		default: (): SelectedItemType[] => []
+	},
+	lunar: {
+		type: Boolean,
+		default: false
+	}
+})
+
+const emit = defineEmits(['change'])
+
+const hasSelectedExtra = computed<boolean>((): boolean => {
+	return props.selected.length > 0 && props.weeks.extraInfo != null
+})
+
+const hasExtraInfo = computed<boolean>((): boolean => {
+	return props.weeks.extraInfo != null
+})
+
+const hasExtraInfoText = computed<boolean>((): boolean => {
+	return props.weeks.extraInfo != null && props.weeks.extraInfo!.info != ''
+})
+
+const extraInfoText = computed<string>((): string => {
+	if (props.weeks.extraInfo != null) {
+		return props.weeks.extraInfo!.info
+	}
+	return ''
+})
+
+const lunarText = computed<string>((): string => {
+	if (props.weeks.isDay) {
+		return '今天'
+	}
+	if (props.weeks.lunar != null) {
+		const lunar = props.weeks.lunar!
+		if (lunar.IDayCn == '初一') {
+			return lunar.IMonthCn
+		}
+		return lunar.IDayCn
+	}
+	return ''
+})
+
+const isCurrentDate = computed<boolean>((): boolean => {
+	return props.calendar.fullDate == props.weeks.fullDate
+})
+
+const weeksBoxClass = computed<string>((): string => {
+	let classes: string[] = []
+	if (props.weeks.disable) {
+		classes.push('uni-calendar-item--disable')
+	}
+	if (isCurrentDate.value && props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay')
+	}
+	if (isCurrentDate.value && !props.weeks.isDay) {
+		classes.push('uni-calendar-item--checked')
+	}
+	if (props.weeks.multiple) {
+		classes.push('uni-calendar-item--multiple')
+	}
+	return classes.join(' ')
+})
+
+const textClass = computed<string>((): string => {
+	let classes: string[] = []
+	if (props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay-text')
+	}
+	if (isCurrentDate.value && props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay')
+	}
+	if (isCurrentDate.value && !props.weeks.isDay) {
+		classes.push('uni-calendar-item--checked')
+	}
+	if (props.weeks.multiple) {
+		classes.push('uni-calendar-item--multiple')
+	}
+	if (props.weeks.disable) {
+		classes.push('uni-calendar-item--disable')
+	}
+	return classes.join(' ')
+})
+
+const lunarTextClass = computed<string>((): string => {
+	let classes: string[] = []
+	if (props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay-text')
+	}
+	if (isCurrentDate.value && props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay')
+	}
+	if (isCurrentDate.value && !props.weeks.isDay) {
+		classes.push('uni-calendar-item--checked')
+	}
+	if (props.weeks.multiple) {
+		classes.push('uni-calendar-item--multiple')
+	}
+	if (props.weeks.disable) {
+		classes.push('uni-calendar-item--disable')
+	}
+	return classes.join(' ')
+})
+
+const extraTextClass = computed<string>((): string => {
+	let classes: string[] = []
+	if (hasExtraInfoText.value) {
+		classes.push('uni-calendar-item--extra')
+	}
+	if (props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay-text')
+	}
+	if (isCurrentDate.value && props.weeks.isDay) {
+		classes.push('uni-calendar-item--isDay')
+	}
+	if (isCurrentDate.value && !props.weeks.isDay) {
+		classes.push('uni-calendar-item--checked')
+	}
+	if (props.weeks.multiple) {
+		classes.push('uni-calendar-item--multiple')
+	}
+	if (props.weeks.disable) {
+		classes.push('uni-calendar-item--disable')
+	}
+	return classes.join(' ')
+})
+
+const choiceDate = (weeks: WeekItemType): void => {
+	emit('change', weeks)
+}
+</script>
+
+<style lang="scss" scoped>
+	.uni-calendar-item__weeks-box {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		flex-shrink: 0;
+	}
+
+	.uni-calendar-item__weeks-box-text {
+		font-size: 14px;
+		color: #333333;
+	}
+
+	.uni-calendar-item__weeks-lunar-text {
+		font-size: 12px;
+		color: #333333;
+	}
+
+	.uni-calendar-item__weeks-box-item {
+		width: 100%;
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 35px;
+	}
+
+	.uni-calendar-item__weeks-box-circle {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		width: 8px;
+		height: 8px;
+		border-radius: 8px;
+		background-color: #dd524d;
+	}
+	
+	.uni-calendar-item__weeks-box-selected {
+		width: 100%;
+		height: 100%;
+		background-color: #f0ad4e;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		opacity: 0.8;
+	}
+
+	.uni-calendar-item--disable {
+		background-color: rgba(249, 249, 249, 0.6);
+		color: #c0c0c0;
+	}
+
+	.uni-calendar-item--isDay-text {
+		color: #f0ad4e;
+	}
+
+	.uni-calendar-item--isDay {
+		color: #f0ad4e;
+	}
+
+	.uni-calendar-item--extra {
+		color: #dd524d;
+		opacity: 0.8;
+	}
+
+	.uni-calendar-item--checked {
+		background-color: #f0ad4e;
+		color: #fff;
+		opacity: 0.8;
+		border-radius: 25px;
+	}
+
+	.uni-calendar-item--multiple {
+		background-color: #007aff;
+		color: #fff;
+		opacity: 0.8;
+	}
+</style>

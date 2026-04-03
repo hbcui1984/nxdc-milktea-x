@@ -1,0 +1,427 @@
+// 商品模拟数据
+// 类型定义
+type PropertyValue = {
+	id: number
+	value: string
+	is_default: number
+}
+
+type Property = {
+	name: string
+	desc: string | null
+	values: PropertyValue[]
+}
+
+type GoodItem = {
+	id: number
+	name: string
+	content: string
+	price: number
+	images: string
+	use_property: boolean
+	property: Property[]
+}
+
+type Category = {
+	id: number
+	name: string
+	icon: string
+	goods_list: GoodItem[]
+}
+
+export const mockGoods: Category[] = [
+	{
+		id: 6905,
+		name: "奈雪早餐",
+		icon: "",
+		goods_list: [
+			{
+				id: 65825,
+				name: "奈雪早餐",
+				content: "购买三明治,享早餐指定饮品半价",
+				price: 18.5,
+				images: "https://img-shop.qmimg.cn/s23107/2020/04/19/fda6dd99c83af02353.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			}
+		]
+	},
+	{
+		id: 6208,
+		name: "新品推荐",
+		icon: "https://img-shop.qmimg.cn/s23107/2019/04/30/458c5a14fb2f190f96.png?imageView2/0/w/200/h/200",
+		goods_list: [
+			{
+				id: 24516,
+				name: "脏脏王",
+				content: "酥软口感,进口奶油搭配特制巧克力内馅",
+				price: 18,
+				images: "https://img-shop.qmimg.cn/s23107/2020/04/29/4a62ee45dd527609ed.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 24517,
+				name: "抹茶王",
+				content: "精选北川半兵卫抹茶粉和秘制红豆泥",
+				price: 18,
+				images: "https://img-shop.qmimg.cn/s23107/2020/04/29/99daa7b20061efab10.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 68339,
+				name: "霸气杨梅",
+				content: "饱满大颗的新鲜杨梅,满杯手工去核,搭配茉莉初雪茶底,清爽多汁",
+				price: 30,
+				images: "https://img-shop.qmimg.cn/s23107/2020/04/26/559a075d81060b23c7.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 583, value: "去冰", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: null,
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			},
+			{
+				id: 68345,
+				name: "霸气酸奶杨梅",
+				content: "霸气杨梅和酸奶的首次搭配,甘甜可口",
+				price: 32,
+				images: "https://img-shop.qmimg.cn/s23107/2020/04/26/ea8fc439fddf2f62e3.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 583, value: "去冰", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: null,
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		id: 6387,
+		name: "招牌热卖",
+		icon: "https://img-shop.qmimg.cn/s23107/2019/04/30/458c5a14fb2f190f96.png?imageView2/0/w/200/h/200",
+		goods_list: [
+			{
+				id: 31826,
+				name: "霸气榴莲王",
+				content: "马来西亚D24榴莲王果肉+芒果干，爆浆的榴莲馅，这款是榴莲控的最爱。",
+				price: 28,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/28/be484557ff7cfa4dba.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 31507,
+				name: "霸气橙子",
+				content: "奈雪明星产品。优选进口新奇士橙，搭配严选茉莉毛尖茶底，橙意满满。",
+				price: 25,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/26/2a4b2697bec6f7e502.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 583, value: "去冰", is_default: 0 },
+							{ id: 584, value: "热", is_default: 0 },
+							{ id: 2544, value: "温", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: "茶饮含糖量较低，推荐标准做法，口味更佳",
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			},
+			{
+				id: 31532,
+				name: "霸气芝士葡萄",
+				content: "精选优质巨峰葡萄、手工去皮去籽、加入带兰桂花香，经中度焙火的金观音茶中，搭配轻盈香甜芝士奶盖",
+				price: 28,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/19/a3ee1fa72435259a73.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "配料",
+						desc: null,
+						values: [
+							{ id: 1218, value: "标准(芝士)", is_default: 1 },
+							{ id: 1166, value: "芝士换酸奶", is_default: 0 }
+						]
+					},
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 1164, value: "冰沙", is_default: 0 },
+							{ id: 583, value: "去冰", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: "茶饮含糖量较低，推荐标准做法，口味更佳",
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			},
+			{
+				id: 16808,
+				name: "草莓魔法棒",
+				content: "大大的一根魔法棒，加入淡奶油和进口酵母，配上经典的草莓鲜果。好看的外表和经典的口味造就的一款奈雪明星产品。",
+				price: 20,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/28/94d8440ab7b4fed802.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 31424,
+				name: "霸气芝士草莓",
+				content: "奈雪明星产品。选用奈雪自有草莓园新鲜草莓，搭配严选茉莉毛尖茶底，淋上轻盈香滑的芝士奶盖。",
+				price: 29,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/26/1cb88e6cd2fbcefb2a.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "配料",
+						desc: null,
+						values: [
+							{ id: 1218, value: "标准(芝士)", is_default: 1 },
+							{ id: 1166, value: "芝士换酸奶", is_default: 0 }
+						]
+					},
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 0 },
+							{ id: 1164, value: "冰沙", is_default: 1 },
+							{ id: 583, value: "去冰", is_default: 0 },
+							{ id: 584, value: "热", is_default: 0 },
+							{ id: 2544, value: "温", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: "茶饮含糖量较低，推荐标准做法，口味更佳",
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			}
+		]
+	},
+	{
+		id: 2522,
+		name: "软欧包",
+		icon: "https://img-shop.qmimg.cn/s23107/2019/04/28/bfeae4de9de15a0f88.png?imageView2/0/w/200/h/200",
+		goods_list: [
+			{
+				id: 31544,
+				name: "蜜蜜芝士火龙果",
+				content: "粉嫩的面包体加入了火龙果果泥，颜值和健康的共存，满满的香浓芝士内陷搭配柔软有嚼劲的软欧包，葡萄干的加缀增添丰富有层次的口感，让你一试喜欢。",
+				price: 20,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/28/6e4829e475329d4836.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 27016,
+				name: "紫薯嘟嘟",
+				content: "紫薯醇香包裹蜜润红豆，麻薯带来超长拉丝惊喜",
+				price: 16,
+				images: "https://img-shop.qmimg.cn/s23107/2019/10/11/e2035bc2f7003ad0e9.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 27014,
+				name: "咸蛋黄嘟嘟",
+				content: "咸香蛋黄浓郁细腻注入经典芋泥甜咸风味正适宜",
+				price: 16,
+				images: "https://img-shop.qmimg.cn/s23107/2019/10/11/3cf65a33efba914504.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 27009,
+				name: "南瓜嘟嘟",
+				content: "爆浆南瓜泥清甜不腻，麻薯Q弹有活力",
+				price: 16,
+				images: "https://img-shop.qmimg.cn/s23107/2019/10/11/0093e8ec087a074edf.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 27008,
+				name: "红豆嘟嘟",
+				content: "抹茶卡仕达表皮包裹着软糯红豆和绵密芋泥，拉丝麻薯糯唧唧",
+				price: 16,
+				images: "https://img-shop.qmimg.cn/s23107/2019/10/11/21bad4be51837450a8.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 31834,
+				name: "梅菜肉肉",
+				content: "梅菜扣肉咸香接地气，摊成薄薄饼状增大烘焙面积，撒上香烤的芝麻粒，特色风味独树一帜。",
+				price: 15,
+				images: "https://img-shop.qmimg.cn/s23107/2019/04/28/d8e4330c48ae58c7da.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			}
+		]
+	},
+	{
+		id: 6510,
+		name: "手作烘焙",
+		icon: "https://img-shop.qmimg.cn/s23107/2019/04/28/bfeae4de9de15a0f88.png?imageView2/0/w/200/h/200",
+		goods_list: [
+			{
+				id: 57165,
+				name: "原味吐司",
+				content: "无水工艺制作、只添加鸡蛋和牛奶，面包香味浓郁，口感细腻柔韧、嚼劲十足",
+				price: 16,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/19/08b868c6270203c344.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 57167,
+				name: "红豆千层吐司",
+				content: "酥软外皮、自制香草风味卡仕达、颗粒饱满的柔软红豆，豆香四溢",
+				price: 23,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/19/a7e10078ca8d48789f.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 57166,
+				name: "肉松麻薯吐司",
+				content: "进口面粉揉制的面团，咸香四溢的肉松搭配自制Q弹麻薯",
+				price: 22,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/19/576288b90223ac24ae.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			},
+			{
+				id: 25006,
+				name: "草莓咩咩",
+				content: "多种草莓元素汇集，打造专属咩咩包的粉红暴击；以草莓果酱特调淡奶油内馅，享受口腔里肆意的爆浆感，表面撒层酸甜草莓粉搭配草莓干颗粒与草莓巧克力薄层，果香萦绕，充满甜美气息。",
+				price: 9,
+				images: "https://img-shop.qmimg.cn/s23107/2019/06/13/a74abd2b454461e7ed.jpg?imageView2/2/w/400/h/400",
+				use_property: false,
+				property: []
+			}
+		]
+	},
+	{
+		id: 2497,
+		name: "芝士茗茶",
+		icon: "https://img-shop.qmimg.cn/s23107/2019/04/28/edd969e6c892853667.png?imageView2/0/w/200/h/200",
+		goods_list: [
+			{
+				id: 58708,
+				name: "芝士金观音",
+				content: "精选金观音茶叶，汤色金黄清澈、香气馥郁幽长，搭配奈雪芝士奶盖，回甘醇厚。",
+				price: 19,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/26/fcece4bb6af2673e37.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 609, value: "少冰", is_default: 0 },
+							{ id: 583, value: "去冰", is_default: 0 },
+							{ id: 584, value: "热", is_default: 0 },
+							{ id: 2544, value: "温", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: null,
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 610, value: "微糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			},
+			{
+				id: 31558,
+				name: "芝士茉莉",
+				content: "优选茉莉毛尖茶底，搭配轻盈香滑的芝士奶盖，茶香四溢。",
+				price: 19,
+				images: "https://img-shop.qmimg.cn/s23107/2020/03/27/369520a40d39e0ac11.jpg?imageView2/2/w/400/h/400",
+				use_property: true,
+				property: [
+					{
+						name: "温度",
+						desc: null,
+						values: [
+							{ id: 582, value: "标准冰", is_default: 1 },
+							{ id: 583, value: "去冰", is_default: 0 },
+							{ id: 584, value: "热", is_default: 0 },
+							{ id: 2544, value: "温", is_default: 0 }
+						]
+					},
+					{
+						name: "糖度",
+						desc: "茶饮含糖量较低，推荐标准做法，口味更佳",
+						values: [
+							{ id: 585, value: "标准糖", is_default: 1 },
+							{ id: 586, value: "少糖", is_default: 0 },
+							{ id: 1959, value: "不另外加糖", is_default: 0 }
+						]
+					}
+				]
+			}
+		]
+	}
+]

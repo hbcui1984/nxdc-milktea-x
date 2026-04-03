@@ -1,0 +1,99 @@
+// 储值卡模拟数据
+export type RechargeCardItem = {
+	updated_at: string
+	id: number
+	sales: number
+	image: string
+	value: string
+	deleted_at: string | null
+	sort: number
+	status_text: string
+	status: number
+	created_at: string
+	desc: string
+	store_id: number
+	gifts: string[]
+	type: number
+	full_image: string
+	name: string
+	sell_price: string
+}
+
+export const mockRechargeCards: RechargeCardItem[] = [
+	{
+		updated_at: "2020-05-03 20:31:46",
+		id: 1948,
+		sales: 314,
+		image: "/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		value: "100.00",
+		deleted_at: null,
+		sort: 999,
+		status_text: "启用",
+		status: 1,
+		created_at: "2020-01-03 15:46:36",
+		desc: "1. 储值成功后，不可退款，请根据自己的消费情况充值。\n2. 储值余额不可提现，不可转移、转赠。",
+		store_id: 23107,
+		gifts: [],
+		type: 0,
+		full_image: "https://img-shop.qmimg.cn/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		name: "100元",
+		sell_price: "100.00"
+	},
+	{
+		updated_at: "2020-05-02 21:59:50",
+		id: 1972,
+		sales: 112,
+		image: "/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		value: "200.00",
+		deleted_at: null,
+		sort: 999,
+		status_text: "启用",
+		status: 1,
+		created_at: "2020-01-09 23:37:52",
+		desc: "1. 储值成功后，不可退款，请根据自己的消费情况充值。\n2. 储值余额不可提现，不可转移、转赠。",
+		store_id: 23107,
+		gifts: [],
+		type: 0,
+		full_image: "https://img-shop.qmimg.cn/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		name: "200元",
+		sell_price: "200.00"
+	},
+	{
+		updated_at: "2020-05-01 20:19:41",
+		id: 1973,
+		sales: 31,
+		image: "/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		value: "300.00",
+		deleted_at: null,
+		sort: 999,
+		status_text: "启用",
+		status: 1,
+		created_at: "2020-01-09 23:38:10",
+		desc: "1. 储值成功后，不可退款，请根据自己的消费情况充值。\n2. 储值余额不可提现，不可转移、转赠。",
+		store_id: 23107,
+		gifts: [],
+		type: 0,
+		full_image: "https://img-shop.qmimg.cn/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		name: "300元",
+		sell_price: "300.00"
+	},
+	{
+		updated_at: "2020-05-03 13:12:35",
+		id: 1974,
+		sales: 14,
+		image: "/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		value: "400.00",
+		deleted_at: null,
+		sort: 999,
+		status_text: "启用",
+		status: 1,
+		created_at: "2020-01-09 23:38:30",
+		desc: "1. 储值成功后，不可退款，请根据自己的消费情况充值。\n2. 储值余额不可提现，不可转移、转赠。",
+		store_id: 23107,
+		gifts: [],
+		type: 0,
+		full_image: "https://img-shop.qmimg.cn/s1000106/2018/07/09/cfbc38cae535a8ad8a.jpeg",
+		name: "400元",
+		sell_price: "400.00"
+	}
+]

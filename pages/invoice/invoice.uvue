@@ -1,0 +1,251 @@
+<template>
+	<view class="container">
+		<view class="invoice-box-1">
+			<list-cell :hover="false">
+				<view class="d-flex">
+					<view class="label">发票类型</view>
+					<view class="flex-fill d-flex flex-column">
+						<view class="text-base">电子普通发票</view>
+						<view class="sub-text">电子发票与纸质普通发票具备同等法律效益，可支持报销入账</view>
+					</view>
+				</view>
+			</list-cell>
+			<view class="line"></view>
+			<list-cell :hover="false">
+				<view class="d-flex">
+					<view class="label">发票内容</view>
+					<view class="flex-fill text-base">食品</view>
+				</view>
+			</list-cell>
+			<view class="line"></view>
+			<list-cell :hover="false" last>
+				<view class="d-flex">
+					<view class="label">发票抬头</view>
+					<view class="flex-fill">
+						<view class="radio-group">
+							<view class="radio mr-20" :class="{'checked': form.taitou == 0}" @click="setTaitou(0)">个人</view>
+							<view class="radio" :class="{'checked': form.taitou == 1}" @click="setTaitou(1)">公司</view>
+						</view>
+					</view>
+				</view>
+			</list-cell>
+		</view>
+		
+		<view class="invoice-box-2">
+			<list-cell :hover="false">
+				<view class="d-flex w-100">
+					<view class="label">姓名</view>
+					<view class="flex-fill d-flex align-items-center">
+						<input class="flex-fill mr-20 input-field" type="text" :value="form.username" @input="onUsernameInput" placeholder="请输入姓名" placeholder-class="placeholder-style"/>
+						<view class="text-color-danger">必填</view>
+					</view>
+				</view>
+			</list-cell>
+			<view class="line"></view>
+			<list-cell :hover="false">
+				<view class="d-flex w-100">
+					<view class="label">邮箱地址</view>
+					<view class="flex-fill d-flex align-items-center">
+						<input class="flex-fill mr-20 input-field" type="text" :value="form.email" @input="onEmailInput" placeholder="请输入邮箱地址" placeholder-class="placeholder-style"/>
+						<view class="text-color-danger">必填</view>
+					</view>
+				</view>
+			</list-cell>
+			<view class="line"></view>
+			<list-cell :hover="false" last>
+				<view class="d-flex w-100">
+					<view class="label">手机号</view>
+					<view class="flex-fill d-flex align-items-center">
+						<input class="flex-fill mr-20 input-field" type="text" :value="form.telphone" @input="onTelphoneInput" placeholder="请输入手机号码" placeholder-class="placeholder-style"/>
+						<view class="text-color-danger">必填</view>
+					</view>
+				</view>
+			</list-cell>
+		</view>
+		
+		<view class="btn-box">
+			<view class="item">
+				<button type="primary" plain class="btn">导入发票抬头</button>
+			</view>
+			<view class="item">
+				<button type="primary" class="btn">提交</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import listCell from '../../components/list-cell/list-cell.uvue'
+
+type InvoiceFormType = {
+	taitou: number
+	username: string
+	email: string
+	telphone: string
+}
+
+const form = reactive({
+	taitou: 0,
+	username: '',
+	email: '',
+	telphone: ''
+} as InvoiceFormType)
+
+const setTaitou = (value: number) => {
+	form.taitou = value
+}
+
+const onUsernameInput = (e: InputEvent) => {
+	form.username = e.detail.value
+}
+
+const onEmailInput = (e: InputEvent) => {
+	form.email = e.detail.value
+}
+
+const onTelphoneInput = (e: InputEvent) => {
+	form.telphone = e.detail.value
+}
+</script>
+
+<style lang="scss">
+.container {
+	padding: 10rpx 20rpx;
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 140rpx;
+}
+
+.invoice-box-1, .invoice-box-2 {
+	background-color: #FFFFFF;
+	font-size: 24rpx;
+	border-radius: 12rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.invoice-box-1 {
+	margin-bottom: 10rpx;
+}
+
+.line {
+	height: 2rpx;
+	background-color: #eeeeee;
+	margin-left: 30rpx;
+	margin-right: 30rpx;
+}
+
+.d-flex {
+	display: flex;
+	flex-direction: row;
+}
+
+.flex-column {
+	flex-direction: column;
+}
+
+.align-items-center {
+	align-items: center;
+}
+
+.flex-fill {
+	flex: 1;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.mr-20 {
+	margin-right: 20rpx;
+}
+
+.text-base {
+	font-size: 28rpx;
+	color: #333333;
+}
+
+.sub-text {
+	font-size: 20rpx;
+	color: #999999;
+	margin-top: 8rpx;
+}
+
+.radio-group {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+
+.radio {
+	padding: 10rpx 30rpx;
+	border-radius: 6rpx;
+	border-width: 2rpx;
+	border-style: solid;
+	border-color: #999999;
+	color: #999999;
+	font-size: 28rpx;
+}
+
+.radio.checked {
+	background-color: #ADB838;
+	color: #FFFFFF;
+	border-color: #ADB838;
+}
+
+.label {
+	width: 150rpx;
+	color: #999999;
+}
+
+.input-field {
+	flex: 1;
+	font-size: 28rpx;
+}
+
+.placeholder-style {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.text-color-danger {
+	color: #f56c6c;
+	font-size: 24rpx;
+}
+
+.btn-box {
+	background-color: #ffffff;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 120rpx;
+	box-shadow: 0 0 20rpx rgba(0, 0, 0, 0.1);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-evenly;
+	z-index: 11;
+}
+
+.btn-box .item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding: 20rpx 10rpx;
+	flex: 1;
+	flex-shrink: 0;
+}
+
+.btn-box .item .btn {
+	width: 100%;
+	border-radius: 100px;
+	height: 80rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+}
+</style>

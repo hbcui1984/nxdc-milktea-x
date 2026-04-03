@@ -1,0 +1,14 @@
+// 积分信息模拟数据
+export type CustomPointsData = {
+	soonExpiredPoints: number
+	totalPoints: number
+	expiredTime: string | null
+	foreverPoints: number
+}
+
+export const mockCustomPoints: CustomPointsData = {
+	soonExpiredPoints: 0,
+	totalPoints: 487,
+	expiredTime: null,
+	foreverPoints: 0
+}

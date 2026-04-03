@@ -1,0 +1,182 @@
+<template>
+	<view class="container">
+		<view class="invite-box">
+			<view class="progress-header">
+				<view class="text-color-danger font-size-lg">0</view>
+				<view class="text-color-assist">/3</view>
+			</view>
+			<view class="progress-box">
+				<progress :percent="progressPercent" backgroundColor="#FEEBD5" activeColor="#FEDC5F" stroke-width="30" border-radius="30"></progress>
+			</view>
+			<view class="tips-box">
+				<view class="tips-text text-color-danger">每邀3位新用户点亮，得买茶送包劵1张</view>
+				<view class="tips-text text-color-danger">新用户可得30元权益劵包</view>
+			</view>
+			<view class="invite-btn-wrapper">
+				<view class="invite-btn-container">
+					<image src="https://img-shop.qmimg.cn//s16/images/2020/04/21/a45e8244188a5ea0.png" class="invite-btn-bg" mode="widthFix"></image>
+				</view>
+				<view class="invite-btn-text">
+					<view class="invite-text">立即找好友助力</view>
+					<image class="to-invite-img" src="https://img-shop.qmimg.cn/s16/images/2020/04/22/36d4a67a6ede4068.png" mode="widthFix"></image>
+				</view>
+			</view>
+		</view>
+		
+		<view class="my-award">
+			<image src="https://img-shop.qmimg.cn/s16/images/2020/04/21/7a7cde7fb0259f0d.png" class="my-award-img" mode="widthFix"></image>
+			<view class="award-item">
+				<view class="font-size-lg text-color-danger">0</view>
+				<view class="font-size-sm text-color-assist">已成功邀请(位)</view>
+			</view>
+			<view class="award-divider"></view>
+			<view class="award-item">
+				<view class="font-size-lg text-color-danger">0</view>
+				<view class="font-size-sm text-color-assist">已获得奖励(次)</view>
+			</view>
+		</view>
+		
+		<image src='https://img-shop.qmimg.cn/s16/images/2020/04/27/ca59f6bbbb830a16.png' class="friend-award" mode="widthFix"></image>
+	</view>
+</template>
+
+<script setup lang="uts">
+const progressPercent = ref<number>(33)
+</script>
+
+<style lang="scss">
+page {
+	background-color: #f5f5f5;
+}
+
+.container {
+	padding: 30rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.invite-box {
+	padding: 40rpx 70rpx;
+	background-color: #FFFFFF;
+	border-radius: 8rpx;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	margin-bottom: 30rpx;
+}
+
+.progress-header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: baseline;
+}
+
+.progress-box {
+	width: 100%;
+	margin-top: 20rpx;
+	margin-bottom: 20rpx;
+}
+
+.tips-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 40rpx;
+}
+
+.tips-text {
+	font-size: 24rpx;
+	line-height: 40rpx;
+}
+
+.text-color-danger {
+	color: #f56c6c;
+}
+
+.text-color-assist {
+	color: #999999;
+}
+
+.font-size-lg {
+	font-size: 32rpx;
+}
+
+.font-size-sm {
+	font-size: 24rpx;
+}
+
+.invite-btn-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.invite-btn-container {
+	width: 90%;
+	position: relative;
+}
+
+.invite-btn-bg {
+	width: 100%;
+}
+
+.invite-btn-text {
+	position: absolute;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	margin-top: 30rpx;
+}
+
+.invite-text {
+	font-size: 32rpx;
+	color: #f56c6c;
+}
+
+.to-invite-img {
+	width: 16rpx;
+	margin-left: 10rpx;
+}
+
+.my-award {
+	padding: 60rpx 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	background-color: #FFFFFF;
+	border-radius: 8rpx;
+	margin-bottom: 30rpx;
+	position: relative;
+}
+
+.my-award-img {
+	width: 291rpx;
+	position: absolute;
+	top: -15rpx;
+}
+
+.award-item {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.award-divider {
+	width: 2rpx;
+	height: 60rpx;
+	background-color: #cccccc;
+}
+
+.friend-award {
+	width: 100%;
+	border-radius: 8rpx;
+}
+</style>

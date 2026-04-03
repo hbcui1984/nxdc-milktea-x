@@ -1,0 +1,229 @@
+<template>
+	<view class="container">
+		<view class="content">
+			<list-cell last class="mb-20" :hover="false">
+				<view class="header-row">
+					<view class="font-size-lg text-color-base flex-fill">{{ storename }}</view>
+					<view class="font-size-base text-color-assist mr-10">{{ date }}</view>
+					<view class="font-size-base text-color-assist">{{ typeCate == 1 ? '堂食' : '外卖' }}</view>
+				</view>
+			</list-cell>
+			<view class="review-form">
+				<view class="review-rate-form mb-20">
+					<rate-form-item :modelValue="form.score_service" @update:modelValue="updateScoreService" label="服务" tips="能感受到良好的服务态度吗？"></rate-form-item>
+					<rate-form-item :modelValue="form.score_order" @update:modelValue="updateScoreOrder" label="点单" tips="点单有恰当的介绍，快速准确地下单吗？"></rate-form-item>
+					<rate-form-item :modelValue="form.score_speed" @update:modelValue="updateScoreSpeed" label="速度" tips="出品的速度您认为可接受吗？"></rate-form-item>
+					<rate-form-item :modelValue="form.score_product" @update:modelValue="updateScoreProduct" label="产品" tips="您享用的茶饮或面包，如您所期待吗？"></rate-form-item>
+					<rate-form-item :modelValue="form.score_enviroment" @update:modelValue="updateScoreEnviroment" label="环境" tips="门店环境和清洁卫生，您满意吗？"></rate-form-item>
+				</view>
+				<view class="review-textarea-form">
+					<textarea :value="form.opinion" @input="onOpinionInput" placeholder="如果您有什么意见和建议,请告诉我们,我们会认真聆听" 
+					placeholder-class="placeholder-style" class="opinion-textarea"/>
+					<view class="text-right font-size-sm text-color-assist">{{ opinionLength }}/500</view>
+				</view>
+			</view>
+		</view>
+		<view class="btn-box">
+			<button type="primary" class="submit-btn" @click="submit">提交评论</button>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import listCell from '@/components/list-cell/list-cell.uvue'
+import rateFormItem from './rate-form-item/index.uvue'
+
+type ReviewFormType = {
+	score_service: number
+	score_order: number
+	score_speed: number
+	score_product: number
+	score_enviroment: number
+	opinion: string
+}
+
+const form = reactive({
+	score_service: 0,
+	score_order: 0,
+	score_speed: 0,
+	score_product: 0,
+	score_enviroment: 0,
+	opinion: ''
+} as ReviewFormType)
+
+const storename = ref<string>('')
+const typeCate = ref<number>(1)
+const date = ref<string>('')
+
+onLoad((options: OnLoadOptions) => {
+	const storenameParam = options['storename'] as string | null
+	const typeCateParam = options['typeCate'] as string | null
+	const dateParam = options['date'] as string | null
+	
+	if (storenameParam != null) {
+		storename.value = storenameParam
+	}
+	if (typeCateParam != null) {
+		typeCate.value = parseInt(typeCateParam)
+	}
+	if (dateParam != null) {
+		date.value = dateParam
+	}
+})
+
+const opinionLength = computed((): number => {
+	return form.opinion.length
+})
+
+const onOpinionInput = (e: InputEvent) => {
+	form.opinion = e.detail.value
+}
+
+const updateScoreService = (value: number) => {
+	form.score_service = value
+}
+
+const updateScoreOrder = (value: number) => {
+	form.score_order = value
+}
+
+const updateScoreSpeed = (value: number) => {
+	form.score_speed = value
+}
+
+const updateScoreProduct = (value: number) => {
+	form.score_product = value
+}
+
+const updateScoreEnviroment = (value: number) => {
+	form.score_enviroment = value
+}
+
+const submit = () => {
+	if (form.score_service == 0 || form.score_order == 0 || form.score_speed == 0 || form.score_product == 0 || form.score_enviroment == 0) {
+		uni.showToast({
+			title: '请先选择评论内容',
+			icon: 'none'
+		})
+		return
+	}
+	
+	uni.showToast({
+		title: '提交成功'
+	})
+	
+	uni.navigateBack()
+}
+</script>
+
+<style lang="scss">
+.container {
+	display: flex;
+	flex-direction: column;
+}
+
+.content {
+	padding-bottom: 120rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.header-row {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.font-size-lg {
+	font-size: 32rpx;
+}
+
+.font-size-base {
+	font-size: 28rpx;
+}
+
+.font-size-sm {
+	font-size: 24rpx;
+}
+
+.text-color-base {
+	color: #333333;
+}
+
+.text-color-assist {
+	color: #999999;
+}
+
+.flex-fill {
+	flex: 1;
+}
+
+.mr-10 {
+	margin-right: 10rpx;
+}
+
+.mb-20 {
+	margin-bottom: 20rpx;
+}
+
+.btn-box {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 120rpx;
+	background-color: #FFFFFF;
+	padding: 20rpx 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.submit-btn {
+	width: 90%;
+	height: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	border-radius: 100px;
+}
+
+.review-form {
+	background-color: #FFFFFF;
+	padding: 20rpx 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.review-rate-form {
+	display: flex;
+	flex-direction: column;
+}
+
+.review-textarea-form {
+	padding: 0 30rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.opinion-textarea {
+	width: 100%;
+	background-color: #f5f5f5;
+	padding: 30rpx;
+	font-size: 24rpx;
+	color: #333333;
+	box-sizing: border-box;
+}
+
+.placeholder-style {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.text-right {
+	text-align: right;
+}
+</style>

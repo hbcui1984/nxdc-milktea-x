@@ -1,0 +1,36 @@
+<template>
+	<view class="position-absolute" :style="{zIndex: 99, height: height + 'px', top: top + 'px', left: left + 'px'}" @tap="click">
+		<image src="/static/images/back.png" :style="{height: height + 'px', width: height + 'px'}"></image>
+	</view>
+</template>
+
+<script setup lang="uts">
+	const height = ref<number>(0)
+	const left = ref<number>(0)
+	const top = ref<number>(0)
+
+	onMounted(() => {
+		// #ifdef MP-WEIXIN
+		const menuButton = uni.getMenuButtonBoundingClientRect()
+		const systemInfo = uni.getSystemInfoSync()
+		top.value = menuButton.top.toInt()
+		left.value = (systemInfo.windowWidth - menuButton.right).toInt()
+		height.value = menuButton.height.toInt()
+		// #endif
+		// #ifndef MP-WEIXIN
+		height.value = 32
+		top.value = 26
+		left.value = 10
+		// #endif
+	})
+
+	const click = () => {
+		uni.navigateBack()
+	}
+</script>
+
+<style lang="scss">
+	.position-absolute {
+		position: absolute;
+	}
+</style>

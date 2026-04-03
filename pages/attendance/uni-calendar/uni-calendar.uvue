@@ -1,0 +1,465 @@
+<template>
+	<view class="uni-calendar">
+		<view v-if="!insert && show" class="uni-calendar__mask" :class="{'uni-calendar--mask-show': aniMaskShow}" @click="clean"></view>
+		<view v-if="insert || show" class="uni-calendar__content" :class="{'uni-calendar--fixed': !insert, 'uni-calendar--ani-show': aniMaskShow}">
+			<view v-if="!insert" class="uni-calendar__header uni-calendar--fixed-top">
+				<view class="uni-calendar__header-btn-box" @click="close">
+					<text class="uni-calendar__header-text uni-calendar--fixed-width">取消</text>
+				</view>
+				<view class="uni-calendar__header-btn-box" @click="confirmAction">
+					<text class="uni-calendar__header-text uni-calendar--fixed-width">确定</text>
+				</view>
+			</view>
+			<view class="uni-calendar__header">
+				<view class="d-flex align-items-center">
+					<view class="uni-calendar__header-btn-box" @click="pre">
+						<view class="uni-calendar__header-btn uni-calendar--left"></view>
+					</view>
+					<text class="uni-calendar__header-text">{{ nowDateDisplay }}</text>
+					<view class="uni-calendar__header-btn-box" @click="next">
+						<view class="uni-calendar__header-btn uni-calendar--right"></view>
+					</view>
+				</view>
+				<view class="uni-calendar__backtoday">
+					<text class="backtoday-text">已连续签到</text>
+					<text class="text-color-primary continuous-text">{{ continuous }}</text>
+					<text class="backtoday-text">天</text>
+				</view>
+			</view>
+			<view class="uni-calendar__box">
+				<view v-if="showMonth" class="uni-calendar__box-bg">
+					<text class="uni-calendar__box-bg-text">{{ currentMonth }}</text>
+				</view>
+				<view class="uni-calendar__weeks">
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">日</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">一</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">二</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">三</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">四</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">五</text>
+					</view>
+					<view class="uni-calendar__weeks-day">
+						<text class="uni-calendar__weeks-day-text">六</text>
+					</view>
+				</view>
+				<view class="uni-calendar__weeks" v-for="(weekRow, weekIndex) in weeksData" :key="weekIndex">
+					<view class="uni-calendar__weeks-item" v-for="(day, dayIndex) in weekRow" :key="dayIndex">
+						<uni-calendar-item :weeks="day" :calendar="calendarData" :selected="selected" :lunar="lunar" @change="choiceDate"></uni-calendar-item>
+					</view>
+				</view>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import uniCalendarItem from './uni-calendar-item.uvue'
+
+type SelectedItem = {
+	date: string
+}
+
+type CalendarDayItem = {
+	date: string
+	fullDate: string
+	disable: boolean
+	isDay: boolean
+	multiple: boolean
+	lunar: string | null
+	extraInfo: SelectedItem | null
+}
+
+type CalendarInfo = {
+	year: string
+	month: string
+	date: string
+	fullDate: string
+	lunar: string | null
+	extraInfo: SelectedItem | null
+}
+
+const props = defineProps({
+	date: {
+		type: String,
+		default: ''
+	},
+	selected: {
+		type: Array as PropType<SelectedItem[]>,
+		default: (): SelectedItem[] => []
+	},
+	lunar: {
+		type: Boolean,
+		default: false
+	},
+	startDate: {
+		type: String,
+		default: ''
+	},
+	endDate: {
+		type: String,
+		default: ''
+	},
+	range: {
+		type: Boolean,
+		default: false
+	},
+	insert: {
+		type: Boolean,
+		default: true
+	},
+	showMonth: {
+		type: Boolean,
+		default: false
+	},
+	continuous: {
+		type: Number,
+		default: 0
+	}
+})
+
+const emit = defineEmits(['confirm', 'change', 'monthSwitch'])
+
+const show = ref<boolean>(false)
+const aniMaskShow = ref<boolean>(false)
+const currentYear = ref<number>(new Date().getFullYear())
+const currentMonth = ref<number>(new Date().getMonth() + 1)
+const weeksData = ref<CalendarDayItem[][]>([])
+const calendarData = ref<CalendarInfo>({
+	year: '',
+	month: '',
+	date: '',
+	fullDate: '',
+	lunar: null,
+	extraInfo: null
+})
+
+const nowDateDisplay = computed<string>((): string => {
+	const monthStr = currentMonth.value < 10 ? '0' + currentMonth.value.toString() : currentMonth.value.toString()
+	return currentYear.value.toString() + '-' + monthStr
+})
+
+const clean = (): void => {}
+
+const open = (): void => {
+	show.value = true
+	setTimeout(() => {
+		aniMaskShow.value = true
+	}, 50)
+}
+
+const close = (): void => {
+	aniMaskShow.value = false
+	setTimeout(() => {
+		show.value = false
+	}, 300)
+}
+
+const confirmAction = (): void => {
+	emit('confirm', calendarData.value)
+	close()
+}
+
+const choiceDate = (day: CalendarDayItem): void => {
+	if (day.disable) return
+	calendarData.value = {
+		year: currentYear.value.toString(),
+		month: currentMonth.value.toString(),
+		date: day.date,
+		fullDate: day.fullDate,
+		lunar: day.lunar,
+		extraInfo: day.extraInfo
+	}
+	emit('change', calendarData.value)
+}
+
+const generateCalendar = (): void => {
+	const year = currentYear.value
+	const month = currentMonth.value
+	const firstDay = new Date(year, month - 1, 1).getDay()
+	const daysInMonth = new Date(year, month, 0).getDate()
+	const today = new Date()
+	const todayStr = today.getFullYear().toString() + '-' + 
+		(today.getMonth() + 1 < 10 ? '0' + (today.getMonth() + 1).toString() : (today.getMonth() + 1).toString()) + '-' +
+		(today.getDate() < 10 ? '0' + today.getDate().toString() : today.getDate().toString())
+	
+	const days: CalendarDayItem[] = []
+	
+	// Previous month days
+	for (let i = 0; i < firstDay; i++) {
+		const prevMonthDays = new Date(year, month - 1, 0).getDate()
+		const date = prevMonthDays - firstDay + i + 1
+		days.push({
+			date: date.toString(),
+			fullDate: '',
+			disable: true,
+			isDay: false,
+			multiple: false,
+			lunar: null,
+			extraInfo: null
+		})
+	}
+	
+	// Current month days
+	for (let i = 1; i <= daysInMonth; i++) {
+		const monthStr = month < 10 ? '0' + month.toString() : month.toString()
+		const dayStr = i < 10 ? '0' + i.toString() : i.toString()
+		const fullDate = year.toString() + '-' + monthStr + '-' + dayStr
+		const isToday = fullDate == todayStr
+		
+		// Check if date is in selected
+		let extraInfo: SelectedItem | null = null
+		for (let j = 0; j < props.selected.length; j++) {
+			if (props.selected[j].date == fullDate) {
+				extraInfo = props.selected[j]
+				break
+			}
+		}
+		
+		days.push({
+			date: i.toString(),
+			fullDate: fullDate,
+			disable: false,
+			isDay: isToday,
+			multiple: false,
+			lunar: null,
+			extraInfo: extraInfo
+		})
+	}
+	
+	// Next month days
+	const remaining = 42 - days.length
+	for (let i = 1; i <= remaining; i++) {
+		days.push({
+			date: i.toString(),
+			fullDate: '',
+			disable: true,
+			isDay: false,
+			multiple: false,
+			lunar: null,
+			extraInfo: null
+		})
+	}
+	
+	// Split into weeks
+	const weeks: CalendarDayItem[][] = []
+	for (let i = 0; i < 6; i++) {
+		const week: CalendarDayItem[] = []
+		for (let j = 0; j < 7; j++) {
+			week.push(days[i * 7 + j])
+		}
+		weeks.push(week)
+	}
+	
+	weeksData.value = weeks
+}
+
+const pre = (): void => {
+	if (currentMonth.value <= 1) {
+		currentMonth.value = 12
+		currentYear.value = currentYear.value - 1
+	} else {
+		currentMonth.value = currentMonth.value - 1
+	}
+	generateCalendar()
+	emit('monthSwitch', { year: currentYear.value, month: currentMonth.value })
+}
+
+const next = (): void => {
+	if (currentMonth.value >= 12) {
+		currentMonth.value = 1
+		currentYear.value = currentYear.value + 1
+	} else {
+		currentMonth.value = currentMonth.value + 1
+	}
+	generateCalendar()
+	emit('monthSwitch', { year: currentYear.value, month: currentMonth.value })
+}
+
+onMounted(() => {
+	if (props.startDate != '') {
+		const parts = props.startDate.split('-')
+		if (parts.length >= 2) {
+			currentYear.value = parseInt(parts[0])
+			currentMonth.value = parseInt(parts[1])
+		}
+	}
+	generateCalendar()
+})
+
+watch((): SelectedItem[] => props.selected, (_newVal: SelectedItem[]) => {
+	generateCalendar()
+})
+
+defineExpose({
+	open,
+	close
+})
+</script>
+
+<style lang="scss" scoped>
+.uni-calendar {
+	display: flex;
+	flex-direction: column;
+}
+
+.uni-calendar__mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.4);
+	opacity: 0;
+	z-index: 99;
+}
+
+.uni-calendar--mask-show {
+	opacity: 1;
+}
+
+.uni-calendar__content {
+	background-color: #FFFFFF;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.uni-calendar--fixed {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 100;
+	border-radius: 16px 16px 0 0;
+}
+
+.uni-calendar--ani-show {
+	opacity: 1;
+}
+
+.uni-calendar__header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	border-bottom-width: 1px;
+	border-bottom-color: #f0f0f0;
+	border-bottom-style: solid;
+}
+
+.uni-calendar__header-btn-box {
+	padding: 10px;
+}
+
+.uni-calendar__header-btn {
+	width: 10px;
+	height: 10px;
+	border-top-width: 2px;
+	border-left-width: 2px;
+	border-color: #333333;
+	border-style: solid;
+}
+
+.uni-calendar--left {
+	transform: rotate(-45deg);
+}
+
+.uni-calendar--right {
+	transform: rotate(135deg);
+}
+
+.uni-calendar__header-text {
+	font-size: 16px;
+	color: #333333;
+	margin: 0 10px;
+}
+
+.uni-calendar--fixed-top {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 10px 15px;
+}
+
+.uni-calendar--fixed-width {
+	width: 50px;
+}
+
+.uni-calendar__backtoday {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.backtoday-text {
+	font-size: 12px;
+	color: #999999;
+}
+
+.continuous-text {
+	font-size: 14px;
+	margin: 0 5px;
+}
+
+.uni-calendar__box {
+	position: relative;
+	padding: 10px;
+}
+
+.uni-calendar__box-bg {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.uni-calendar__box-bg-text {
+	font-size: 200px;
+	color: #f5f5f5;
+}
+
+.uni-calendar__weeks {
+	display: flex;
+	flex-direction: row;
+}
+
+.uni-calendar__weeks-day {
+	flex: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px 0;
+}
+
+.uni-calendar__weeks-day-text {
+	font-size: 14px;
+	color: #666666;
+}
+
+.uni-calendar__weeks-item {
+	flex: 1;
+}
+
+.d-flex {
+	display: flex;
+}
+
+.align-items-center {
+	align-items: center;
+}
+
+.text-color-primary {
+	color: #fa524c;
+}
+</style>

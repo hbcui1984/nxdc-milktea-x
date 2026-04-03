@@ -1,0 +1,50 @@
+// 今日签到状态模拟数据
+export type TodayAttendanceListItem = {
+	points: number
+	updated_at: string
+	attendances_id: number
+	id: number
+	status: number
+	receive_type: number
+	created_at: string
+	coupon_name: string
+	attendance_category: number
+	coupon_id: string
+	attendance_day: number
+	coupon_num: number
+	deleted_at: string | null
+}
+
+export type TodayAttendanceData = {
+	is_attendance: number
+	total_points: number
+	attendance_points: number
+	attendance_category: number
+	attendance_continuity_day: number
+	list: TodayAttendanceListItem[]
+}
+
+export const mockTodayAttendance: TodayAttendanceData = {
+	is_attendance: 2,
+	total_points: 0,
+	attendance_points: 1,
+	attendance_category: 1,
+	attendance_continuity_day: 1,
+	list: [
+		{
+			points: 1,
+			updated_at: "2020-01-15 05:29:25",
+			attendances_id: 312,
+			id: 770,
+			status: 0,
+			receive_type: 0,
+			created_at: "2019-10-23 19:17:21",
+			coupon_name: "",
+			attendance_category: 1,
+			coupon_id: "0",
+			attendance_day: 1,
+			coupon_num: 0,
+			deleted_at: null
+		}
+	]
+}

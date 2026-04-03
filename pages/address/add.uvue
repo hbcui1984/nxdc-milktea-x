@@ -1,0 +1,256 @@
+<template>
+	<view class="container">
+		<view class="form-box">
+			<view class="form">
+				<list-cell :hover="false">
+					<view class="form-input">
+						<view class="label">收货人</view>
+						<input class="input" placeholder="请输入收货人" v-model="form.accept_name" placeholder-class="placeholder-text"/>
+					</view>
+				</list-cell>
+				<list-cell :hover="false">
+					<view class="form-input">
+						<view class="label">性别</view>
+						<view class="radio-group">
+							<view class="radio" :class="form.sex == 0 ? 'checked' : ''" @click="setSex(0)">先生</view>
+							<view class="radio radio-right" :class="form.sex == 1 ? 'checked' : ''" @click="setSex(1)">女士</view>
+						</view>
+					</view>
+				</list-cell>
+				<list-cell :hover="false">
+					<view class="form-input">
+						<view class="label">联系方式</view>
+						<input class="input" placeholder="请输入收货人联系方式" v-model="form.mobile" placeholder-class="placeholder-text"/>
+					</view>
+				</list-cell>
+				<list-cell :hover="false">
+					<view class="form-input">
+						<view class="label">收货地址</view>
+						<input class="input" placeholder="请选择收货地址" v-model="form.street" placeholder-class="placeholder-text"/>
+					</view>
+				</list-cell>
+				<list-cell :hover="false">
+					<view class="form-input">
+						<view class="label">门牌号</view>
+						<input class="input" placeholder="请输入收货人详细地址" v-model="form.door_number" placeholder-class="placeholder-text"/>
+					</view>
+				</list-cell>
+			</view>
+			<view class="btn-section">
+				<button type="primary" size="default" class="save-btn" @click="save">保存</button>
+			</view>
+		</view>
+	</view>
+</template>
+
+<script setup lang="uts">
+import { state, setAddresses, AddressType, DistrictType } from '@/store/index.uts'
+
+// 表单数据类型
+type FormType = {
+	id: number
+	accept_name: string
+	sex: number
+	mobile: string
+	street: string
+	door_number: string
+}
+
+// 表单数据
+const form = reactive({
+	id: 0,
+	accept_name: '',
+	sex: 0,
+	mobile: '',
+	street: '',
+	door_number: ''
+} as FormType)
+
+// 是否编辑模式
+const isEdit = ref<boolean>(false)
+
+onLoad((options: OnLoadOptions) => {
+	if (options['id'] != null) {
+		const id = parseInt(options['id'] as string)
+		const address = state.addresses.find((item: AddressType): boolean => item.id == id)
+		if (address != null) {
+			isEdit.value = true
+			form.id = address.id
+			form.accept_name = address.accept_name
+			form.sex = address.sex
+			form.mobile = address.mobile
+			form.street = address.street
+			form.door_number = address.door_number
+		}
+	}
+})
+
+// 设置性别
+const setSex = (sex: number) => {
+	form.sex = sex
+}
+
+// 保存地址
+const save = () => {
+	// 表单验证
+	if (form.accept_name.length == 0) {
+		uni.showToast({ title: '请输入收货人', icon: 'none' })
+		return
+	}
+	if (form.mobile.length == 0) {
+		uni.showToast({ title: '请输入联系方式', icon: 'none' })
+		return
+	}
+	if (form.street.length == 0) {
+		uni.showToast({ title: '请输入收货地址', icon: 'none' })
+		return
+	}
+	
+	// 创建新地址对象
+	const newAddress: AddressType = {
+		id: isEdit.value ? form.id : Date.now() as number,
+		accept_name: form.accept_name,
+		mobile: form.mobile,
+		province_name: '',
+		area: 0,
+		city: 0,
+		sex: form.sex,
+		district: {
+			districts: '',
+			area: '',
+			city: '',
+			province: ''
+		} as DistrictType,
+		street: form.street,
+		inner: false,
+		lat: '',
+		door_number: form.door_number,
+		is_default: 0,
+		province: 0,
+		area_name: '',
+		city_name: '',
+		poiname: ''
+	}
+	
+	// 更新地址列表
+	const newAddresses: AddressType[] = [] as AddressType[]
+	let found = false
+	
+	for (let i = 0; i < state.addresses.length; i++) {
+		if (state.addresses[i].id == form.id && isEdit.value) {
+			newAddresses.push(newAddress)
+			found = true
+		} else {
+			newAddresses.push(state.addresses[i])
+		}
+	}
+	
+	if (!found) {
+		newAddresses.push(newAddress)
+	}
+	
+	setAddresses(newAddresses)
+	
+	uni.showToast({ 
+		title: isEdit.value ? '修改成功' : '添加成功', 
+		icon: 'success' 
+	})
+	
+	setTimeout(() => {
+		uni.navigateBack({})
+	}, 1500)
+}
+</script>
+
+<style lang="scss">
+.container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.form-box {
+	width: 100%;
+	flex: 1;
+	padding: 30rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+}
+
+.form-input {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	width: 100%;
+}
+
+.label {
+	width: 200rpx;
+	font-size: 32rpx;
+	font-weight: 500;
+}
+
+.input {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	font-size: 28rpx;
+}
+
+.placeholder-text {
+	color: #999999;
+}
+
+.radio-group {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+
+.radio {
+	padding: 10rpx 30rpx;
+	border-radius: 6rpx;
+	border-width: 2rpx;
+	border-style: solid;
+	border-color: #999999;
+	color: #999999;
+	font-size: 28rpx;
+}
+
+.radio-right {
+	margin-left: 20rpx;
+}
+
+.radio.checked {
+	background-color: #D12E32;
+	color: #FFFFFF;
+	border-color: #D12E32;
+}
+
+.btn-section {
+	flex: 1;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	margin-top: 60rpx;
+}
+
+.save-btn {
+	font-size: 28rpx;
+	height: 90rpx;
+	border-radius: 45rpx;
+	width: 85%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+</style>

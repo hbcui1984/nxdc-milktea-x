@@ -1,0 +1,399 @@
+<template>
+	<view class="container position-relative w-100 h-100 overflow-hidden">
+		<view class="exchange-box">
+			<view class="input-box">
+				<input type="text" placeholder="请输入兑换码" placeholder-class="text-color-assist font-size-base" v-model="exchangeCode" />
+				<button type="primary" @click="exchange">兑换</button>
+			</view>
+			<view class="font-size-sm text-color-primary line-height-2">查看兑换规则</view>
+		</view>
+		<view class="tabbar">
+			<view class="tab" :class="{'active': activeTabIndex == 0}" @click="handleTab(0)">
+				<view class="title">全部</view>
+			</view>
+			<view class="tab" :class="{'active': activeTabIndex == 1}" @click="handleTab(1)">
+				<view class="title">茶饮券</view>
+			</view>
+			<view class="tab" :class="{'active': activeTabIndex == 2}" @click="handleTab(2)">
+				<view class="title">酒屋券</view>
+			</view>
+		</view>
+		<view class="flex-fill">
+			<scroll-view scroll-y class="coupon-list">
+				<view class="wrapper">
+					<view class="coupon" v-for="(item, index) in coupons" :key="index" @click="openDetailModal(index)">
+						<view class="d-flex align-items-center detail">
+							<image :src="getCouponImage(item)" class="coupon-img"></image>
+							<view class="flex-fill d-flex flex-column just-content-center overflow-hidden">
+								<view class="font-size-lg text-color-base text-truncate mb-10">{{ getCouponTitle(item) }}</view>
+								<view class="font-size-sm text-color-base">有效期至{{ getCouponEndAt(item) }}</view>
+							</view>
+						</view>
+						<view class="d-flex align-items-center justify-content-end detail-link">
+							<view class="font-size-sm text-color-primary">查看详情</view>
+						</view>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+		<view class="bottom-box d-flex align-items-center just-content-center font-size-sm text-color-primary">
+			<view class="item" @click="showHistory">历史卡券</view>
+			<view class="item" @click="showTip1">赠送记录</view>
+			<view class="item" @click="showTip2">第三方权益</view>
+		</view>
+		<modal :custom="true" :show="detailModalVisible" @cancel="closeDetailModal" width="90%">
+			<view class="modal-content">
+				<view class="d-flex font-size-extra-lg text-color-base just-content-center mb-20">{{ currentCouponTitle }}</view>
+				<view class="d-flex font-size-sm text-color-base mb-20">
+					有效期：{{ currentCouponBeginAt }}至{{ currentCouponEndAt }}
+				</view>
+				<view class="pre-line font-size-sm text-color-assist mb-30">
+					{{ currentCouponExplain }}
+				</view>
+				<view class="d-flex align-items-center just-content-center">
+					<button type="primary" @click="useCoupon" class="use-coupon-btn">立即使用</button>
+				</view>
+			</view>
+		</modal>
+	</view>
+</template>
+
+<script setup lang="uts">
+// 优惠券类型定义
+type CouponType = {
+	id: string
+	title: string
+	imageUrl: string
+	beginAt: string
+	endAt: string
+	couponType: string
+	couponExplain: string
+}
+
+const exchangeCode = ref<string>('')
+const activeTabIndex = ref<number>(0)
+const coupons = ref<CouponType[]>([])
+const allCoupons = ref<CouponType[]>([])
+const detailModalVisible = ref<boolean>(false)
+const currentCouponIndex = ref<number>(-1)
+
+const currentCouponTitle = computed((): string => {
+	if (currentCouponIndex.value >= 0 && currentCouponIndex.value < coupons.value.length) {
+		return coupons.value[currentCouponIndex.value].title
+	}
+	return ''
+})
+
+const currentCouponBeginAt = computed((): string => {
+	if (currentCouponIndex.value >= 0 && currentCouponIndex.value < coupons.value.length) {
+		return coupons.value[currentCouponIndex.value].beginAt
+	}
+	return ''
+})
+
+const currentCouponEndAt = computed((): string => {
+	if (currentCouponIndex.value >= 0 && currentCouponIndex.value < coupons.value.length) {
+		return coupons.value[currentCouponIndex.value].endAt
+	}
+	return ''
+})
+
+const currentCouponExplain = computed((): string => {
+	if (currentCouponIndex.value >= 0 && currentCouponIndex.value < coupons.value.length) {
+		return coupons.value[currentCouponIndex.value].couponExplain
+	}
+	return ''
+})
+
+const getCouponImage = (item: CouponType): string => {
+	return item.imageUrl
+}
+
+const getCouponTitle = (item: CouponType): string => {
+	return item.title
+}
+
+const getCouponEndAt = (item: CouponType): string => {
+	return item.endAt
+}
+
+const filterCoupons = () => {
+	if (activeTabIndex.value == 0) {
+		coupons.value = allCoupons.value
+	} else {
+		const typeValue = activeTabIndex.value.toString()
+		const filtered: CouponType[] = []
+		for (let i = 0; i < allCoupons.value.length; i++) {
+			if (allCoupons.value[i].couponType == typeValue) {
+				filtered.push(allCoupons.value[i])
+			}
+		}
+		coupons.value = filtered
+	}
+}
+
+const handleTab = (index: number) => {
+	activeTabIndex.value = index
+	filterCoupons()
+}
+
+const openDetailModal = (index: number) => {
+	currentCouponIndex.value = index
+	detailModalVisible.value = true
+}
+
+const closeDetailModal = () => {
+	detailModalVisible.value = false
+	currentCouponIndex.value = -1
+}
+
+const useCoupon = () => {
+	uni.switchTab({
+		url: '/pages/menu/menu'
+	})
+}
+
+const exchange = () => {
+	if (exchangeCode.value == '') {
+		uni.showToast({
+			title: '请输入兑换码',
+			icon: 'none'
+		})
+		return
+	}
+	uni.showToast({
+		title: '兑换成功',
+		icon: 'success'
+	})
+}
+
+const showHistory = () => {
+	uni.showToast({
+		title: '暂无历史卡券',
+		icon: 'none'
+	})
+}
+
+const showTip1 = () => {
+	uni.showToast({
+		title: '您暂时还没有赠送中卡券哦~',
+		icon: 'none'
+	})
+}
+
+const showTip2 = () => {
+	uni.showToast({
+		title: '您暂时还没有券码哦~',
+		icon: 'none'
+	})
+}
+
+onShow(() => {
+	// 模拟数据
+	allCoupons.value = [
+		{
+			id: '1',
+			title: '新人专享-任意饮品买一送一',
+			imageUrl: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png',
+			beginAt: '2024-01-01',
+			endAt: '2024-12-31',
+			couponType: '1',
+			couponExplain: '1. 本券限新用户使用\n2. 单次消费仅可使用一张\n3. 本券不可兑换现金'
+		},
+		{
+			id: '2',
+			title: '酒屋满100减20券',
+			imageUrl: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png',
+			beginAt: '2024-01-01',
+			endAt: '2024-12-31',
+			couponType: '2',
+			couponExplain: '1. 满100元可用\n2. 仅限酒屋商品使用\n3. 本券不可兑换现金'
+		}
+	] as CouponType[]
+	filterCoupons()
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.exchange-box {
+	flex-shrink: 0;
+	height: 200rpx;
+	background-color: #ffffff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.exchange-box .input-box {
+	display: flex;
+	align-items: stretch;
+	width: 70%;
+	flex-shrink: 0;
+}
+
+.exchange-box .input-box input {
+	flex: 1;
+	height: 80rpx;
+	border-width: 1rpx;
+	border-style: solid;
+	border-color: #eeeeee;
+	border-right-width: 0;
+	border-top-left-radius: 8rpx;
+	border-bottom-left-radius: 8rpx;
+	padding: 20rpx;
+	font-size: 28rpx;
+	color: #5A5B5C;
+}
+
+.exchange-box .input-box button {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-top-right-radius: 8rpx;
+	border-bottom-right-radius: 8rpx;
+	display: flex;
+	align-items: center;
+}
+
+.tabbar {
+	flex-shrink: 0;
+	width: 100%;
+	height: 120rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.tabbar .tab {
+	flex: 1;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	font-size: 28rpx;
+	color: #5A5B5C;
+	position: relative;
+}
+
+.tabbar .tab .title {
+	padding: 15rpx 0;
+}
+
+.tabbar .tab.active {
+	color: #ADB838;
+}
+
+.tabbar .tab.active .title {
+	border-bottom-width: 5rpx;
+	border-bottom-style: solid;
+	border-bottom-color: #ADB838;
+}
+
+.bottom-box {
+	height: 80rpx;
+	flex-shrink: 0;
+	background-color: #ffffff;
+}
+
+.bottom-box .item {
+	padding: 0 20rpx;
+	position: relative;
+}
+
+.coupon-list {
+	height: 100%;
+}
+
+.wrapper {
+	padding: 0 40rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.wrapper .coupon {
+	display: flex;
+	flex-direction: column;
+	background-color: #FFFFFF;
+	margin-bottom: 30rpx;
+	padding: 0 30rpx;
+	border-radius: 6rpx;
+	box-shadow: 0 10rpx 10rpx -10rpx rgba(15, 15, 15, 0.1);
+	position: relative;
+}
+
+.wrapper .coupon .detail {
+	padding: 20rpx 0;
+	position: relative;
+	border-bottom-width: 1rpx;
+	border-bottom-style: dashed;
+	border-bottom-color: #c6c6c6;
+}
+
+.wrapper .coupon .detail .coupon-img {
+	width: 150rpx;
+	height: 150rpx;
+	margin-right: 40rpx;
+}
+
+.wrapper .coupon .detail-link {
+	height: 80rpx;
+}
+
+.modal-content {
+	padding: 20rpx;
+}
+
+.use-coupon-btn {
+	width: 95%;
+	border-radius: 100px;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.h-100 {
+	height: 100%;
+}
+
+.mb-10 {
+	margin-bottom: 10rpx;
+}
+
+.mb-20 {
+	margin-bottom: 20rpx;
+}
+
+.mb-30 {
+	margin-bottom: 30rpx;
+}
+
+.flex-fill {
+	flex: 1;
+}
+
+.overflow-hidden {
+	overflow: hidden;
+}
+
+.text-truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pre-line {
+	white-space: pre-line;
+}
+
+.line-height-2 {
+	line-height: 2;
+}
+</style>

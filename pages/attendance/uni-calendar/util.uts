@@ -1,0 +1,370 @@
+/**
+ * 日历工具 - uni-app x 版本
+ * 简化版本，不包含农历计算
+ */
+
+// 日期信息类型
+export type DateInfo = {
+	fullDate: string
+	year: number
+	month: number
+	date: number
+	day: number
+}
+
+// 日历项类型
+export type CalendarItem = {
+	fullDate: string
+	year: number
+	month: number
+	date: number
+	day: number
+	disable: boolean
+	isDay: boolean
+	multiple: boolean
+	lunar: string
+	extraInfo: SelectedItem | null
+}
+
+// 选中项类型
+export type SelectedItem = {
+	date: string
+	info: string
+	data: UTSJSONObject | null
+}
+
+// 多选状态类型
+export type MultipleStatus = {
+	before: string
+	after: string
+	data: string[]
+}
+
+// 日期数据类型
+export type DatesData = {
+	lastMonthDays: CalendarItem[]
+	currentMonthDys: CalendarItem[]
+	nextMonthDays: CalendarItem[]
+}
+
+// 周数据类型
+export type WeeksData = Map<number, CalendarItem[]>
+
+// 日历配置类型
+export type CalendarConfig = {
+	date: string | null
+	selected: SelectedItem[]
+	startDate: string | null
+	endDate: string | null
+	range: boolean
+}
+
+/**
+ * 日历类
+ */
+export class Calendar {
+	date: DateInfo
+	selected: SelectedItem[]
+	startDate: string | null
+	endDate: string | null
+	range: boolean
+	multipleStatus: MultipleStatus
+	weeks: WeeksData
+	canlender: CalendarItem[]
+
+	constructor(config: CalendarConfig) {
+		this.date = this.getDate(config.date, 0, 'day')
+		this.selected = config.selected
+		this.startDate = config.startDate
+		this.endDate = config.endDate
+		this.range = config.range
+		this.multipleStatus = {
+			before: '',
+			after: '',
+			data: []
+		}
+		this.weeks = new Map<number, CalendarItem[]>()
+		this.canlender = []
+		this._getWeek(this.date.fullDate)
+	}
+
+	/**
+	 * 获取任意时间
+	 */
+	getDate(date: string | null, addDayCount: number, str: string): DateInfo {
+		let d: Date
+		if (date == null || date == '') {
+			d = new Date()
+		} else {
+			const dateStr = date.replace(/-/g, '/')
+			d = new Date(dateStr)
+		}
+
+		if (str == 'day') {
+			d.setDate(d.getDate() + addDayCount)
+		} else if (str == 'month') {
+			if (d.getDate() == 31) {
+				d.setDate(d.getDate() + addDayCount)
+			} else {
+				d.setMonth(d.getMonth() + addDayCount)
+			}
+		} else if (str == 'year') {
+			d.setFullYear(d.getFullYear() + addDayCount)
+		}
+
+		const y = d.getFullYear()
+		const m = d.getMonth() + 1
+		const day = d.getDate()
+		const monthStr = m < 10 ? '0' + m.toString() : m.toString()
+		const dayStr = day < 10 ? '0' + day.toString() : day.toString()
+
+		return {
+			fullDate: y.toString() + '-' + monthStr + '-' + dayStr,
+			year: y,
+			month: m,
+			date: day,
+			day: d.getDay()
+		}
+	}
+
+	/**
+	 * 获取上月剩余天数
+	 */
+	_getLastMonthDays(firstDay: number, full: DateInfo): CalendarItem[] {
+		const dateArr: CalendarItem[] = []
+		for (let i = firstDay; i > 0; i--) {
+			const beforeDate = new Date(full.year, full.month - 1, -i + 1).getDate()
+			dateArr.push({
+				fullDate: '',
+				year: full.year,
+				month: full.month - 1,
+				date: beforeDate,
+				day: 0,
+				disable: true,
+				isDay: false,
+				multiple: false,
+				lunar: '',
+				extraInfo: null
+			})
+		}
+		return dateArr
+	}
+
+	/**
+	 * 获取本月天数
+	 */
+	_currentMonthDys(dateData: number, full: DateInfo): CalendarItem[] {
+		const dateArr: CalendarItem[] = []
+		const fullDate = this.date.fullDate
+
+		for (let i = 1; i <= dateData; i++) {
+			const dayStr = i < 10 ? '0' + i.toString() : i.toString()
+			const monthStr = full.month < 10 ? '0' + full.month.toString() : full.month.toString()
+			const nowDate = full.year.toString() + '-' + monthStr + '-' + dayStr
+			const isDay = fullDate == nowDate
+
+			// 获取打点信息
+			let info: SelectedItem | null = null
+			for (let j = 0; j < this.selected.length; j++) {
+				if (this.dateEqual(nowDate, this.selected[j].date)) {
+					info = this.selected[j]
+					break
+				}
+			}
+
+			// 日期禁用
+			let disableBefore = true
+			let disableAfter = true
+			
+			if (this.startDate != null) {
+				const dateCompBefore = this.dateCompare(this.startDate!, fullDate)
+				disableBefore = this.dateCompare(dateCompBefore ? this.startDate! : fullDate, nowDate)
+			}
+
+			if (this.endDate != null) {
+				const dateCompAfter = this.dateCompare(fullDate, this.endDate!)
+				disableAfter = this.dateCompare(nowDate, dateCompAfter ? this.endDate! : fullDate)
+			}
+
+			let checked = false
+			if (this.range) {
+				const multiples = this.multipleStatus.data
+				for (let k = 0; k < multiples.length; k++) {
+					if (this.dateEqual(multiples[k], nowDate)) {
+						checked = true
+						break
+					}
+				}
+			}
+
+			dateArr.push({
+				fullDate: nowDate,
+				year: full.year,
+				month: full.month,
+				date: i,
+				day: 0,
+				disable: !disableBefore || !disableAfter,
+				isDay: isDay,
+				multiple: this.range ? checked : false,
+				lunar: '',
+				extraInfo: info
+			})
+		}
+		return dateArr
+	}
+
+	/**
+	 * 获取下月天数
+	 */
+	_getNextMonthDays(surplus: number, full: DateInfo): CalendarItem[] {
+		const dateArr: CalendarItem[] = []
+		for (let i = 1; i < surplus + 1; i++) {
+			dateArr.push({
+				fullDate: '',
+				year: full.year,
+				month: full.month + 1,
+				date: i,
+				day: 0,
+				disable: true,
+				isDay: false,
+				multiple: false,
+				lunar: '',
+				extraInfo: null
+			})
+		}
+		return dateArr
+	}
+
+	/**
+	 * 设置日期
+	 */
+	setDate(date: string): void {
+		this._getWeek(date)
+	}
+
+	/**
+	 * 获取当前日期详情
+	 */
+	getInfo(date: string | null): CalendarItem | null {
+		const dateInfo = this.getDate(date, 0, 'day')
+		for (let i = 0; i < this.canlender.length; i++) {
+			if (this.canlender[i].fullDate == dateInfo.fullDate) {
+				return this.canlender[i]
+			}
+		}
+		return null
+	}
+
+	/**
+	 * 比较时间大小
+	 */
+	dateCompare(startDate: string, endDate: string): boolean {
+		const start = new Date(startDate.replace(/-/g, '/'))
+		const end = new Date(endDate.replace(/-/g, '/'))
+		return start.getTime() <= end.getTime()
+	}
+
+	/**
+	 * 比较时间是否相等
+	 */
+	dateEqual(before: string, after: string): boolean {
+		const b = new Date(before.replace(/-/g, '/'))
+		const a = new Date(after.replace(/-/g, '/'))
+		return b.getTime() == a.getTime()
+	}
+
+	/**
+	 * 获取日期范围内所有日期
+	 */
+	geDateAll(begin: string, end: string): string[] {
+		const arr: string[] = []
+		const ab = begin.split('-')
+		const ae = end.split('-')
+		const db = new Date()
+		db.setFullYear(parseInt(ab[0]), parseInt(ab[1]) - 1, parseInt(ab[2]))
+		const de = new Date()
+		de.setFullYear(parseInt(ae[0]), parseInt(ae[1]) - 1, parseInt(ae[2]))
+		const unixDb = db.getTime() - 24 * 60 * 60 * 1000
+		const unixDe = de.getTime() - 24 * 60 * 60 * 1000
+		let k = unixDb
+		while (k <= unixDe) {
+			k = k + 24 * 60 * 60 * 1000
+			arr.push(this.getDate(new Date(k).toISOString().split('T')[0], 0, 'day').fullDate)
+		}
+		return arr
+	}
+
+	/**
+	 * 设置打点
+	 */
+	setSelectInfo(data: string, value: SelectedItem[]): void {
+		this.selected = value
+		this._getWeek(data)
+	}
+
+	/**
+	 * 获取多选状态
+	 */
+	setMultiple(fullDate: string): void {
+		const before = this.multipleStatus.before
+		const after = this.multipleStatus.after
+		
+		if (!this.range) return
+		
+		if (before != '' && after != '') {
+			this.multipleStatus.before = ''
+			this.multipleStatus.after = ''
+			this.multipleStatus.data = []
+			this._getWeek(fullDate)
+		} else {
+			if (before == '') {
+				this.multipleStatus.before = fullDate
+			} else {
+				this.multipleStatus.after = fullDate
+				if (this.dateCompare(this.multipleStatus.before, this.multipleStatus.after)) {
+					this.multipleStatus.data = this.geDateAll(this.multipleStatus.before, this.multipleStatus.after)
+				} else {
+					this.multipleStatus.data = this.geDateAll(this.multipleStatus.after, this.multipleStatus.before)
+				}
+				this._getWeek(fullDate)
+			}
+		}
+	}
+
+	/**
+	 * 获取每周数据
+	 */
+	_getWeek(dateData: string): void {
+		const dateInfo = this.getDate(dateData, 0, 'day')
+		const firstDay = new Date(dateInfo.year, dateInfo.month - 1, 1).getDay()
+		const currentDay = new Date(dateInfo.year, dateInfo.month, 0).getDate()
+
+		const lastMonthDays = this._getLastMonthDays(firstDay, dateInfo)
+		const currentMonthDys = this._currentMonthDys(currentDay, dateInfo)
+		const surplus = 42 - (lastMonthDays.length + currentMonthDys.length)
+		const nextMonthDays = this._getNextMonthDays(surplus, dateInfo)
+
+		const canlender: CalendarItem[] = []
+		for (let i = 0; i < lastMonthDays.length; i++) {
+			canlender.push(lastMonthDays[i])
+		}
+		for (let i = 0; i < currentMonthDys.length; i++) {
+			canlender.push(currentMonthDys[i])
+		}
+		for (let i = 0; i < nextMonthDays.length; i++) {
+			canlender.push(nextMonthDays[i])
+		}
+
+		const weeks = new Map<number, CalendarItem[]>()
+		for (let i = 0; i < canlender.length; i++) {
+			const weekIndex = Math.floor(i / 7)
+			if (!weeks.has(weekIndex)) {
+				weeks.set(weekIndex, [])
+			}
+			weeks.get(weekIndex)!.push(canlender[i])
+		}
+
+		this.canlender = canlender
+		this.weeks = weeks
+	}
+}

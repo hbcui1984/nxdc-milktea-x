@@ -1,0 +1,116 @@
+// 券包模拟数据
+export type CouponDetail = {
+	title: string
+	desc: string
+	image: string
+	expire: string
+	coupon_amount: string
+	id: string
+}
+
+export type PackageCoupon = {
+	id: number
+	coupon_id: string
+	coupon_num: number
+	packages_id: number
+	detail: CouponDetail
+}
+
+export type PackageItem = {
+	id: number
+	has_send_num: number
+	start_at: string
+	end_at: string
+	deleted_at: string | null
+	buy_status: number
+	coupons: PackageCoupon[]
+	amount: string
+	intro: string
+	name: string
+	title: string
+	image: string
+	status: number
+	type: number
+	original_amount: string
+}
+
+export const mockPackages: PackageItem[] = [
+	{
+		id: 187,
+		has_send_num: 0,
+		start_at: "2020-03-30 00:00",
+		end_at: "2020-05-15 23:59",
+		deleted_at: null,
+		buy_status: 1,
+		coupons: [
+			{
+				id: 401,
+				coupon_id: "451347890055233536",
+				coupon_num: 1,
+				packages_id: 187,
+				detail: {
+					title: "第2件半价券(mini卡)",
+					desc: "1. 使用条件：在有效期内购买任意茶饮或软欧包，第二件可获得半价优惠",
+					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
+					expire: "领券当日开始30天内有效",
+					coupon_amount: "买A赠B券",
+					id: "451347890055233536"
+				}
+			},
+			{
+				id: 402,
+				coupon_id: "451348136147632128",
+				coupon_num: 1,
+				packages_id: 187,
+				detail: {
+					title: "58-6元现金券(mini卡)",
+					desc: "1. 使用条件：在有效期内，购买任意饮品或软欧包满58元享受6元优惠",
+					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
+					expire: "领券当日开始30天内有效",
+					coupon_amount: "现金券6元",
+					id: "451348136147632128"
+				}
+			}
+		],
+		amount: "9.90",
+		intro: "霸气mini卡超值优惠券包",
+		name: "霸气mini卡",
+		title: "霸气mini卡",
+		image: "https://images.qmai.cn/s23107/2020/03/30/36abfdcc24e07ac46e.png",
+		status: 1,
+		type: 1,
+		original_amount: "39.00"
+	},
+	{
+		id: 188,
+		has_send_num: 0,
+		start_at: "2020-04-01 00:00",
+		end_at: "2020-06-30 23:59",
+		deleted_at: null,
+		buy_status: 1,
+		coupons: [
+			{
+				id: 403,
+				coupon_id: "451347890055233537",
+				coupon_num: 2,
+				packages_id: 188,
+				detail: {
+					title: "满30减5元券",
+					desc: "在有效期内，购买满30元可减5元",
+					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
+					expire: "领券当日开始15天内有效",
+					coupon_amount: "现金券5元",
+					id: "451347890055233537"
+				}
+			}
+		],
+		amount: "19.90",
+		intro: "超值满减券包",
+		name: "满减优惠卡",
+		title: "满减优惠卡",
+		image: "https://images.qmai.cn/s23107/2020/03/30/36abfdcc24e07ac46e.png",
+		status: 1,
+		type: 1,
+		original_amount: "50.00"
+	}
+]

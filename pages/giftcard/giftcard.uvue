@@ -1,0 +1,347 @@
+<template>
+	<view class="container">
+		<view class="tabbar">
+			<view class="item" :class="{'active': currentTab == 0}" @click="switchTab(0)">购买礼品卡</view>
+			<view class="item" :class="{'active': currentTab == 1}" @click="switchTab(1)">我的礼品卡</view>
+		</view>
+		<swiper :duration="400" class="swiper" :current="currentTab" @change="onSwiperChange">
+			<!-- 购买礼品卡 begin -->
+			<swiper-item class="swiper-item-1">
+				<scroll-view scroll-y class="scroll-view-1">
+					<image :src="giftCardImg" class="w-100" mode="widthFix"/>
+					<view class="pl-20 pr-20 mb-30">
+						<view class="category-list mt-40" v-for="(category, cIndex) in categoryList" :key="cIndex">
+							<view class="font-size-lg font-weight-bold">{{ getCategoryName(category) }}</view>
+							<view class="themes-list">
+								<view class="theme" v-for="(theme, tIndex) in getThemesList(category)" :key="tIndex">
+									<image :src="getThemeImage(theme)" class="theme-img" mode="widthFix"/>
+									<view class="activity-name">{{ getThemeActivityName(theme) }}</view>
+								</view>
+							</view>
+						</view>
+					</view>
+				</scroll-view>
+				<view class="footer-1">
+					<view>购买须知</view>
+					<view class="divider"></view>
+					<view>礼品卡章程</view>
+				</view>
+			</swiper-item>
+			<!-- 购买礼品卡 end -->
+			<!-- 我的礼品卡 begin -->
+			<swiper-item class="swiper-item-2">
+				<view class="header">
+					<view class="gift-card-types">
+						<view class="type-item" :class="{'type-active': giftCardType == 0}" @click="switchGiftCardType(0)">可使用(0)</view>
+						<view class="type-item" :class="{'type-active': giftCardType == 1}" @click="switchGiftCardType(1)">不可使用(0)</view>
+					</view>
+					<view class="d-flex align-items-center text-color-primary">兑换礼品卡</view>
+				</view>
+				<swiper :duration="400" class="inner-swiper" :current="giftCardType" @change="onGiftCardTypeChange">
+					<swiper-item>
+						<view v-if="myCardsEmpty" class="d-flex flex-column align-items-center">
+							<image src="https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png" class="empty-img" mode="widthFix"/>
+							<view class="font-size-sm text-color-assist">您暂时还没有礼品卡哦~</view>
+						</view>
+					</swiper-item>
+					<swiper-item>
+						<view v-if="myCardsEmpty" class="d-flex flex-column align-items-center">
+							<image src="https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png" class="empty-img" mode="widthFix"/>
+							<view class="font-size-sm text-color-assist">您暂时还没有礼品卡哦~</view>
+						</view>
+					</swiper-item>
+				</swiper>
+				<view class="footer-2">
+					<button type="primary" plain class="btn-plain">获取记录</button>
+					<button type="primary" class="btn-primary">赠送记录</button>
+				</view>
+			</swiper-item>
+			<!-- 我的礼品卡 end -->
+		</swiper>
+	</view>
+</template>
+
+<script setup lang="uts">
+// 主题类型定义
+type ThemeType = {
+	imageUrls: string
+	activityName: string
+}
+
+// 分类类型定义
+type CategoryType = {
+	name: string
+	themesList: ThemeType[]
+}
+
+// 礼品卡数据类型定义
+type GiftCardDataType = {
+	img: string
+	category_list: CategoryType[]
+}
+
+// 我的礼品卡类型
+type MyCardType = {
+	id: string
+	name: string
+	balance: number
+}
+
+const giftCardImg = ref<string>('')
+const categoryList = ref<CategoryType[]>([])
+const currentTab = ref<number>(0)
+const giftCardType = ref<number>(0)
+const myCards = ref<MyCardType[]>([])
+
+const myCardsEmpty = computed((): boolean => {
+	return myCards.value.length == 0
+})
+
+const getCategoryName = (category: CategoryType): string => {
+	return category.name
+}
+
+const getThemesList = (category: CategoryType): ThemeType[] => {
+	return category.themesList
+}
+
+const getThemeImage = (theme: ThemeType): string => {
+	return theme.imageUrls
+}
+
+const getThemeActivityName = (theme: ThemeType): string => {
+	return theme.activityName
+}
+
+const switchTab = (index: number) => {
+	if (currentTab.value == index) return
+	currentTab.value = index
+}
+
+const onSwiperChange = (e: UniSwiperChangeEvent) => {
+	currentTab.value = e.detail.current
+}
+
+const switchGiftCardType = (index: number) => {
+	if (giftCardType.value == index) return
+	giftCardType.value = index
+}
+
+const onGiftCardTypeChange = (e: UniSwiperChangeEvent) => {
+	giftCardType.value = e.detail.current
+}
+
+onShow(() => {
+	// 模拟数据
+	giftCardImg.value = 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png'
+	categoryList.value = [
+		{
+			name: '节日专区',
+			themesList: [
+				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '新年快乐' },
+				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '情人节限定' }
+			]
+		},
+		{
+			name: '生日专区',
+			themesList: [
+				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '生日快乐' },
+				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '生日祝福' }
+			]
+		}
+	] as CategoryType[]
+})
+</script>
+
+<style lang="scss" scoped>
+.container {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.tabbar {
+	width: 100%;
+	height: 100rpx;
+	border-top-width: 1rpx;
+	border-top-style: solid;
+	border-top-color: #e2e2e2;
+	background-color: #ffffff;
+	display: flex;
+	align-items: stretch;
+	font-size: 32rpx;
+}
+
+.tabbar .item {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.tabbar .item.active {
+	color: #ADB838;
+}
+
+.swiper {
+	flex: 1;
+}
+
+.swiper-item-1 {
+	height: 100%;
+	position: relative;
+}
+
+.scroll-view-1 {
+	height: 100%;
+	padding-bottom: 80rpx;
+}
+
+.themes-list {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.themes-list .theme {
+	width: 340rpx;
+	margin-top: 30rpx;
+	border-radius: 24rpx;
+	background-color: #ffffff;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 20rpx 20rpx -20rpx rgba(51, 51, 51, 0.1);
+}
+
+.themes-list .theme .theme-img {
+	width: 100%;
+	border-top-left-radius: 24rpx;
+	border-top-right-radius: 24rpx;
+	max-height: 300rpx;
+}
+
+.themes-list .activity-name {
+	font-size: 28rpx;
+	padding: 20rpx 0;
+	text-align: center;
+}
+
+.footer-1 {
+	z-index: 10;
+	background-color: #F1F8FA;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 80rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 24rpx;
+	color: #ADB838;
+}
+
+.footer-1 .divider {
+	height: 24rpx;
+	width: 4rpx;
+	background-color: #ADB838;
+	margin: 0 20rpx;
+}
+
+.swiper-item-2 {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.swiper-item-2 .header {
+	height: 110rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+	padding: 30rpx;
+	font-size: 24rpx;
+}
+
+.swiper-item-2 .header .gift-card-types {
+	display: flex;
+	align-items: stretch;
+}
+
+.swiper-item-2 .header .gift-card-types .type-item {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 0 20rpx;
+}
+
+.swiper-item-2 .header .gift-card-types .type-item.type-active {
+	background-color: #FFFFFF;
+	box-shadow: 0 20rpx 20rpx -20rpx rgba(51, 51, 51, 0.1);
+	border-radius: 100px;
+	color: #ADB838;
+}
+
+.inner-swiper {
+	flex: 1;
+}
+
+.empty-img {
+	width: 300rpx;
+	margin-top: 100rpx;
+}
+
+.footer-2 {
+	z-index: 10;
+	background-color: #ffffff;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10rpx 40rpx;
+	box-shadow: 0 -10rpx 10rpx rgba(238, 238, 238, 0.1);
+}
+
+.footer-2 .btn-plain {
+	width: 310rpx;
+	height: 80rpx;
+	line-height: 80rpx;
+	border-radius: 100px;
+	font-size: 32rpx;
+}
+
+.footer-2 .btn-primary {
+	width: 310rpx;
+	height: 80rpx;
+	line-height: 80rpx;
+	border-radius: 100px;
+	font-size: 32rpx;
+}
+
+.w-100 {
+	width: 100%;
+}
+
+.pl-20 {
+	padding-left: 20rpx;
+}
+
+.pr-20 {
+	padding-right: 20rpx;
+}
+
+.mb-30 {
+	margin-bottom: 30rpx;
+}
+
+.mt-40 {
+	margin-top: 40rpx;
+}
+</style>
