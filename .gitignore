@@ -1,2 +1,4 @@
 /unpackage
 manifest.json
+.DS_Store
+upgradeLog_files/
