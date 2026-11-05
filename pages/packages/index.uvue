@@ -23,36 +23,15 @@
 
 <script setup lang="uts">
 import LoadingComponent from '@/components/loading.uvue'
-
-// 套餐类型
-type PackageItem = {
-	id: number
-	title: string
-	amount: number
-	image: string
-}
+import { $api } from '@/api/index.uts'
+import { PackageItem } from '@/api/packages.uts'
 
 const isLoading = ref<boolean>(true)
 const packages = ref<PackageItem[]>([])
 
-const getPackages = () => {
+const getPackages = async () => {
 	isLoading.value = true
-	// TODO: 实现套餐数据获取
-	// 模拟数据
-	packages.value = [
-		{
-			id: 1,
-			title: '奈雪超值套餐',
-			amount: 88,
-			image: '/static/images/packages/package1.png'
-		},
-		{
-			id: 2,
-			title: '霸气水果茶套餐',
-			amount: 128,
-			image: '/static/images/packages/package2.png'
-		}
-	]
+	packages.value = await $api<PackageItem[]>('packages')
 	isLoading.value = false
 }
 
@@ -62,12 +41,12 @@ const pay = (id: number) => {
 	})
 }
 
-onLoad(() => {
-	getPackages()
+onLoad(async () => {
+	await getPackages()
 })
 
-onPullDownRefresh(() => {
-	getPackages()
+onPullDownRefresh(async () => {
+	await getPackages()
 	uni.stopPullDownRefresh()
 })
 </script>
