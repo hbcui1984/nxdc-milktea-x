@@ -24,7 +24,7 @@ export type GiftCardsData = {
 export const mockGiftCards: GiftCardsData = {
 	banner_activity_id: 38,
 	img: "https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png",
-	content: "1.发售渠道：奈雪の茶心意卡券在"奈雪点单"小程序内独立发售...",
+	content: "1.发售渠道：奈雪の茶心意卡券在\"奈雪点单\"小程序内独立发售...",
 	category_list: [
 		{
 			id: 41,
@@ -38,7 +38,7 @@ export const mockGiftCards: GiftCardsData = {
 				},
 				{
 					activityId: 42,
-					activityName: ""大宝宝"通行证",
+					activityName: "\"大宝宝\"通行证",
 					activityCode: "474613956256256001",
 					cardShelvesCategoryId: 41,
 					imageUrls: "https://img-shop.qmimg.cn/s36192/2020/06/02/c58ae1b6c7af70ace3.jpg"

@@ -24,7 +24,7 @@ export const mockPointsMall: PointsMallEntry[] = [
 		value: [
 			{
 				points_price: 800,
-				exchange_desc: "兑换规则：会员可凭800积分兑换"任意软欧包免费券"1件",
+				exchange_desc: "兑换规则：会员可凭800积分兑换\"任意软欧包免费券\"1件",
 				goods_id: "28910",
 				goods_name: "软欧包免费券",
 				goods_stock: 99665,
@@ -37,7 +37,7 @@ export const mockPointsMall: PointsMallEntry[] = [
 			},
 			{
 				points_price: 800,
-				exchange_desc: "兑换规则：会员可凭800积分兑换"买一送一优惠券"1件",
+				exchange_desc: "兑换规则：会员可凭800积分兑换\"买一送一优惠券\"1件",
 				goods_id: "28321",
 				goods_name: "买一送一券",
 				goods_stock: 97377,
@@ -50,7 +50,7 @@ export const mockPointsMall: PointsMallEntry[] = [
 			},
 			{
 				points_price: 1000,
-				exchange_desc: "兑换规则：会员可凭1000积分兑换"任意茶饮免费券"1件",
+				exchange_desc: "兑换规则：会员可凭1000积分兑换\"任意茶饮免费券\"1件",
 				goods_id: "28911",
 				goods_name: "茶饮免费券",
 				goods_stock: 99111,
