@@ -3,79 +3,79 @@
 	<scroll-view class="home-scroll" scroll-y>
 	<!-- #endif -->
 	<view class="container">
-		<view class="banner">
+		<view class="banner home-banner">
 			<image src="https://img-shop.qmimg.cn/s23107/2020/04/26/3eb7808bf105262604.jpg" mode="" class="bg"></image>
-			<view class="intro">
-				<view class="greet">您好，{{ isLogin ? state.member?.nickname : '游客' }}</view>
-				<view class="note">一杯奶茶，一口软欧包，在奈雪遇见两种美好</view>
+			<view class="intro home-banner-intro">
+				<text class="greet home-banner-greet home-banner-greet-text">您好，{{ isLogin ? state.member?.nickname : '游客' }}</text>
+				<text class="note home-banner-note home-banner-note-text">一杯奶茶，一口软欧包，在奈雪遇见两种美好</text>
 			</view>
 		</view>
-		<view class="content">
-			<view class="entrance">
-				<view class="item" @click="takein">
-					<image src="/static/images/index/zq.png" class="icon"></image>
-					<view class="title">自取</view>
+		<view class="content home-content">
+			<view class="entrance home-entrance">
+				<view class="item home-entrance-item home-entrance-item-first" @click="takein">
+					<image src="/static/images/index/zq.png" class="icon home-entrance-icon"></image>
+					<text class="title home-entrance-title home-entrance-title-text">自取</text>
 				</view>
-				<view class="item" @click="takeout">
-					<image src="/static/images/index/wm.png" class="icon"></image>
-					<view class="title">外卖</view>
+				<view class="item home-entrance-item" @click="takeout">
+					<image src="/static/images/index/wm.png" class="icon home-entrance-icon"></image>
+					<text class="title home-entrance-title home-entrance-title-text">外卖</text>
 				</view>
 			</view>
-			<view class="info">
-				<view class="integral_section" @click="integrals">
-					<view class="top">
-						<text class="title">我的积分</text>
-						<text class="value">411</text>
+			<view class="info home-info">
+				<view class="integral_section home-integral-section" @click="integrals">
+					<view class="top home-integral-top">
+						<text class="title home-integral-title">我的积分</text>
+						<text class="value home-integral-value">411</text>
 					</view>
-					<view class="bottom">
-						<text>进入积分商城兑换奈雪券及周边好礼</text>
+					<view class="bottom home-integral-bottom">
+						<text class="home-integral-bottom-text">进入积分商城兑换奈雪券及周边好礼</text>
 						<view class="iconfont iconarrow-right"></view>
 					</view>
 				</view>
-				<view class="qrcode_section" @click="memberCode">
+				<view class="qrcode_section home-qrcode-section" @click="memberCode">
 					<image src="/static/images/index/qrcode.png"></image>
-					<text>会员码</text>
+					<text class="home-qrcode-text">会员码</text>
 				</view>
 			</view>
-			<view class="navigators">
-				<view class="left">
-					<view class="grid flex-column just-content-center">
+			<view class="navigators home-navigators">
+				<view class="left home-navigators-left">
+					<view class="grid flex-column just-content-center home-nav-grid">
 						<view class="d-flex align-items-center">
 							<image src="/static/images/index/csc.png" class="mark-img"></image>
-							<text class="font-size-sm text-color-base">奈雪的茶商城</text>
+							<text class="font-size-sm text-color-base home-nav-main-text">奈雪的茶商城</text>
 						</view>
-						<text class="text-color-assist" style="margin-left: 40rpx; font-size: 20rpx;">优质茶礼盒，网红零食</text>
+						<text class="text-color-assist home-nav-sub-text">优质茶礼盒，网红零食</text>
 					</view>
-					<view class="grid justify-content-end align-items-end">
+					<view class="grid justify-content-end align-items-end home-nav-grid">
 						<image src="/static/images/index/yzclh.png" class="yzclh-img" mode="heightFix"></image>
 					</view>
 				</view>
-				<view class="right">
-					<view class="tea-activity" @click="invite">
+				<view class="right home-navigators-right">
+					<view class="tea-activity home-side-card" @click="invite">
 						<image src="/static/images/index/mcsb.png" class="mark-img"></image>
-						<text>买茶送包</text>
-						<view class="right-img">
+						<text class="home-side-card-text">买茶送包</text>
+						<view class="right-img home-side-card-image-wrap">
 							<image src="/static/images/index/mcsb_bg.png" mode="widthFix"></image>
 						</view>
 					</view>
-					<view class="member-gifts" @click="packages">
+					<view class="member-gifts home-side-card" @click="packages">
 						<image src="/static/images/index/hyjb.png" class="mark-img"></image>
-						<text>会员劵包</text>
-						<view class="right-img">
+						<text class="home-side-card-text">会员劵包</text>
+						<view class="right-img home-side-card-image-wrap">
 							<image src="/static/images/index/hyjb_bg.png" mode="widthFix"></image>
 						</view>
 					</view>
 				</view>
 			</view>
-			<view class="member-news">
-				<view class="header">
-					<text class="title">会员新鲜事</text>
+			<view class="member-news home-member-news">
+				<view class="header home-member-news-header">
+					<text class="title home-member-news-title">会员新鲜事</text>
 					<view class="iconfont iconRightbutton"></view>
 				</view>
 				<view class="list">
 					<view class="item">
 						<image src="https://img-shop.qmimg.cn/s23107/2020/04/27/0039bf41c9ebd50a2c.jpg"></image>
-						<text class="title">"梅"你不行 | 霸气杨梅清爽回归</text>
+						<text class="title home-member-news-item-title">"梅"你不行 | 霸气杨梅清爽回归</text>
 					</view>
 				</view>
 			</view>
@@ -182,11 +182,46 @@ const invite = () => {
 	}
 }
 
+.home-banner-intro {
+	position: absolute;
+	top: calc(50rpx + var(--status-bar-height));
+	left: 40rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.home-banner-greet {
+	font-size: 32rpx;
+	color: #FFFFFF;
+	margin-bottom: 10rpx;
+}
+
+.home-banner-greet-text {
+	font-size: 32rpx;
+	color: #FFFFFF;
+}
+
+.home-banner-note {
+	font-size: 24rpx;
+	color: #FFFFFF;
+}
+
+.home-banner-note-text {
+	font-size: 24rpx;
+	color: #FFFFFF;
+}
+
 .content {
 	position: relative;
 	z-index: 1;
 	padding: 0 30rpx;
 	margin-top: -80rpx;
+}
+
+.home-content {
+	position: relative;
+	z-index: 1;
+	padding: 0 30rpx;
 }
 
 .entrance {
@@ -221,6 +256,54 @@ const invite = () => {
 			font-weight: 600;
 		}
 	}
+}
+
+.home-entrance {
+	position: relative;
+	margin-bottom: 30rpx;
+	border-radius: 10rpx;
+	background-color: #ffffff;
+	box-shadow: $box-shadow;
+	padding: 30rpx 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.home-entrance-item {
+	flex: 1;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	overflow: visible;
+}
+
+.home-entrance-item-first {
+	border-right-width: 1rpx;
+	border-right-style: solid;
+	border-right-color: #dddddd;
+}
+
+.home-entrance-icon {
+	width: 84rpx;
+	height: 84rpx;
+	margin: 20rpx;
+	flex-shrink: 0;
+}
+
+.home-entrance-title {
+	font-size: 30rpx;
+	color: #333333;
+	font-weight: 600;
+}
+
+.home-entrance-title-text {
+	font-size: 30rpx;
+	color: #333333;
+	font-weight: 600;
 }
 
 .info {
@@ -279,6 +362,70 @@ const invite = () => {
 			margin-bottom: 10rpx;
 		}
 	}
+}
+
+.home-info {
+	position: relative;
+	margin-bottom: 30rpx;
+	border-radius: 10rpx;
+	background-color: #ffffff;
+	box-shadow: $box-shadow;
+	padding: 30rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+}
+
+.home-integral-section {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.home-integral-top {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.home-integral-title {
+	color: #333333;
+	font-size: 28rpx;
+	margin-right: 10rpx;
+}
+
+.home-integral-value {
+	font-size: 44rpx;
+	font-weight: bold;
+}
+
+.home-integral-bottom {
+	font-size: 24rpx;
+	color: #999999;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.home-integral-bottom-text {
+	font-size: 24rpx;
+	color: #999999;
+}
+
+.home-qrcode-section {
+	color: #ADB838;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	font-size: 24rpx;
+}
+
+.home-qrcode-text {
+	font-size: 24rpx;
+	color: #ADB838;
 }
 
 .navigators {
@@ -359,6 +506,79 @@ const invite = () => {
 		height: 122.96rpx;
 		width: 214.86rpx;
 	}
+}
+
+.home-navigators {
+	width: 100%;
+	margin-bottom: 20rpx;
+	border-radius: 10rpx;
+	background-color: #ffffff;
+	box-shadow: $box-shadow;
+	padding: 20rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+}
+
+.home-navigators-left {
+	width: 340rpx;
+	margin-right: 20rpx;
+	padding: 0 20rpx;
+	font-size: 24rpx;
+	color: #333333;
+	background-color: #F2F2E6;
+	display: flex;
+	flex-direction: column;
+}
+
+.home-nav-grid {
+	height: 50%;
+	display: flex;
+	flex-direction: row;
+}
+
+.home-navigators-right {
+	width: 290rpx;
+	display: flex;
+	flex-direction: column;
+}
+
+.home-nav-main-text {
+	font-size: 24rpx;
+	color: #333333;
+}
+
+.home-nav-sub-text {
+	margin-left: 40rpx;
+	font-size: 20rpx;
+	color: #999999;
+}
+
+.home-side-card {
+	width: 100%;
+	padding: 20rpx;
+	font-size: 24rpx;
+	color: #333333;
+	align-items: center;
+	position: relative;
+	display: flex;
+	flex-direction: row;
+}
+
+.home-side-card-text {
+	font-size: 24rpx;
+	color: #333333;
+}
+
+.home-side-card-image-wrap {
+	flex: 1;
+	position: relative;
+	margin-left: 20rpx;
+	margin-right: -20rpx;
+	margin-bottom: -20rpx;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
 }
 
 .d-flex {
@@ -447,5 +667,33 @@ const invite = () => {
 			}
 		}
 	}
+}
+
+.home-member-news {
+	width: 100%;
+	margin-bottom: 30rpx;
+}
+
+.home-member-news-header {
+	padding: 20rpx 0;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.home-member-news-title {
+	font-size: 32rpx;
+	font-weight: bold;
+}
+
+.home-member-news-item-title {
+	position: relative;
+	font-size: 32rpx;
+	font-weight: 500;
+	width: 100%;
+	top: -70rpx;
+	left: 16rpx;
+	color: #ffffff;
 }
 </style>
