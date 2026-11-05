@@ -49,73 +49,16 @@
 
 <script setup lang="uts">
 import { isLogin } from '@/store/index.uts'
-
-// 商品类型
-type GoodItem = {
-	name: string
-	number: number
-	price: string
-	property?: string
-}
-
-// 门店类型
-type StoreInfo = {
-	name: string
-	address: string
-}
-
-// 订单类型
-type OrderItem = {
-	id: number
-	order_no: string
-	status_text: string
-	goods_num: number
-	amount: string | number
-	created_at: number
-	invoice_status: number
-	completed_time: string
-	typeCate: number
-	store: StoreInfo
-	goods: GoodItem[]
-}
-
-// 模拟订单数据
-const ordersData: OrderItem[] = [
-	{
-		id: 1,
-		order_no: "ABCDEFGHIJKLMN0001",
-		status_text: "已完成",
-		goods_num: 2,
-		amount: "50.00",
-		created_at: 1588936782,
-		invoice_status: 1,
-		completed_time: "2020-05-08 19:25:39",
-		typeCate: 1,
-		store: { name: "福永同泰时代城店", address: "广东省深圳市宝安区" },
-		goods: [{ name: "霸气葡萄", number: 1, price: "28.00" }, { name: "霸气葡萄", number: 1, price: "22.00" }]
-	},
-	{
-		id: 2,
-		order_no: "ABCDEFGHIJKLMN0002",
-		status_text: "已完成",
-		goods_num: 3,
-		amount: "73.00",
-		created_at: 1588682001,
-		invoice_status: 0,
-		completed_time: "2020-05-05 20:42:46",
-		typeCate: 2,
-		store: { name: "福永同泰时代城店", address: "广东省深圳市宝安区" },
-		goods: [{ name: "杨枝甘露宝藏茶", number: 1, price: "27.00" }]
-	}
-]
+import { $api } from '@/api/index.uts'
+import { OrderItem, OrderGoodsItem } from '@/api/orders.uts'
 
 const page = ref<number>(1)
 const pageSize = ref<number>(5)
 const orderList = ref<OrderItem[]>([])
 
-const orderGoodsName = (goods: GoodItem[]): string => {
+const orderGoodsName = (goods: OrderGoodsItem[]): string => {
 	const arr: string[] = []
-	goods.forEach((good: GoodItem) => {
+	goods.forEach((good: OrderGoodsItem) => {
 		arr.push(good.name + '*' + good.number.toString())
 	})
 	return arr.join('，')
@@ -131,7 +74,7 @@ const formatDateTime = (timestamp: number): string => {
 	return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
-const getOrders = (isRefresh: boolean): void => {
+const getOrders = async (isRefresh: boolean): Promise<void> => {
 	uni.showLoading({ title: '加载中' })
 	
 	if (isRefresh) {
@@ -139,6 +82,7 @@ const getOrders = (isRefresh: boolean): void => {
 		page.value = 1
 	}
 	
+	const ordersData = await $api<OrderItem[]>('orders')
 	const start = pageSize.value * (page.value - 1)
 	const end = pageSize.value * page.value
 	const orders = ordersData.slice(start, end)
@@ -171,19 +115,19 @@ const goToInvoice = (): void => {
 	})
 }
 
-onLoad(() => {
+onLoad(async () => {
 	if (!isLogin.value) {
 		uni.navigateTo({ url: '/pages/login/login' })
 	}
-	getOrders(false)
+	await getOrders(false)
 })
 
-onReachBottom(() => {
-	getOrders(false)
+onReachBottom(async () => {
+	await getOrders(false)
 })
 
-onPullDownRefresh(() => {
-	getOrders(true)
+onPullDownRefresh(async () => {
+	await getOrders(true)
 })
 </script>
 

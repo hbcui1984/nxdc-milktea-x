@@ -121,107 +121,44 @@
 </template>
 
 <script setup lang="uts">
-// 商品类型
-type GoodItem = {
-	name: string
-	number: number
-	price: string
-	property?: string
-}
+import { $api } from '@/api/index.uts'
+import { OrderItem } from '@/api/orders.uts'
 
-// 门店类型
-type StoreInfo = {
-	name: string
-	address: string
-}
-
-// 订单详情类型
-type OrderDetail = {
-	id: number
-	order_no: string
-	status_text: string
-	goods_num: number
-	amount: string | number
-	created_at: number
-	invoice_status: number
-	completed_time: string
-	typeCate: number
-	pay_mode: string
-	sort_num: string
-	productioned_time: string
-	postscript: string
-	store: StoreInfo
-	goods: GoodItem[]
-}
-
-// 模拟订单数据
-const ordersData: OrderDetail[] = [
-	{
-		id: 1,
-		order_no: "ABCDEFGHIJKLMN0001",
-		status_text: "已完成",
-		goods_num: 2,
-		amount: "50.00",
-		created_at: 1588936782,
-		invoice_status: 1,
-		completed_time: "2020-05-08 19:25:39",
-		typeCate: 1,
-		pay_mode: "微信支付",
-		sort_num: "8093",
-		productioned_time: "2020-05-08 19:24:37",
-		postscript: "打包",
-		store: { 
-			name: "福永同泰时代城店", 
-			address: "广东省深圳市宝安区深圳市宝安区福海街道宝安大道6259号 L1 层55/56号商铺" 
-		},
-		goods: [
-			{ name: "霸气葡萄", number: 1, price: "28.00", property: "去冰,标准糖" }, 
-			{ name: "霸气葡萄", number: 1, price: "22.00", property: "标准冰,标准糖" }
-		]
-	},
-	{
-		id: 2,
-		order_no: "ABCDEFGHIJKLMN0002",
-		status_text: "已完成",
-		goods_num: 3,
-		amount: "73.00",
-		created_at: 1588682001,
-		invoice_status: 0,
-		completed_time: "2020-05-05 20:42:46",
-		typeCate: 2,
-		pay_mode: "微信支付",
-		sort_num: "8145",
-		productioned_time: "2020-05-05 20:38:49",
-		postscript: "打包",
-		store: { 
-			name: "福永同泰时代城店", 
-			address: "广东省深圳市宝安区深圳市宝安区福海街道宝安大道6259号 L1 层55/56号商铺" 
-		},
-		goods: [
-			{ name: "杨枝甘露宝藏茶", number: 1, price: "27.00", property: "标准,标准（冰沙）,标准糖" }
-		]
-	}
-]
-
-const defaultOrder: OrderDetail = {
-	id: 0,
-	order_no: "",
-	status_text: "",
+const defaultOrder: OrderItem = {
+	coupon_name: '',
+	receive_at: 0,
+	pay_mode: '',
+	pay_user_name: '',
+	updated_at: 0,
 	goods_num: 0,
-	amount: "0",
+	completed_at: 0,
 	created_at: 0,
 	invoice_status: 0,
-	completed_time: "",
+	sended_time: 0,
+	status_text: '',
+	remark: '',
+	coupon_amount: 0,
+	mobile: '',
+	user_name: '',
+	payed_at: 0,
+	total_amount: '0',
+	store: { address: '', longitude: '', latitude: '', mobile: '', name: '' },
+	send_status: 0,
+	discount: [],
+	status: 0,
+	completed_time: '',
+	amount: '0',
+	multi_store: '',
+	productioned_time: '',
+	postscript: '',
+	sort_num: '',
+	order_no: '',
+	id: 0,
 	typeCate: 0,
-	pay_mode: "",
-	sort_num: "",
-	productioned_time: "",
-	postscript: "",
-	store: { name: "", address: "" },
 	goods: []
 }
 
-const order = ref<OrderDetail>(defaultOrder)
+const order = ref<OrderItem>(defaultOrder)
 
 const formatDateTime = (timestamp: number): string => {
 	const date = new Date(timestamp * 1000)
@@ -247,10 +184,11 @@ const goToInvoice = (): void => {
 	})
 }
 
-onLoad((option: OnLoadOptions) => {
+onLoad(async (option: OnLoadOptions) => {
 	const id = option['id'] ?? ''
 	const orderId = parseInt(id)
-	const foundOrder = ordersData.find((item: OrderDetail): boolean => item.id == orderId)
+	const ordersData = await $api<OrderItem[]>('orders')
+	const foundOrder = ordersData.find((item: OrderItem): boolean => item.id == orderId)
 	if (foundOrder != null) {
 		order.value = foundOrder
 	}
