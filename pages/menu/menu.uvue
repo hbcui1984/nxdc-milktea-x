@@ -233,7 +233,8 @@
 import { state, isLogin, setOrderType, AddressType, StoreType } from '@/store/index.uts'
 import modal from '@/components/modal/modal.uvue'
 import popupLayer from '@/components/popup-layer/popup-layer.uvue'
-import { mockGoods } from '@/api/goods.uts'
+import { $api } from '@/api/index.uts'
+import { Category as ApiCategory } from '@/api/goods.uts'
 
 // 类型定义
 type PropertyValue = {
@@ -384,6 +385,7 @@ const handleSetOrderType = (type: string) => {
 
 const init = async () => {
 	loading.value = true
+	const mockGoods = await $api<ApiCategory[]>('goods')
 	console.log('init start, mockGoods.length:', mockGoods.length)
 	// 加载模拟商品数据并转换为内部类型
 	const loadedGoods: Category[] = []

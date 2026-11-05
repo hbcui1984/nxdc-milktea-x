@@ -48,6 +48,9 @@
 </template>
 
 <script setup lang="uts">
+import { $api } from '@/api/index.uts'
+import { RechargeCardItem } from '@/api/rechargeCards.uts'
+
 // 充值卡类型定义
 type RechargeCardType = {
 	id: string
@@ -119,16 +122,19 @@ const buy = () => {
 	})
 }
 
-onLoad(() => {
-	// 模拟数据
-	amounts.value = [
-		{ id: '1', value: 50, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额', selected: false },
-		{ id: '2', value: 100, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额', selected: false },
-		{ id: '3', value: 200, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满200元送20元', selected: false },
-		{ id: '4', value: 300, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满300元送35元', selected: false },
-		{ id: '5', value: 500, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满500元送60元', selected: false },
-		{ id: '6', value: 1000, desc: '1. 储值金额不可退款\n2. 储值后可在门店或小程序使用\n3. 单笔订单仅可使用一个账户余额\n4. 储值满1000元送150元', selected: false }
-	] as RechargeCardType[]
+onLoad(async () => {
+	const cards = await $api<RechargeCardItem[]>('rechargeCards')
+	const list: RechargeCardType[] = []
+	for (let i = 0; i < cards.length; i++) {
+		const card = cards[i]
+		list.push({
+			id: card.id.toString(),
+			value: parseInt(card.value),
+			desc: card.desc,
+			selected: false
+		})
+	}
+	amounts.value = list
 })
 </script>
 

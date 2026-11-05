@@ -48,52 +48,53 @@ import navbarBackButton from '@/components/navbar-back-button.uvue'
 import uniCalendar from '@/pages/attendance/uni-calendar/uni-calendar.uvue'
 import modal from '@/components/modal/modal.uvue'
 import { state } from '@/store/index.uts'
-
-type CustomPointsType = {
-	totalPoints: number
-}
-
-type AttendanceItemType = {
-	date: string
-}
-
-type TodayAttendanceType = {
-	attendance_continuity_day: number
-}
+import { $api } from '@/api/index.uts'
+import { CustomPointsData } from '@/api/custom-points.uts'
+import { AttendanceListItem } from '@/api/attendance-list.uts'
+import { TodayAttendanceData } from '@/api/today-attendance.uts'
+import { SelectedItem } from '@/pages/attendance/uni-calendar/util.uts'
 
 type MemberInfoType = {
 	avatar: string
 	nickname: string
 }
 
-const customPoints = ref<CustomPointsType>({ totalPoints: 0 })
+const customPoints = ref<CustomPointsData>({ soonExpiredPoints: 0, totalPoints: 0, expiredTime: null, foreverPoints: 0 })
 const attendanceModalVisible = ref<boolean>(false)
-const attendanceList = ref<AttendanceItemType[]>([])
-const todayAttendance = ref<TodayAttendanceType>({ attendance_continuity_day: 0 })
+const attendanceList = ref<SelectedItem[]>([])
+const todayAttendance = ref<TodayAttendanceData>({
+	is_attendance: 0,
+	total_points: 0,
+	attendance_points: 0,
+	attendance_category: 0,
+	attendance_continuity_day: 0,
+	list: []
+})
 const startDate = ref<string>('')
 
 const member = computed<MemberInfoType>((): MemberInfoType => {
 	if (state.member != null) {
-		return { avatar: state.member!.avatar, nickname: state.member!.nickname } as MemberInfoType
+		const info: MemberInfoType = { avatar: state.member!.avatar, nickname: state.member!.nickname }
+		return info
 	}
-	return { avatar: '', nickname: '' } as MemberInfoType
+	const empty: MemberInfoType = { avatar: '', nickname: '' }
+	return empty
 })
 
 const attendance = (): void => {
 	attendanceModalVisible.value = true
 }
 
-onLoad((_: OnLoadOptions) => {
-	const instance = getCurrentInstance()
-	if (instance != null) {
-		const proxy = instance.proxy
-		if (proxy != null) {
-			// TODO: Replace with real API calls
-			customPoints.value = { totalPoints: 100 } as CustomPointsType
-			attendanceList.value = [] as AttendanceItemType[]
-			todayAttendance.value = { attendance_continuity_day: 0 } as TodayAttendanceType
-		}
+onLoad(async (_: OnLoadOptions) => {
+	customPoints.value = await $api<CustomPointsData>('customPoints')
+	const list = await $api<AttendanceListItem[]>('attendanceList')
+	const selected: SelectedItem[] = []
+	for (let i = 0; i < list.length; i++) {
+		const item: SelectedItem = { date: list[i].date, info: '', data: null }
+		selected.push(item)
 	}
+	attendanceList.value = selected
+	todayAttendance.value = await $api<TodayAttendanceData>('todayAttendance')
 	const date = new Date()
 	const year = date.getFullYear()
 	const month = date.getMonth()
