@@ -59,21 +59,13 @@
 </template>
 
 <script setup lang="uts">
-// 优惠券类型定义
-type CouponType = {
-	id: string
-	title: string
-	imageUrl: string
-	beginAt: string
-	endAt: string
-	couponType: string
-	couponExplain: string
-}
+import { $api } from '@/api/index.uts'
+import { CustomerCouponItem } from '@/api/customer-coupons.uts'
 
 const exchangeCode = ref<string>('')
 const activeTabIndex = ref<number>(0)
-const coupons = ref<CouponType[]>([])
-const allCoupons = ref<CouponType[]>([])
+const coupons = ref<CustomerCouponItem[]>([])
+const allCoupons = ref<CustomerCouponItem[]>([])
 const detailModalVisible = ref<boolean>(false)
 const currentCouponIndex = ref<number>(-1)
 
@@ -105,15 +97,15 @@ const currentCouponExplain = computed((): string => {
 	return ''
 })
 
-const getCouponImage = (item: CouponType): string => {
+const getCouponImage = (item: CustomerCouponItem): string => {
 	return item.imageUrl
 }
 
-const getCouponTitle = (item: CouponType): string => {
+const getCouponTitle = (item: CustomerCouponItem): string => {
 	return item.title
 }
 
-const getCouponEndAt = (item: CouponType): string => {
+const getCouponEndAt = (item: CustomerCouponItem): string => {
 	return item.endAt
 }
 
@@ -121,10 +113,9 @@ const filterCoupons = () => {
 	if (activeTabIndex.value == 0) {
 		coupons.value = allCoupons.value
 	} else {
-		const typeValue = activeTabIndex.value.toString()
-		const filtered: CouponType[] = []
+		const filtered: CustomerCouponItem[] = []
 		for (let i = 0; i < allCoupons.value.length; i++) {
-			if (allCoupons.value[i].couponType == typeValue) {
+			if (allCoupons.value[i].couponType == activeTabIndex.value) {
 				filtered.push(allCoupons.value[i])
 			}
 		}
@@ -188,28 +179,8 @@ const showTip2 = () => {
 	})
 }
 
-onShow(() => {
-	// 模拟数据
-	allCoupons.value = [
-		{
-			id: '1',
-			title: '新人专享-任意饮品买一送一',
-			imageUrl: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png',
-			beginAt: '2024-01-01',
-			endAt: '2024-12-31',
-			couponType: '1',
-			couponExplain: '1. 本券限新用户使用\n2. 单次消费仅可使用一张\n3. 本券不可兑换现金'
-		},
-		{
-			id: '2',
-			title: '酒屋满100减20券',
-			imageUrl: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png',
-			beginAt: '2024-01-01',
-			endAt: '2024-12-31',
-			couponType: '2',
-			couponExplain: '1. 满100元可用\n2. 仅限酒屋商品使用\n3. 本券不可兑换现金'
-		}
-	] as CouponType[]
+onShow(async () => {
+	allCoupons.value = await $api<CustomerCouponItem[]>('customerCoupons')
 	filterCoupons()
 })
 </script>

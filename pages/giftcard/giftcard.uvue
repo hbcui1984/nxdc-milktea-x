@@ -62,23 +62,8 @@
 </template>
 
 <script setup lang="uts">
-// 主题类型定义
-type ThemeType = {
-	imageUrls: string
-	activityName: string
-}
-
-// 分类类型定义
-type CategoryType = {
-	name: string
-	themesList: ThemeType[]
-}
-
-// 礼品卡数据类型定义
-type GiftCardDataType = {
-	img: string
-	category_list: CategoryType[]
-}
+import { $api } from '@/api/index.uts'
+import { GiftCardsData, CategoryItem, ThemeItem } from '@/api/gift-cards.uts'
 
 // 我的礼品卡类型
 type MyCardType = {
@@ -88,7 +73,7 @@ type MyCardType = {
 }
 
 const giftCardImg = ref<string>('')
-const categoryList = ref<CategoryType[]>([])
+const categoryList = ref<CategoryItem[]>([])
 const currentTab = ref<number>(0)
 const giftCardType = ref<number>(0)
 const myCards = ref<MyCardType[]>([])
@@ -97,19 +82,19 @@ const myCardsEmpty = computed((): boolean => {
 	return myCards.value.length == 0
 })
 
-const getCategoryName = (category: CategoryType): string => {
+const getCategoryName = (category: CategoryItem): string => {
 	return category.name
 }
 
-const getThemesList = (category: CategoryType): ThemeType[] => {
+const getThemesList = (category: CategoryItem): ThemeItem[] => {
 	return category.themesList
 }
 
-const getThemeImage = (theme: ThemeType): string => {
+const getThemeImage = (theme: ThemeItem): string => {
 	return theme.imageUrls
 }
 
-const getThemeActivityName = (theme: ThemeType): string => {
+const getThemeActivityName = (theme: ThemeItem): string => {
 	return theme.activityName
 }
 
@@ -131,25 +116,10 @@ const onGiftCardTypeChange = (e: UniSwiperChangeEvent) => {
 	giftCardType.value = e.detail.current
 }
 
-onShow(() => {
-	// 模拟数据
-	giftCardImg.value = 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png'
-	categoryList.value = [
-		{
-			name: '节日专区',
-			themesList: [
-				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '新年快乐' },
-				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '情人节限定' }
-			]
-		},
-		{
-			name: '生日专区',
-			themesList: [
-				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '生日快乐' },
-				{ imageUrls: 'https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png', activityName: '生日祝福' }
-			]
-		}
-	] as CategoryType[]
+onShow(async () => {
+	const data = await $api<GiftCardsData>('giftCards')
+	giftCardImg.value = data.img
+	categoryList.value = data.category_list
 })
 </script>
 
