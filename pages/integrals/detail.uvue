@@ -1,7 +1,7 @@
 <template>
 	<view class="container position-relative">
 		<view style="padding-bottom: 150rpx;">
-			<view class="d-flex flex-column" v-if="pointGood.goods_type == 2">
+			<view class="d-flex flex-column" v-if="pointGood.exchange_type == 2">
 				<view class="bg-white mb-30">
 					<image :src="getFirstImage()" class="w-100" mode="widthFix"></image>
 					<view class="d-flex flex-column" style="padding: 30rpx;">
@@ -78,22 +78,9 @@
 </template>
 
 <script setup lang="uts">
-// 积分商品类型
-type PointGoodType = {
-	id: number
-	goods_name: string
-	points_price: number
-	amount: string
-	goods_stock: number
-	img: string[]
-	goods_type: number
-	exchange_desc: string
-}
-
-// 用户积分类型
-type CustomPointsType = {
-	totalPoints: number
-}
+import { $api } from '@/api/index.uts'
+import { CustomPointsData } from '@/api/custom-points.uts'
+import { PointsMallEntry, PointsMallItem } from '@/api/points-mall.uts'
 
 // 使用须知类型
 type UseTipType = {
@@ -101,16 +88,19 @@ type UseTipType = {
 	value: string
 }
 
-const customPoints = ref<CustomPointsType>({ totalPoints: 0 })
-const pointGood = ref<PointGoodType>({
+const customPoints = ref<CustomPointsData>({ soonExpiredPoints: 0, totalPoints: 0, expiredTime: null, foreverPoints: 0 })
+const pointGood = ref<PointsMallItem>({
 	id: 0,
 	goods_name: '',
 	points_price: 0,
 	amount: '0.00',
 	goods_stock: 0,
 	img: [],
-	goods_type: 1,
-	exchange_desc: ''
+	exchange_type: 1,
+	exchange_desc: '',
+	goods_id: '',
+	sort: 0,
+	status: 1
 })
 
 const useTips = ref<UseTipType[]>([
@@ -136,24 +126,23 @@ const getFirstImage = (): string => {
 	return '/static/images/integrals/ticket.png'
 }
 
-onLoad((option: OnLoadOptions) => {
+onLoad(async (option: OnLoadOptions) => {
 	const cate = option['cate'] ?? ''
 	const id = option['id'] ?? ''
-	// TODO: 根据 cate 和 id 获取商品详情
-	console.log('加载商品详情', cate, id)
-	
-	// 模拟数据
-	pointGood.value = {
-		id: parseInt(id),
-		goods_name: '软欧包免费券',
-		points_price: 800,
-		amount: '0.00',
-		goods_stock: 99665,
-		img: [],
-		goods_type: 1,
-		exchange_desc: '<p>兑换规则：会员可凭800积分兑换</p>'
+	customPoints.value = await $api<CustomPointsData>('customPoints')
+	const entries = await $api<PointsMallEntry[]>('pointsMall')
+	for (let i = 0; i < entries.length; i++) {
+		if (entries[i].key == cate) {
+			const items = entries[i].value
+			for (let j = 0; j < items.length; j++) {
+				if (items[j].id.toString() == id) {
+					pointGood.value = items[j]
+					break
+				}
+			}
+			break
+		}
 	}
-	customPoints.value = { totalPoints: 1200 }
 })
 </script>
 

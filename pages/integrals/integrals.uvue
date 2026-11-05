@@ -73,19 +73,10 @@
 
 <script setup lang="uts">
 import navbarBackButton from '@/components/navbar-back-button.uvue'
+import { $api } from '@/api/index.uts'
+import { CustomPointsData } from '@/api/custom-points.uts'
+import { PointsMallEntry, PointsMallItem } from '@/api/points-mall.uts'
 // uni-steps 组件已移除，使用简化显示
-
-// 积分商品类型
-type PointGoodItem = {
-	id: number
-	goods_name: string
-	points_price: number
-	amount: string
-	goods_stock: number
-	img: string[]
-	goods_type: number
-	exchange_desc: string | null
-}
 
 // 签到步骤类型
 type StepOption = {
@@ -95,23 +86,12 @@ type StepOption = {
 	circleStyle?: string
 }
 
-// 用户积分类型
-type CustomPointsType = {
-	totalPoints: number
-}
-
-// 积分商品条目类型
-type PointsMallEntry = {
-	key: string
-	value: PointGoodItem[]
-}
-
-const customPoints = ref<CustomPointsType>({ totalPoints: 0 })
+const customPoints = ref<CustomPointsData>({ soonExpiredPoints: 0, totalPoints: 0, expiredTime: null, foreverPoints: 0 })
 const stepsOption = ref<StepOption[]>([])
 const activeDay = ref<number>(0)
 const pointsMallEntries = ref<PointsMallEntry[]>([])
 
-const getItemImage = (item: PointGoodItem): string => {
+const getItemImage = (item: PointsMallItem): string => {
 	if (item.img.length > 0) {
 		return item.img[0]
 	}
@@ -138,10 +118,7 @@ const getStepsOptions = async () => {
 }
 
 const getPointsMall = async () => {
-	// TODO: 实现积分商城数据获取
-	// 模拟数据结构
-	const entries: PointsMallEntry[] = []
-	pointsMallEntries.value = entries
+	pointsMallEntries.value = await $api<PointsMallEntry[]>('pointsMall')
 }
 
 const attendance = () => {
@@ -162,11 +139,10 @@ const detail = (cate: string, id: number) => {
 	})
 }
 
-onLoad(() => {
+onLoad(async () => {
 	getStepsOptions()
-	getPointsMall()
-	// 模拟用户积分
-	customPoints.value = { totalPoints: 1200 }
+	await getPointsMall()
+	customPoints.value = await $api<CustomPointsData>('customPoints')
 })
 </script>
 
