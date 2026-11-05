@@ -230,7 +230,8 @@
 </template>
 
 <script setup lang="uts">
-import { state, isLogin, setOrderType, AddressType, StoreType } from '@/store/index.uts'
+import { state, isLogin, setOrderType, StoreType } from '@/store/index.uts'
+import { AddressData as AddressType } from '@/api/addresses.uts'
 import modal from '@/components/modal/modal.uvue'
 import popupLayer from '@/components/popup-layer/popup-layer.uvue'
 import { $api } from '@/api/index.uts'

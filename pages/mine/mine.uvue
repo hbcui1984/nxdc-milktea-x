@@ -168,7 +168,8 @@
 </template>
 
 <script setup lang="uts">
-import { state, isLogin, MemberType } from '@/store/index.uts'
+import { state, isLogin } from '@/store/index.uts'
+import { MemberData as MemberType } from '@/api/member.uts'
 
 const newIcon = ref<string>('https://img-shop.qmimg.cn/s16/images/2020/05/12/ffb0613dded704b6.png')
 

@@ -29,7 +29,8 @@
 </template>
 
 <script setup lang="uts">
-import { state, setAddress, setAddresses, setOrderType, AddressType } from '@/store/index.uts'
+import { state, setAddress, setAddresses, setOrderType } from '@/store/index.uts'
+import { AddressData as AddressType } from '@/api/addresses.uts'
 
 // 页面参数
 const scene = ref<string>('menu')
