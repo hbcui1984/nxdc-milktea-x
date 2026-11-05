@@ -1,0 +1,56 @@
+// 统一模拟数据访问层
+// 用法：const data = await $api<PackageItem[]>('packages')
+// 后续接入真实接口（如 uniCloud）时，只需修改本文件内部实现，页面无需改动
+import { mockPackages } from './packages.uts'
+import { mockStore } from './store.uts'
+import { mockGoods } from './goods.uts'
+import { mockLevelBenefits } from './level-benefits.uts'
+import { mockMember } from './member.uts'
+import { mockRechargeCards } from './rechargeCards.uts'
+import { mockAddresses } from './addresses.uts'
+import { mockAttendance } from './attendance.uts'
+import { mockCustomPoints } from './custom-points.uts'
+import { mockPointsMall } from './points-mall.uts'
+import { mockAttendanceList } from './attendance-list.uts'
+import { mockTodayAttendance } from './today-attendance.uts'
+import { mockOrders } from './orders.uts'
+import { mockCustomerCoupons } from './customer-coupons.uts'
+import { mockGiftCards } from './gift-cards.uts'
+
+export function $api<T>(name: string): Promise<T> {
+	return new Promise<T>((resolve, reject) => {
+		if (name == 'packages') {
+			resolve(mockPackages as T)
+		} else if (name == 'store') {
+			resolve(mockStore as T)
+		} else if (name == 'goods') {
+			resolve(mockGoods as T)
+		} else if (name == 'levelBenefits') {
+			resolve(mockLevelBenefits as T)
+		} else if (name == 'member') {
+			resolve(mockMember as T)
+		} else if (name == 'rechargeCards') {
+			resolve(mockRechargeCards as T)
+		} else if (name == 'addresses') {
+			resolve(mockAddresses as T)
+		} else if (name == 'attendance') {
+			resolve(mockAttendance as T)
+		} else if (name == 'customPoints') {
+			resolve(mockCustomPoints as T)
+		} else if (name == 'pointsMall') {
+			resolve(mockPointsMall as T)
+		} else if (name == 'attendanceList') {
+			resolve(mockAttendanceList as T)
+		} else if (name == 'todayAttendance') {
+			resolve(mockTodayAttendance as T)
+		} else if (name == 'orders') {
+			resolve(mockOrders as T)
+		} else if (name == 'customerCoupons') {
+			resolve(mockCustomerCoupons as T)
+		} else if (name == 'giftCards') {
+			resolve(mockGiftCards as T)
+		} else {
+			reject(new Error('未知的模拟数据名称: ' + name))
+		}
+	})
+}

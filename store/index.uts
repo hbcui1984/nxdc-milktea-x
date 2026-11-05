@@ -2,74 +2,17 @@
  * 全局状态管理 - uni-app x 版本
  * 使用 reactive 替代 Vuex
  */
+import { MemberData } from '@/api/member.uts'
+import { AddressData, DistrictInfo, mockAddresses } from '@/api/addresses.uts'
 
-// 会员信息类型
-export type MemberType = {
-	storeId: string | null
-	mobilePhone: string
-	nickname: string
-	avatar: string
-	country: string
-	cardName: string
-	memberLevel: number
-	city: string
-	cardNo: string
-	openingCardDate: string
-	customerId: string
-	district: string | null
-	unionId: string
-	address: string | null
-	storeName: string | null
-	gender: number
-	province: string
-	memberOrigin: string
-	username: string
-	memberLevelName: string
-	birthday: string
-	pointNum: number
-	couponNum: number
-	rechargeBalance: number | null
-	balance: number
-	giftBalance: number
-	expenseAmount: number | null
-	conditionType: number
-	ruleList: string | null
-	expiredTime: string | null
-	currentValue: number
-	level: number
-	cardUrl: string
-	needValue: number
-	max: boolean
-}
+// 会员信息类型（复用 api 数据层定义，避免重复维护）
+export type MemberType = MemberData
 
-// 地区信息类型
-export type DistrictType = {
-	districts: string
-	area: string
-	city: string
-	province: string
-}
+// 地区信息类型（复用 api 数据层定义）
+export type DistrictType = DistrictInfo
 
-// 地址类型
-export type AddressType = {
-	id: number
-	accept_name: string
-	mobile: string
-	province_name: string
-	area: number
-	city: number
-	sex: number
-	district: DistrictType
-	street: string
-	inner: boolean
-	lat: string
-	door_number: string
-	is_default: number
-	province: number
-	area_name: string
-	city_name: string
-	poiname: string
-}
+// 地址类型（复用 api 数据层定义）
+export type AddressType = AddressData
 
 // 门店类型
 export type StoreType = {
@@ -115,15 +58,17 @@ export type State = {
 }
 
 // 创建响应式状态
-export const state = reactive({
+const initialState: State = {
 	store: null,
 	cart: [],
 	orderType: 'takein',
 	address: null,
-	addresses: [],
+	addresses: mockAddresses.slice(),
 	member: null,
 	order: null
-} as State)
+}
+
+export const state = reactive(initialState)
 
 // Getters
 export const isLogin = computed((): boolean => {

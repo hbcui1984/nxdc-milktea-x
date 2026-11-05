@@ -1,4 +1,9 @@
 // 券包模拟数据
+export type CouponUseTime = {
+	use_time_start: string
+	use_time_end: string
+}
+
 export type CouponDetail = {
 	title: string
 	desc: string
@@ -6,6 +11,7 @@ export type CouponDetail = {
 	expire: string
 	coupon_amount: string
 	id: string
+	coupon_use_time: CouponUseTime[]
 }
 
 export type PackageCoupon = {
@@ -32,6 +38,7 @@ export type PackageItem = {
 	status: number
 	type: number
 	original_amount: string
+	content: string
 }
 
 export const mockPackages: PackageItem[] = [
@@ -54,7 +61,10 @@ export const mockPackages: PackageItem[] = [
 					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
 					expire: "领券当日开始30天内有效",
 					coupon_amount: "买A赠B券",
-					id: "451347890055233536"
+					id: "451347890055233536",
+					coupon_use_time: [
+						{ use_time_start: "00:00", use_time_end: "23:59" }
+					]
 				}
 			},
 			{
@@ -68,7 +78,10 @@ export const mockPackages: PackageItem[] = [
 					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
 					expire: "领券当日开始30天内有效",
 					coupon_amount: "现金券6元",
-					id: "451348136147632128"
+					id: "451348136147632128",
+					coupon_use_time: [
+						{ use_time_start: "00:00", use_time_end: "23:59" }
+					]
 				}
 			}
 		],
@@ -79,7 +92,8 @@ export const mockPackages: PackageItem[] = [
 		image: "https://images.qmai.cn/s23107/2020/03/30/36abfdcc24e07ac46e.png",
 		status: 1,
 		type: 1,
-		original_amount: "39.00"
+		original_amount: "39.00",
+		content: "【基本规则】\n1、成功购买后，优惠券可在奈雪点单小程序内使用或线下门店出示会员码使用。\n2、优惠券规则以优惠券使用详情为准。\n3、单笔订单仅限使用一张优惠券，且不与其他活动共享。\n4、用户购买券包使用的手机号需和小程序登录的会员手机号保持一致。\n5、如逾期未使用优惠券，优惠券将自动失效，请在有效期内使用。"
 	},
 	{
 		id: 188,
@@ -100,7 +114,10 @@ export const mockPackages: PackageItem[] = [
 					image: "https://img-shop.qmimg.cn/s23107/2019/10/09/ea5b8ed493c0cc310d.jpg",
 					expire: "领券当日开始15天内有效",
 					coupon_amount: "现金券5元",
-					id: "451347890055233537"
+					id: "451347890055233537",
+					coupon_use_time: [
+						{ use_time_start: "00:00", use_time_end: "23:59" }
+					]
 				}
 			}
 		],
@@ -111,6 +128,7 @@ export const mockPackages: PackageItem[] = [
 		image: "https://images.qmai.cn/s23107/2020/03/30/36abfdcc24e07ac46e.png",
 		status: 1,
 		type: 1,
-		original_amount: "50.00"
+		original_amount: "50.00",
+		content: "【基本规则】\n1、成功购买后，优惠券可在奈雪点单小程序内使用或线下门店出示会员码使用。\n2、优惠券规则以优惠券使用详情为准。\n3、单笔订单仅限使用一张优惠券，且不与其他活动共享。\n4、用户购买券包使用的手机号需和小程序登录的会员手机号保持一致。\n5、如逾期未使用优惠券，优惠券将自动失效，请在有效期内使用。"
 	}
 ]

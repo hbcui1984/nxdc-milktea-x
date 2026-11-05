@@ -16,12 +16,14 @@ export type CategoryItem = {
 
 export type GiftCardsData = {
 	banner_activity_id: number
+	img: string
 	content: string
 	category_list: CategoryItem[]
 }
 
 export const mockGiftCards: GiftCardsData = {
 	banner_activity_id: 38,
+	img: "https://img-shop.qmimg.cn/s16/images/2020/01/11/c1214fe339279c49.png",
 	content: "1.发售渠道：奈雪の茶心意卡券在"奈雪点单"小程序内独立发售...",
 	category_list: [
 		{

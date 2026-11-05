@@ -13,65 +13,72 @@ export type PointsMallItem = {
 	img: string[]
 }
 
-export type PointsMallData = {
-	[key: string]: PointsMallItem[]
+export type PointsMallEntry = {
+	key: string
+	value: PointsMallItem[]
 }
 
-export const mockPointsMall: PointsMallData = {
-	"奈雪好券": [
-		{
-			points_price: 800,
-			exchange_desc: "兑换规则：会员可凭800积分兑换"任意软欧包免费券"1件",
-			goods_id: "28910",
-			goods_name: "软欧包免费券",
-			goods_stock: 99665,
-			amount: "0.00",
-			id: 574,
-			exchange_type: 1,
-			sort: 6,
-			status: 1,
-			img: []
-		},
-		{
-			points_price: 800,
-			exchange_desc: "兑换规则：会员可凭800积分兑换"买一送一优惠券"1件",
-			goods_id: "28321",
-			goods_name: "买一送一券",
-			goods_stock: 97377,
-			amount: "0.00",
-			id: 380,
-			exchange_type: 1,
-			sort: 7,
-			status: 1,
-			img: []
-		},
-		{
-			points_price: 1000,
-			exchange_desc: "兑换规则：会员可凭1000积分兑换"任意茶饮免费券"1件",
-			goods_id: "28911",
-			goods_name: "茶饮免费券",
-			goods_stock: 99111,
-			amount: "0.00",
-			id: 433,
-			exchange_type: 1,
-			sort: 8,
-			status: 1,
-			img: []
-		}
-	],
-	"奈雪好物": [
-		{
-			points_price: 100,
-			exchange_desc: "夏日宝藏画框 - 奈雪独家定制画框",
-			goods_id: "641",
-			goods_name: "夏日宝藏挂画",
-			goods_stock: 100,
-			amount: "68.00",
-			id: 641,
-			exchange_type: 2,
-			sort: 9,
-			status: 1,
-			img: ["https://images.qmai.cn/s23107/2020/04/30/1399a8bee03f3dd13a.jpg"]
-		}
-	]
-}
+export const mockPointsMall: PointsMallEntry[] = [
+	{
+		key: "奈雪好券",
+		value: [
+			{
+				points_price: 800,
+				exchange_desc: "兑换规则：会员可凭800积分兑换"任意软欧包免费券"1件",
+				goods_id: "28910",
+				goods_name: "软欧包免费券",
+				goods_stock: 99665,
+				amount: "0.00",
+				id: 574,
+				exchange_type: 1,
+				sort: 6,
+				status: 1,
+				img: []
+			},
+			{
+				points_price: 800,
+				exchange_desc: "兑换规则：会员可凭800积分兑换"买一送一优惠券"1件",
+				goods_id: "28321",
+				goods_name: "买一送一券",
+				goods_stock: 97377,
+				amount: "0.00",
+				id: 380,
+				exchange_type: 1,
+				sort: 7,
+				status: 1,
+				img: []
+			},
+			{
+				points_price: 1000,
+				exchange_desc: "兑换规则：会员可凭1000积分兑换"任意茶饮免费券"1件",
+				goods_id: "28911",
+				goods_name: "茶饮免费券",
+				goods_stock: 99111,
+				amount: "0.00",
+				id: 433,
+				exchange_type: 1,
+				sort: 8,
+				status: 1,
+				img: []
+			}
+		]
+	},
+	{
+		key: "奈雪好物",
+		value: [
+			{
+				points_price: 100,
+				exchange_desc: "夏日宝藏画框 - 奈雪独家定制画框",
+				goods_id: "641",
+				goods_name: "夏日宝藏挂画",
+				goods_stock: 100,
+				amount: "68.00",
+				id: 641,
+				exchange_type: 2,
+				sort: 9,
+				status: 1,
+				img: ["https://images.qmai.cn/s23107/2020/04/30/1399a8bee03f3dd13a.jpg"]
+			}
+		]
+	}
+]
